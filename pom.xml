@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.library</groupId>
-	<artifactId>librarymanagement</artifactId>
+	<artifactId>library-management</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>library-management</name>
 	<description>Library Management website using Spring Boot</description>
