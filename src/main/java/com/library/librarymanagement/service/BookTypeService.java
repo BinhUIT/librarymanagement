@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.library.librarymanagement.request.BookTypeCreationRequest;
 import com.library.librarymanagement.request.BookTypeUpdateRequest;
+import com.library.librarymanagement.resource.ResourceStrings;
 import com.library.librarymanagement.entity.BookTypeImageData;
 import com.library.librarymanagement.entity.BookTypeImagePath;
 import com.library.librarymanagement.repository.BookTypeRepository;
@@ -15,8 +16,6 @@ import com.library.librarymanagement.ulti.File;
 
 @Service
 public final class BookTypeService {
-    private static final String IMAGE_FOLDER_PATH = "C:/Users/Snow/Desktop/Test";
-
     private final BookTypeRepository repository;
 
     @Autowired(required = true)
@@ -58,12 +57,12 @@ public final class BookTypeService {
     }
 
     public boolean createBookType(final BookTypeCreationRequest request) {
-        if ((request == null) || (this.repository == null) || (this.repository.existsByName(request.getName()))) {
+        if ((request == null) || (this.repository == null) || (ResourceStrings.DIR_BOOK_TYPE_IMAGE == null)
+                || (this.repository.existsByName(request.getName()))) {
             return false;
         }
 
-        var newImagePath = String.format("%s/%s/%s", IMAGE_FOLDER_PATH, "BookType",
-                request.getName());
+        var newImagePath = String.format("%s/%s", ResourceStrings.DIR_BOOK_TYPE_IMAGE, request.getName());
         var newImageFile = new File(newImagePath);
         if (!newImageFile.createAndWrite(request.getImageData())) {
             return false;
@@ -76,7 +75,7 @@ public final class BookTypeService {
     }
 
     public boolean updateBookType(final BookTypeUpdateRequest request) {
-        if ((request == null) || (this.repository == null)) {
+        if ((request == null) || (this.repository == null) || (ResourceStrings.DIR_BOOK_TYPE_IMAGE == null)) {
             return false;
         }
 
@@ -86,8 +85,7 @@ public final class BookTypeService {
         }
 
         var oldImagePath = bookType.getImagePath();
-        var newImagePath = String.format("%s/%s/%s", IMAGE_FOLDER_PATH, "BookType",
-                request.getName());
+        var newImagePath = String.format("%s/%s", ResourceStrings.DIR_BOOK_TYPE_IMAGE, request.getName());
         if (oldImagePath == null || newImagePath == null) {
             return false;
         }

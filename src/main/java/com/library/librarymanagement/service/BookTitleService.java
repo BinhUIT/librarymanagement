@@ -9,28 +9,22 @@ import org.springframework.stereotype.Service;
 
 import com.library.librarymanagement.request.BookTitleCreationRequest;
 import com.library.librarymanagement.request.BookTitleUpdateRequest;
-import com.library.librarymanagement.config.DotenvConfig;
+import com.library.librarymanagement.resource.ResourceStrings;
 import com.library.librarymanagement.entity.BookTitleImagePath;
 import com.library.librarymanagement.repository.BookTitleRepository;
 import com.library.librarymanagement.repository.BookTypeRepository;
 import com.library.librarymanagement.ulti.File;
 
-import io.github.cdimascio.dotenv.Dotenv;
-
 @Service
 public final class BookTitleService {
-    private static final String IMAGE_FOLDER_PATH = "C:/Users/Snow/Desktop/Test";
-
     private final BookTitleRepository bookTitleRepository;
     private final BookTypeRepository bookTypeRepository;
-    private final Dotenv dotenv;
 
     @Autowired(required = true)
     private BookTitleService(final BookTitleRepository bookTitleRepository,
-            final BookTypeRepository bookTypeRepository, final Dotenv dotenv) {
+            final BookTypeRepository bookTypeRepository) {
         this.bookTitleRepository = bookTitleRepository;
         this.bookTypeRepository = bookTypeRepository;
-        this.dotenv = dotenv;
     }
 
     public List<BookTitleImagePath> getBookTitles(final Integer start, final Integer amount) {
@@ -55,7 +49,7 @@ public final class BookTitleService {
     }
 
     public boolean createBookTitle(final BookTitleCreationRequest request) {
-        if ((this.bookTitleRepository == null) || (request == null)
+        if ((this.bookTitleRepository == null) || (request == null) || (ResourceStrings.DIR_BOOK_TITLE_IMAGE == null)
                 || this.bookTitleRepository.existsByName(request.getName())) {
             return false;
         }
@@ -65,7 +59,7 @@ public final class BookTitleService {
             return false;
         }
 
-        var newImagePath = String.format("%s/%s/%s", IMAGE_FOLDER_PATH, "BookTitle", request.getName());
+        var newImagePath = String.format("%s/%s", ResourceStrings.DIR_BOOK_TITLE_IMAGE, request.getName());
         var newImageFile = new File(newImagePath);
         if (!newImageFile.createAndWrite(request.getImageData())) {
             return false;
@@ -79,7 +73,8 @@ public final class BookTitleService {
     }
 
     public boolean updateBookTitle(final BookTitleUpdateRequest request) {
-        if ((request == null) || (this.bookTitleRepository == null) || (this.bookTypeRepository == null)) {
+        if ((request == null) || (this.bookTitleRepository == null) || (this.bookTypeRepository == null)
+                || (ResourceStrings.DIR_BOOK_TITLE_IMAGE == null)) {
             return false;
         }
 
@@ -94,7 +89,7 @@ public final class BookTitleService {
         }
 
         var oldImagePath = bookTitleImagePath.getImagePath();
-        var newImagePath = String.format("%s/%s/%s", IMAGE_FOLDER_PATH, "BookTitle", request.getName());
+        var newImagePath = String.format("%s/%s", ResourceStrings.DIR_BOOK_TITLE_IMAGE, request.getName());
         if (oldImagePath == null || newImagePath == null) {
             return false;
         }
