@@ -23,7 +23,7 @@ public final class BookTypeService {
         this.repository = repository;
     }
 
-    public List<BookTypeImageData> getBookTypes() {
+    public List<BookTypeImageData> getAllBookTypes() {
         List<BookTypeImageData> result = new ArrayList<>();
 
         if (this.repository != null) {

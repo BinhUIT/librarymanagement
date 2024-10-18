@@ -1,5 +1,7 @@
 package com.library.librarymanagement.entity;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.library.librarymanagement.databind.ByteArraySerializer;
 import com.library.librarymanagement.ulti.File;
 
 public final class BookTitleImageData {
@@ -11,10 +13,11 @@ public final class BookTitleImageData {
 
     private Integer amountRemaining = null;
 
-    private BookTypeImagePath type = null;
+    private BookTypeImageData type = null;
 
     private String author = null;
 
+    @JsonSerialize(using = ByteArraySerializer.class)
     private byte[] imageData = null;
 
     public BookTitleImageData(final BookTitleImagePath bookTitleImagePath) {
@@ -22,6 +25,7 @@ public final class BookTitleImageData {
         this.name = bookTitleImagePath.getName();
         this.amount = bookTitleImagePath.getAmount();
         this.amountRemaining = bookTitleImagePath.getAmountRemaining();
+        this.type = new BookTypeImageData(bookTitleImagePath.getType());
         this.author = bookTitleImagePath.getAuthor();
 
         final var file = new File(bookTitleImagePath.getImagePath());
@@ -48,11 +52,11 @@ public final class BookTitleImageData {
         return this.amountRemaining;
     }
 
-    public BookTypeImagePath getType() {
+    public BookTypeImageData getType() {
         return this.type;
     }
 
-    public void setType(final BookTypeImagePath type) {
+    public void setType(final BookTypeImageData type) {
         this.type = type;
     }
 

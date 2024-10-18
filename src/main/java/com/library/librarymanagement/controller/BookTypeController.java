@@ -24,14 +24,14 @@ public final class BookTypeController {
     private final BookTypeService service;
 
     @Autowired(required = true)
-    public BookTypeController(final BookTypeService service) {
+    private BookTypeController(final BookTypeService service) {
         this.service = service;
     }
 
     @GetMapping
-    public List<BookTypeImageData> getBookTypes() {
+    public List<BookTypeImageData> getAllBookTypes() {
         try {
-            return this.service.getBookTypes();
+            return this.service.getAllBookTypes();
         } catch (final Exception exception) {
             return Collections.emptyList();
         }

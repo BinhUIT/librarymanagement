@@ -2,6 +2,7 @@ package com.library.librarymanagement.service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.library.librarymanagement.request.BookTitleCreationRequest;
 import com.library.librarymanagement.request.BookTitleUpdateRequest;
 import com.library.librarymanagement.resource.ResourceStrings;
+import com.library.librarymanagement.entity.BookTitleImageData;
 import com.library.librarymanagement.entity.BookTitleImagePath;
 import com.library.librarymanagement.repository.BookTitleRepository;
 import com.library.librarymanagement.repository.BookTypeRepository;
@@ -27,7 +29,7 @@ public final class BookTitleService {
         this.bookTypeRepository = bookTypeRepository;
     }
 
-    public List<BookTitleImagePath> getBookTitles(final Integer start, final Integer amount) {
+    private List<BookTitleImagePath> getBookTitlesImagePathByPage(final Integer start, final Integer amount) {
         List<BookTitleImagePath> result = Collections.emptyList();
 
         if ((this.bookTitleRepository != null) && (start >= 0) && (amount > 0)) {
@@ -38,11 +40,33 @@ public final class BookTitleService {
         return result;
     }
 
-    public BookTitleImagePath getBookTitleImagePathById(final Integer id) {
+    public List<BookTitleImageData> getBookTitlesImageDataByPage(final Integer start, final Integer amount) {
+        List<BookTitleImageData> result = new ArrayList<>();
+
+        final var listBookTitleImagePath = this.getBookTitlesImagePathByPage(start, amount);
+        for (final var bookTitleImagePath : listBookTitleImagePath) {
+            result.add(new BookTitleImageData(bookTitleImagePath));
+        }
+
+        return result;
+    }
+
+    private BookTitleImagePath getBookTitleImagePathById(final Integer id) {
         BookTitleImagePath result = null;
 
         if ((this.bookTitleRepository != null) && (id != null)) {
             result = this.bookTitleRepository.findById(id).orElse(null);
+        }
+
+        return result;
+    }
+
+    public BookTitleImageData getBookTitleImageDataById(final Integer id) {
+        BookTitleImageData result = null;
+
+        final var bookTitleImagePath = this.getBookTitleImagePathById(id);
+        if (bookTitleImagePath != null) {
+            result = new BookTitleImageData(bookTitleImagePath);
         }
 
         return result;
