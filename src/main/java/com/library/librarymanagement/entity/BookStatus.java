@@ -12,7 +12,7 @@ import lombok.experimental.FieldNameConstants;
 
 @Entity
 @FieldNameConstants
-@Table(name = "BookStatis")
+@Table(name = "BookStatus")
 public final class BookStatus {
     @Id
     @Column(name = "id", columnDefinition = "tinyint", nullable = false, unique = true, insertable = false, updatable = false)
