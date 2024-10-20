@@ -1,5 +1,7 @@
 package com.library.librarymanagement.request;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 import jakarta.validation.constraints.NotNull;
 
 public final class BookTitleUpdateRequest {
@@ -14,6 +16,7 @@ public final class BookTitleUpdateRequest {
 
     private byte[] imageData = null;
 
+    @JsonCreator
     public BookTitleUpdateRequest(final Integer id, final String name, final Short typeId, final String author,
             final byte[] imageData) {
         this.id = id;

@@ -1,5 +1,7 @@
 package com.library.librarymanagement.request;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -10,6 +12,7 @@ public final class BookTypeCreationRequest {
     @NotNull(message = "BookType Image in creation request cannot be null!")
     private byte[] imageData = null;
 
+    @JsonCreator
     public BookTypeCreationRequest(final String name, final byte[] image) {
         this.name = name;
 

@@ -1,5 +1,7 @@
 package com.library.librarymanagement.request;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 import jakarta.validation.constraints.NotNull;
 
 public final class BookStatusUpdateRequest {
@@ -8,7 +10,8 @@ public final class BookStatusUpdateRequest {
 
     private String name = null;
 
-    public BookStatusUpdateRequest(Byte id, String name) {
+    @JsonCreator
+    public BookStatusUpdateRequest(final Byte id, final String name) {
         this.id = id;
         this.name = name;
     }
