@@ -21,15 +21,17 @@ public final class BookTitleImageData {
     private byte[] imageData = null;
 
     public BookTitleImageData(final BookTitleImagePath bookTitleImagePath) {
-        this.id = bookTitleImagePath.getId();
-        this.name = bookTitleImagePath.getName();
-        this.amount = bookTitleImagePath.getAmount();
-        this.amountRemaining = bookTitleImagePath.getAmountRemaining();
-        this.type = new BookTypeImageData(bookTitleImagePath.getType());
-        this.author = bookTitleImagePath.getAuthor();
+        if (bookTitleImagePath != null) {
+            this.id = bookTitleImagePath.getId();
+            this.name = bookTitleImagePath.getName();
+            this.amount = bookTitleImagePath.getAmount();
+            this.amountRemaining = bookTitleImagePath.getAmountRemaining();
+            this.type = new BookTypeImageData(bookTitleImagePath.getType());
+            this.author = bookTitleImagePath.getAuthor();
 
-        final var file = new File(bookTitleImagePath.getImagePath());
-        this.imageData = file.readBytes();
+            final var file = new File(bookTitleImagePath.getImagePath());
+            this.imageData = file.readBytes();
+        }
     }
 
     public Integer getId() {

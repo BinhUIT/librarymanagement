@@ -29,7 +29,7 @@ public final class BookTitleService {
         this.bookTypeRepository = bookTypeRepository;
     }
 
-    private List<BookTitleImagePath> getBookTitlesImagePathByPage(final Integer start, final Integer amount) {
+    public List<BookTitleImagePath> getBookTitlesImagePathByPage(final Integer start, final Integer amount) {
         List<BookTitleImagePath> result = Collections.emptyList();
 
         if ((this.bookTitleRepository != null) && (start >= 0) && (amount > 0)) {
@@ -51,7 +51,7 @@ public final class BookTitleService {
         return result;
     }
 
-    private BookTitleImagePath getBookTitleImagePathById(final Integer id) {
+    public BookTitleImagePath getBookTitleImagePathById(final Integer id) {
         BookTitleImagePath result = null;
 
         if ((this.bookTitleRepository != null) && (id != null)) {
