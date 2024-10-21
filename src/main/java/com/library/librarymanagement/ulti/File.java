@@ -80,7 +80,7 @@ public class File {
 
     public byte[] readBytes() {
         try {
-            var result = new byte[] {};
+            byte[] result = null;
 
             if (this.core != null) {
                 result = Files.readAllBytes(this.core.toPath());
@@ -88,7 +88,7 @@ public class File {
 
             return result;
         } catch (final Throwable throwable) {
-            return new byte[] {};
+            return null;
         }
     }
 }
