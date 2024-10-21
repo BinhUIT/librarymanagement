@@ -19,7 +19,7 @@ public final class BookTypeImageData {
             this.name = bookTypeImagePath.getName();
 
             final File file = new File(bookTypeImagePath.getImagePath());
-            imageData = file.readBytes();
+            this.imageData = file.readBytes();
         }
     }
 

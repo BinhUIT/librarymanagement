@@ -18,7 +18,15 @@ public class File {
 
     public boolean create() {
         try {
-            return this.core.createNewFile();
+            final boolean result;
+
+            if (this.core != null) {
+                result = this.core.createNewFile();
+            } else {
+                result = false;
+            }
+
+            return result;
         } catch (final Throwable throwable) {
             return false;
         }
@@ -27,7 +35,15 @@ public class File {
     @Nullable
     public Boolean isExisted() {
         try {
-            return this.core.exists();
+            final Boolean result;
+
+            if (this.core != null) {
+                result = this.core.exists();
+            } else {
+                result = null;
+            }
+
+            return result;
         } catch (final Throwable throwable) {
             return null;
         }
@@ -36,7 +52,15 @@ public class File {
     @Nullable
     public Boolean isModifiable() {
         try {
-            return this.core.canWrite();
+            final boolean result;
+
+            if (this.core != null) {
+                result = this.core.canWrite();
+            } else {
+                result = false;
+            }
+
+            return result;
         } catch (final Throwable throwable) {
             return null;
         }
@@ -44,7 +68,15 @@ public class File {
 
     public boolean delete() {
         try {
-            return this.core.delete();
+            final boolean result;
+
+            if (this.core != null) {
+                result = this.core.delete();
+            } else {
+                result = false;
+            }
+
+            return result;
         } catch (final Throwable throwable) {
             return false;
         }
@@ -78,12 +110,28 @@ public class File {
         return this.write(bytes);
     }
 
+    public boolean renameTo(final File dest) {
+        try {
+            boolean result = false;
+
+            if ((this.core != null) && (dest.core != null)) {
+                result = this.core.renameTo(dest.core);
+            }
+
+            return result;
+        } catch (final Throwable throwable) {
+            return false;
+        }
+    }
+
     public byte[] readBytes() {
         try {
-            byte[] result = null;
+            final byte[] result;
 
             if (this.core != null) {
                 result = Files.readAllBytes(this.core.toPath());
+            } else {
+                result = null;
             }
 
             return result;

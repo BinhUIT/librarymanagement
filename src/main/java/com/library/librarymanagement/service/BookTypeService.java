@@ -5,6 +5,10 @@ import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import com.library.librarymanagement.request.BookTypeCreationRequest;
 import com.library.librarymanagement.request.BookTypeUpdateRequest;
@@ -17,10 +21,12 @@ import com.library.librarymanagement.ulti.File;
 @Service
 public final class BookTypeService {
     private final BookTypeRepository repository;
+    private PlatformTransactionManager transactionManager;
 
     @Autowired(required = true)
-    public BookTypeService(final BookTypeRepository repository) {
+    public BookTypeService(final BookTypeRepository repository, final PlatformTransactionManager transactionManager) {
         this.repository = repository;
+        this.transactionManager = transactionManager;
     }
 
     public List<BookTypeImageData> getAllBookTypes() {
@@ -56,58 +62,188 @@ public final class BookTypeService {
         return result;
     }
 
+    public boolean isInValidState() {
+        return (this.repository != null) && (this.transactionManager != null)
+                && (ResourceStrings.DIR_BOOK_TYPE_IMAGE != null);
+    }
+
     public boolean createBookType(final BookTypeCreationRequest request) {
-        if ((request == null) || (this.repository == null) || (ResourceStrings.DIR_BOOK_TYPE_IMAGE == null)
-                || (this.repository.existsByName(request.getName()))) {
-            return false;
+        boolean result = false;
+
+        final String newBookTypeName;
+        if ((request != null) && this.isInValidState()) {
+            newBookTypeName = request.getName();
+        } else {
+            newBookTypeName = null;
         }
 
-        var newImagePath = String.format("%s/%s", ResourceStrings.DIR_BOOK_TYPE_IMAGE, request.getName());
-        var newImageFile = new File(newImagePath);
-        if (!newImageFile.createAndWrite(request.getImageData())) {
-            return false;
+        final String newImagePath;
+        if (newBookTypeName != null) {
+            newImagePath = String.format("%s/%s", ResourceStrings.DIR_BOOK_TYPE_IMAGE, request.getName());
+        } else {
+            newImagePath = null;
         }
 
-        final var newBookType = new BookTypeImagePath(request.getName(), newImagePath);
-        this.repository.save(newBookType);
+        final File newImageFile;
+        if (newImagePath != null) {
+            newImageFile = new File(newImagePath);
+        } else {
+            newImageFile = null;
+        }
 
-        return true;
+        final byte[] imageData;
+        if ((newImageFile != null) && Boolean.FALSE.equals(newImageFile.isExisted())) {
+            imageData = request.getImageData();
+        } else {
+            imageData = null;
+        }
+
+        final TransactionStatus transactionStatus;
+        if (imageData != null) {
+            final var defaultTransactionDefinition = new DefaultTransactionDefinition();
+            defaultTransactionDefinition.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+            transactionStatus = transactionManager.getTransaction(defaultTransactionDefinition);
+        } else {
+            transactionStatus = null;
+        }
+
+        if (transactionStatus != null) {
+            this.repository.save(new BookTypeImagePath(newBookTypeName, newImagePath));
+            if (newImageFile.createAndWrite(imageData)) {
+                this.transactionManager.commit(transactionStatus);
+                result = true;
+            } else {
+                newImageFile.delete();
+                this.transactionManager.rollback(transactionStatus);
+            }
+        }
+
+        return result;
     }
 
     public boolean updateBookType(final BookTypeUpdateRequest request) {
-        if ((request == null) || (this.repository == null) || (ResourceStrings.DIR_BOOK_TYPE_IMAGE == null)) {
-            return false;
+        boolean result = false;
+
+        final Short bookTypeImagePathId;
+        if ((request != null) && this.isInValidState()) {
+            bookTypeImagePathId = request.getId();
+        } else {
+            bookTypeImagePathId = null;
         }
 
-        var bookType = this.getBookTypeImagePathById(request.getId());
-        if (bookType == null) {
-            return false;
+        final BookTypeImagePath bookTypeImagePath;
+        if (bookTypeImagePathId != null) {
+            bookTypeImagePath = this.repository.findById(bookTypeImagePathId).orElse(null);
+        } else {
+            bookTypeImagePath = null;
         }
 
-        var oldImagePath = bookType.getImagePath();
-        var newImagePath = String.format("%s/%s", ResourceStrings.DIR_BOOK_TYPE_IMAGE, request.getName());
-        if (oldImagePath == null || newImagePath == null) {
-            return false;
+        final TransactionStatus transactionStatus;
+        if (bookTypeImagePath != null) {
+            final var defaultTransactionDefinition = new DefaultTransactionDefinition();
+            defaultTransactionDefinition.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+            transactionStatus = this.transactionManager.getTransaction(defaultTransactionDefinition);
+        } else {
+            transactionStatus = null;
         }
 
-        var oldImageFile = new File(oldImagePath);
-        if (newImagePath.equals(oldImagePath)) {
-            return oldImageFile.write(request.getImageData());
-        }
-        if (Boolean.TRUE.equals(oldImageFile.isExisted()) && Boolean.FALSE.equals(oldImageFile.isModifiable())) {
-            return false;
+        final String bookTypeImagePathName;
+        if (transactionStatus != null) {
+            final var oldName = bookTypeImagePath.getName();
+            final var newName = request.getName();
+
+            if ((newName != null) && (!newName.equals(oldName))) {
+                bookTypeImagePath.setName(newName);
+            }
+
+            bookTypeImagePathName = bookTypeImagePath.getName();
+        } else {
+            bookTypeImagePathName = null;
         }
 
-        var newImageFile = new File(newImagePath);
-        if ((!newImageFile.createAndWrite(request.getImageData())) || (!oldImageFile.delete())) {
-            newImageFile.delete();
-            return false;
+        final String oldImagePath;
+        final String newImagePath;
+        if (bookTypeImagePathName != null) {
+            oldImagePath = bookTypeImagePath.getImagePath();
+            newImagePath = String.format("%s/%s", ResourceStrings.DIR_BOOK_TYPE_IMAGE, bookTypeImagePathName);
+        } else {
+            oldImagePath = null;
+            newImagePath = null;
         }
 
-        bookType.setName(request.getName());
-        bookType.setImagePath(newImagePath);
-        this.repository.save(bookType);
+        final File oldImageFile;
+        final File newImageFile;
+        if (newImagePath != null) {
+            final var tempOldImageFile = new File(oldImagePath);
+            final var tempNewImageFile = new File(newImagePath);
+            final boolean samePath = newImagePath.equals(oldImagePath);
 
-        return true;
+            if ((!samePath) && Boolean.TRUE.equals(tempNewImageFile.isExisted())) {
+                oldImageFile = null;
+                newImageFile = null;
+            } else if (samePath && Boolean.TRUE.equals(tempOldImageFile.isExisted())) {
+                oldImageFile = tempOldImageFile;
+                newImageFile = null;
+            } else if (Boolean.FALSE.equals(tempOldImageFile.isExisted())) {
+                oldImageFile = null;
+                newImageFile = tempNewImageFile;
+            } else {
+                oldImageFile = tempOldImageFile;
+                newImageFile = tempNewImageFile;
+            }
+        } else {
+            oldImageFile = null;
+            newImageFile = null;
+        }
+
+        if (newImageFile != null) {
+            bookTypeImagePath.setImagePath(newImagePath);
+        }
+
+        if (transactionStatus != null) {
+            this.repository.save(bookTypeImagePath);
+
+            final boolean fileCorrected;
+            if ((newImageFile != null) && (oldImageFile != null)) {
+                fileCorrected = oldImageFile.renameTo(newImageFile);
+            } else if (newImageFile != null) {
+                fileCorrected = newImageFile.create();
+            } else if (oldImageFile != null) {
+                fileCorrected = true;
+            } else {
+                fileCorrected = false;
+            }
+
+            if (fileCorrected) {
+                final var imageData = request.getImageData();
+
+                if (imageData == null) {
+                    result = true;
+                } else if (newImageFile != null) {
+                    result = newImageFile.write(imageData);
+                } else if (oldImageFile != null) {
+                    result = oldImageFile.write(imageData);
+                } else {
+                    // Do nothing...
+                }
+            }
+
+            if (result) {
+                this.transactionManager.commit(transactionStatus);
+            } else {
+                this.transactionManager.rollback(transactionStatus);
+
+                if (fileCorrected && newImageFile != null) {
+                    if (oldImageFile != null) {
+                        newImageFile.renameTo(oldImageFile);
+                    } else {
+                        newImageFile.delete();
+                    }
+                }
+            }
+        }
+
+        return result;
     }
+
 }
