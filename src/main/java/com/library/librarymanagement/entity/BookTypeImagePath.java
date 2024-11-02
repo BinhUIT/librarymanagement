@@ -46,6 +46,15 @@ public final class BookTypeImagePath {
         this.name = name;
     }
 
+    public boolean setNameIfNotNull(final String name) {
+        if (name != null) {
+            this.name = name;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public String getImagePath() {
         return this.imagePath;
     }

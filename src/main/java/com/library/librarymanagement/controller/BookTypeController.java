@@ -40,7 +40,7 @@ public final class BookTypeController {
     @GetMapping("/details")
     public BookTypeImageData getBookTypeById(@RequestParam("id") final String idString) {
         try {
-            return this.service.getBookTypeImageById(Short.valueOf(idString));
+            return this.service.getBookTypeImageDataById(Short.valueOf(idString));
         } catch (final Exception exception) {
             return null;
         }
@@ -49,7 +49,7 @@ public final class BookTypeController {
     @GetMapping(value = "/image", produces = MediaType.IMAGE_PNG_VALUE)
     public byte[] getImageBookTypeById(@RequestParam("id") final String idString) {
         try {
-            final var bookTypeImage = this.service.getBookTypeImageById(Short.valueOf(idString));
+            final var bookTypeImage = this.service.getBookTypeImageDataById(Short.valueOf(idString));
             return bookTypeImage.getImageData().clone();
         } catch (final Exception exception) {
             return new byte[] {};
@@ -73,5 +73,4 @@ public final class BookTypeController {
             return false;
         }
     }
-
 }
