@@ -41,6 +41,7 @@ public class TokenSecurity {
             token = token +Integer.toString(user.getUserId());
         }
         addToTableToken(token);
+        token=Integer.toString(user.getRole())+token;
         return token;
     }   
     public void addToTableToken(String token) 
@@ -88,6 +89,10 @@ public class TokenSecurity {
         }  
         return true;
         
+    } 
+    public int extractRole(String token) 
+    {  
+        return Character.getNumericValue(token.charAt(0));
     }
     
 

@@ -6,20 +6,22 @@ public class RegisterRequest {
     private String phoneNumber; 
     private String email; 
     private String password; 
-    private String repeatPassword; 
+    private String repeatPassword;  
+    private int role;
 
     public RegisterRequest() 
     {
 
     } 
-    public RegisterRequest(String fullName, String address, String phoneNumber, String email, String password, String repeatPassword) 
+    public RegisterRequest(String fullName, String address, String phoneNumber, String email, String password, String repeatPassword, int role) 
     { 
         this.fullName=fullName; 
         this.address=address; 
         this.phoneNumber = phoneNumber; 
         this.email=email; 
         this.password=password; 
-        this.repeatPassword = repeatPassword; 
+        this.repeatPassword = repeatPassword;  
+        this.role=role;
 
     } 
     public String getFullName() 
@@ -46,6 +48,10 @@ public class RegisterRequest {
     public String getRepeatPassword() 
     {
         return this.repeatPassword;
+    } 
+    public int getRole() 
+    {
+        return this.role;
     }
 
 }

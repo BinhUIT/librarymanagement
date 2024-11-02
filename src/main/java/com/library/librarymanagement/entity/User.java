@@ -32,8 +32,8 @@ public class User {
     @Column(name="PASSWORD", columnDefinition="varchar(100) not null", nullable=false) 
     private String password; 
 
-    @Column(name="ROLE", columnDefinition="boolean not null", nullable=false)
-    private boolean role; 
+    @Column(name="ROLE", columnDefinition="int not null", nullable=false)
+    private int role; 
 
     @Column(name="VERIFICATIONCODE", columnDefinition="varchar(100) not null", nullable=false)
     private String verificationCode;
@@ -42,7 +42,7 @@ public class User {
     {
 
     } 
-    public User(int userId, String fullName, String address, String phoneNumber, String email, boolean enable, String password, boolean role, String verificationCode) { 
+    public User(int userId, String fullName, String address, String phoneNumber, String email, boolean enable, String password, int role, String verificationCode) { 
         this.userId= userId; 
         this.fullName=fullName;
         this.address=address;
@@ -109,11 +109,11 @@ public class User {
     {
         this.password=password;
     } 
-    public boolean getRole() 
+    public int getRole() 
     {
         return this.role;
     } 
-    public void setRole(boolean role) 
+    public void setRole(int role) 
     {
         this.role=role; 
     } 

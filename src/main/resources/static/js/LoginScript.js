@@ -22,7 +22,7 @@ async function login()
     else { 
         localStorage.setItem("userId", responseData.userId); 
         localStorage.setItem("token", responseData.token); 
-        
+        localStorage.setItem('role', responseData.role);
         window.location.href="http://localhost:8080/Test/homePage";
     } 
 

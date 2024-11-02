@@ -6,7 +6,8 @@ async function register()
         phoneNumber: document.getElementById("phoneNumber_register").value,
         email: document.getElementById("email_register").value,
         password: document.getElementById("password_register").value,
-        repeatPassword: document.getElementById("repeatPassword_register").value
+        repeatPassword: document.getElementById("repeatPassword_register").value,
+        role:0
     }; 
     let response = await fetch(
         "http://localhost:8080/Test/register", { 

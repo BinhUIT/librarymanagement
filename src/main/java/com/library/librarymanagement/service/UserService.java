@@ -58,21 +58,21 @@ public class UserService {
         }  
         if(user==null) 
         {
-            return new ResponseEntity<>(new LoginResponse(-1,"Fullname or email is not correct"), HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(new LoginResponse(-1,"Fullname or email is not correct",-1), HttpStatus.UNAUTHORIZED);
         } 
         if(user.getEnable()==false) 
         {
-            return new ResponseEntity<>(new LoginResponse(-1,"You can not use this account"), HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(new LoginResponse(-1,"You can not use this account",-1), HttpStatus.UNAUTHORIZED);
         } 
         
 
         String pass = BCrypt.hashpw(request.getPassword(), bcryptSalt.getSalt()); 
         if(!pass.equals(user.getPassword())) 
         {
-            return new ResponseEntity<>(new LoginResponse(-1,"Wrong password"), HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(new LoginResponse(-1,"Wrong password",-1), HttpStatus.UNAUTHORIZED);
         }  
         String token=tokenSecurity.generateToken(user.getFullname());
-        return new ResponseEntity<>(new LoginResponse(user.getUserId(), token), HttpStatus.OK);
+        return new ResponseEntity<>(new LoginResponse(user.getUserId(), token, user.getRole()), HttpStatus.OK);
 
 
 
@@ -297,9 +297,9 @@ public class UserService {
 
     public boolean checkEmail(String email) 
     {
-        Pattern pattern = Pattern.compile("^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$ "); 
-        Matcher matcher = pattern.matcher(email); 
-        return matcher.find();
+        //Pattern pattern = Pattern.compile("^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$ "); 
+        //Matcher matcher = pattern.matcher(email); 
+        return email.contains("@");
     } 
     public boolean checkUserName(String fullname) 
     { 
