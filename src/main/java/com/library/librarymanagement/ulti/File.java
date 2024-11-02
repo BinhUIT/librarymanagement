@@ -91,6 +91,14 @@ public class File {
         }
     }
 
+    public boolean writeIfBytesNotNull(final byte[] bytes) {
+        if (bytes != null) {
+            return this.write(bytes);
+        } else {
+            return true;
+        }
+    }
+
     public boolean createAndWrite(final byte[] bytes) {
         boolean result = false;
 
