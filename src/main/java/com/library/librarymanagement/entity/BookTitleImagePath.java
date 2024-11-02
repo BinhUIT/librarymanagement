@@ -68,12 +68,29 @@ public final class BookTitleImagePath {
         this.name = name;
     }
 
+    public boolean setNameIfNotNull(final String name) {
+        if (name != null) {
+            this.name = name;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public Integer getAmount() {
         return this.amount;
     }
 
+    public void setAmount(final Integer amount) {
+        this.amount = amount;
+    }
+
     public Integer getAmountRemaining() {
         return this.amountRemaining;
+    }
+
+    public void setAmountRemaining(final Integer amountRemaining) {
+        this.amountRemaining = amountRemaining;
     }
 
     public BookTypeImagePath getType() {
@@ -84,12 +101,30 @@ public final class BookTitleImagePath {
         this.type = type;
     }
 
+    public boolean setTypeIfNotNull(final BookTypeImagePath type) {
+        if (type != null) {
+            this.type = type;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public String getAuthor() {
         return this.author;
     }
 
     public void setAuthor(final String author) {
         this.author = author;
+    }
+
+    public boolean setAuthorIfNotNull(final String author) {
+        if (author != null) {
+            this.author = author;
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public String getImagePath() {

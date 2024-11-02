@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import com.library.librarymanagement.request.BookTitleCreationRequest;
 import com.library.librarymanagement.request.BookTitleUpdateRequest;
@@ -14,27 +15,27 @@ import com.library.librarymanagement.resource.ResourceStrings;
 import com.library.librarymanagement.entity.BookTitleImageData;
 import com.library.librarymanagement.entity.BookTitleImagePath;
 import com.library.librarymanagement.repository.BookTitleRepository;
-import com.library.librarymanagement.repository.BookTypeRepository;
 import com.library.librarymanagement.ulti.File;
 
+import jakarta.transaction.Transactional;
+
 @Service
-public final class BookTitleService {
-    private final BookTitleRepository bookTitleRepository;
-    private final BookTypeRepository bookTypeRepository;
+public class BookTitleService {
+    private final BookTitleRepository repository;
+    private final BookTypeService bookTypeService;
 
     @Autowired(required = true)
-    private BookTitleService(final BookTitleRepository bookTitleRepository,
-            final BookTypeRepository bookTypeRepository) {
-        this.bookTitleRepository = bookTitleRepository;
-        this.bookTypeRepository = bookTypeRepository;
+    public BookTitleService(final BookTitleRepository repository, final BookTypeService bookTypeService) {
+        this.repository = repository;
+        this.bookTypeService = bookTypeService;
     }
 
     public List<BookTitleImagePath> getBookTitlesImagePathByPage(final Integer start, final Integer amount) {
         List<BookTitleImagePath> result = Collections.emptyList();
 
-        if ((this.bookTitleRepository != null) && (start >= 0) && (amount > 0)) {
+        if ((this.repository != null) && (start >= 0) && (amount > 0)) {
             final var pageable = PageRequest.of(start, amount);
-            result = this.bookTitleRepository.findAll(pageable).getContent();
+            result = this.repository.findAll(pageable).getContent();
         }
 
         return result;
@@ -54,8 +55,8 @@ public final class BookTitleService {
     public BookTitleImagePath getBookTitleImagePathById(final Integer id) {
         BookTitleImagePath result = null;
 
-        if ((this.bookTitleRepository != null) && (id != null)) {
-            result = this.bookTitleRepository.findById(id).orElse(null);
+        if ((this.repository != null) && (id != null)) {
+            result = this.repository.findById(id).orElse(null);
         }
 
         return result;
@@ -72,38 +73,65 @@ public final class BookTitleService {
         return result;
     }
 
+    @Transactional
     public boolean createBookTitle(final BookTitleCreationRequest request) {
-        if ((this.bookTitleRepository == null) || (request == null) || (ResourceStrings.DIR_BOOK_TITLE_IMAGE == null)
-                || this.bookTitleRepository.existsByName(request.getName())) {
-            return false;
+        boolean succeed = this.createBookTitleBusinessLogic(request);
+
+        if (!succeed) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         }
 
-        final var newBookTypeImagePath = this.bookTypeRepository.findById(request.getTypeId()).orElse(null);
-        if (newBookTypeImagePath == null) {
-            return false;
-        }
-
-        var newImagePath = String.format("%s/%s", ResourceStrings.DIR_BOOK_TITLE_IMAGE, request.getName());
-        var newImageFile = new File(newImagePath);
-        if (!newImageFile.createAndWrite(request.getImageData())) {
-            return false;
-        }
-
-        final var newBookTitleImagePath = new BookTitleImagePath(request.getName(), newBookTypeImagePath,
-                request.getAuthor(), newImagePath);
-
-        this.bookTitleRepository.save(newBookTitleImagePath);
-        return true;
+        return succeed;
     }
 
-    public boolean updateBookTitle(final BookTitleUpdateRequest request) {
-        if ((request == null) || (this.bookTitleRepository == null) || (this.bookTypeRepository == null)
+    private boolean createBookTitleBusinessLogic(final BookTitleCreationRequest request) {
+        if ((request == null) || (this.repository == null) || (this.bookTypeService == null)
                 || (ResourceStrings.DIR_BOOK_TITLE_IMAGE == null)) {
             return false;
         }
 
-        final var newBookTypeImagePath = this.bookTypeRepository.findById(request.getTypeId()).orElse(null);
-        if (newBookTypeImagePath == null) {
+        final var newBookTitleName = request.getName();
+        final var imageData = request.getImageData();
+        final var newBookTitleAuthor = request.getAuthor();
+        if ((newBookTitleName == null) || (imageData == null) || (newBookTitleAuthor == null)) {
+            return false;
+        }
+
+        final var bookTypeImagePath = this.bookTypeService.getBookTypeImagePathById(request.getTypeId());
+        if (bookTypeImagePath == null) {
+            return false;
+        }
+
+        final var newImagePath = String.format("%s/%s", ResourceStrings.DIR_BOOK_TITLE_IMAGE, request.getName());
+
+        final var bookTitleImagePath = new BookTitleImagePath(
+                newBookTitleName,
+                bookTypeImagePath,
+                newBookTitleAuthor,
+                newImagePath);
+        final var savedBookTitleImagePath = this.repository.save(bookTitleImagePath);
+        if (!newImagePath.equals(savedBookTitleImagePath.getImagePath())) {
+            return false;
+        }
+
+        final var newImageFile = new File(newImagePath);
+        return newImageFile.createAndWrite(imageData);
+    }
+
+    @Transactional
+    public boolean updateBookTitle(final BookTitleUpdateRequest request) {
+        boolean succeed = this.updateBookTitleBusinessLogic(request);
+
+        if (!succeed) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+        }
+
+        return succeed;
+    }
+
+    public boolean updateBookTitleBusinessLogic(final BookTitleUpdateRequest request) {
+        if ((request == null) || (this.repository == null) || (this.bookTypeService == null)
+                || (ResourceStrings.DIR_BOOK_TITLE_IMAGE == null)) {
             return false;
         }
 
@@ -112,32 +140,28 @@ public final class BookTitleService {
             return false;
         }
 
-        var oldImagePath = bookTitleImagePath.getImagePath();
-        var newImagePath = String.format("%s/%s", ResourceStrings.DIR_BOOK_TITLE_IMAGE, request.getName());
-        if (oldImagePath == null || newImagePath == null) {
+        final var oldImageFile = new File(bookTitleImagePath.getImagePath());
+        if (!oldImageFile.writeIfBytesNotNull(request.getImageData())) {
             return false;
         }
 
-        var oldImageFile = new File(oldImagePath);
-        if (newImagePath.equals(oldImagePath)) {
-            return oldImageFile.write(request.getImageData());
-        }
-        if (Boolean.TRUE.equals(oldImageFile.isExisted()) && Boolean.FALSE.equals(oldImageFile.isModifiable())) {
-            return false;
+        bookTitleImagePath.setTypeIfNotNull(this.bookTypeService.getBookTypeImagePathById(request.getTypeId()));
+        bookTitleImagePath.setAuthorIfNotNull(request.getAuthor());
+
+        final var bookTitleNewName = request.getName();
+        if (!bookTitleImagePath.setNameIfNotNull(bookTitleNewName)) {
+            this.repository.save(bookTitleImagePath);
+            return true;
         }
 
-        var newImageFile = new File(newImagePath);
-        if ((!newImageFile.createAndWrite(request.getImageData())) || (!oldImageFile.delete())) {
-            newImageFile.delete();
-            return false;
-        }
-
-        bookTitleImagePath.setName(request.getName());
-        bookTitleImagePath.setType(newBookTypeImagePath);
-        bookTitleImagePath.setAuthor(request.getAuthor());
+        final var newImagePath = String.format("%s/%s", ResourceStrings.DIR_BOOK_TITLE_IMAGE, bookTitleNewName);
         bookTitleImagePath.setImagePath(newImagePath);
-        this.bookTitleRepository.save(bookTitleImagePath);
+        bookTitleImagePath = this.repository.save(bookTitleImagePath);
+        if (!newImagePath.equals(bookTitleImagePath.getImagePath())) {
+            return false;
+        }
 
-        return true;
+        final var newImageFile = new File(newImagePath);
+        return oldImageFile.renameTo(newImageFile);
     }
 }
