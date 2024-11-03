@@ -14,7 +14,7 @@ public final class BookImageData {
             this.id = bookImagePath.getId();
             this.title = new BookTitleImageData(bookImagePath.getTitle());
             this.status = bookImagePath.getStatus();
-            this.isUsable = bookImagePath.isUsable();
+            this.isUsable = bookImagePath.getIsUsable();
         }
     }
 

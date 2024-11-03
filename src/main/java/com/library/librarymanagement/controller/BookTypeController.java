@@ -29,27 +29,27 @@ public final class BookTypeController {
     }
 
     @GetMapping
-    public List<BookTypeImageData> getAllBookTypes() {
+    public List<BookTypeImageData> findAllBookTypes() {
         try {
-            return this.service.getAllBookTypes();
+            return this.service.findAllBookTypes();
         } catch (final Exception exception) {
             return Collections.emptyList();
         }
     }
 
     @GetMapping("/details")
-    public BookTypeImageData getBookTypeById(@RequestParam("id") final String idString) {
+    public BookTypeImageData findBookTypeById(@RequestParam("id") final String idString) {
         try {
-            return this.service.getBookTypeImageDataById(Short.valueOf(idString));
+            return this.service.findBookTypeImageDataById(Short.valueOf(idString));
         } catch (final Exception exception) {
             return null;
         }
     }
 
     @GetMapping(value = "/image", produces = MediaType.IMAGE_PNG_VALUE)
-    public byte[] getImageBookTypeById(@RequestParam("id") final String idString) {
+    public byte[] findImageBookTypeById(@RequestParam("id") final String idString) {
         try {
-            final var bookTypeImage = this.service.getBookTypeImageDataById(Short.valueOf(idString));
+            final var bookTypeImage = this.service.findBookTypeImageDataById(Short.valueOf(idString));
             return bookTypeImage.getImageData().clone();
         } catch (final Exception exception) {
             return new byte[] {};

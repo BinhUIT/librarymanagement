@@ -46,8 +46,8 @@ public final class BookTypeImagePath {
         this.name = name;
     }
 
-    public boolean setNameIfNotNull(final String name) {
-        if (name != null) {
+    public boolean setNameIfNotBlank(final String name) {
+        if ((name != null) && (!name.isBlank())) {
             this.name = name;
             return true;
         } else {

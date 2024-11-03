@@ -1,6 +1,5 @@
 package com.library.librarymanagement.controller;
 
-import org.assertj.core.api.IntegerAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,10 +26,10 @@ public final class BookController {
     }
 
     @GetMapping("/details")
-    public BookImageData getBookImageDataById(@RequestParam("id") final String idString) {
+    public BookImageData findBookImageDataById(@RequestParam("id") final String idString) {
         try {
             final var id = Integer.valueOf(idString);
-            return this.service.getBookImageDataById(id);
+            return this.service.findBookImageDataById(id);
         } catch (final Exception exception) {
             return null;
         }

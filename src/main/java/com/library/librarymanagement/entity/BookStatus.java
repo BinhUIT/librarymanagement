@@ -41,4 +41,13 @@ public final class BookStatus {
     public void setName(final String name) {
         this.name = name;
     }
+
+    public boolean setNameIfNotBlank(final String name) {
+        if ((name != null) && (!name.isBlank())) {
+            this.name = name;
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

@@ -27,7 +27,7 @@ public class BookTypeService {
         this.repository = repository;
     }
 
-    public List<BookTypeImageData> getAllBookTypes() {
+    public List<BookTypeImageData> findAllBookTypes() {
         List<BookTypeImageData> result = new ArrayList<>();
 
         if (this.repository != null) {
@@ -40,24 +40,20 @@ public class BookTypeService {
     }
 
     public BookTypeImagePath getBookTypeImagePathById(final Short id) {
-        BookTypeImagePath result = null;
-
         if ((this.repository != null) && (id != null)) {
-            result = this.repository.findById(id).orElse(null);
+            return this.repository.findById(id).orElse(null);
+        } else {
+            return null;
         }
-
-        return result;
     }
 
-    public BookTypeImageData getBookTypeImageDataById(final Short id) {
-        BookTypeImageData result = null;
-
+    public BookTypeImageData findBookTypeImageDataById(final Short id) {
         final var bookTypeImagePath = this.getBookTypeImagePathById(id);
         if (bookTypeImagePath != null) {
-            result = new BookTypeImageData(bookTypeImagePath);
+            return new BookTypeImageData(bookTypeImagePath);
+        } else {
+            return null;
         }
-
-        return result;
     }
 
     @Transactional
@@ -121,7 +117,7 @@ public class BookTypeService {
         }
 
         final var bookTypeNewName = request.getName();
-        if (!bookTypeImagePath.setNameIfNotNull(bookTypeNewName)) {
+        if (!bookTypeImagePath.setNameIfNotBlank(bookTypeNewName)) {
             return true;
         }
 

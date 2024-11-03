@@ -57,6 +57,15 @@ public final class BookImagePath {
         this.title = title;
     }
 
+    public boolean setTitleIfNotNull(final BookTitleImagePath title) {
+        if (title != null) {
+            this.title = title;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public BookStatus getStatus() {
         return this.status;
     }
@@ -65,7 +74,16 @@ public final class BookImagePath {
         this.status = status;
     }
 
-    public boolean isUsable() {
+    public boolean setStatusIfNotNull(final BookStatus status) {
+        if (status != null) {
+            this.status = status;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean getIsUsable() {
         return this.isUsable;
     }
 
@@ -73,4 +91,12 @@ public final class BookImagePath {
         this.isUsable = isUsable;
     }
 
+    public boolean setUsableIfNotNull(final Boolean isUsable) {
+        if (isUsable != null) {
+            this.isUsable = isUsable;
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

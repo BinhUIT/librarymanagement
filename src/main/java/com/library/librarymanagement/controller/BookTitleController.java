@@ -28,12 +28,12 @@ public final class BookTitleController {
     }
 
     @GetMapping
-    public List<BookTitleImageData> getBookTitlesImageDataByPage(@RequestParam("page") final String numPageString) {
+    public List<BookTitleImageData> findBookTitlesImageDataByPage(@RequestParam("page") final String numPageString) {
         final Integer AMOUNT_BOOK_TITLES_IN_ONE_PAGE = 50;
 
         try {
             final var numPage = Integer.valueOf(numPageString);
-            return this.service.getBookTitlesImageDataByPage((numPage - 1) * AMOUNT_BOOK_TITLES_IN_ONE_PAGE,
+            return this.service.findBookTitlesImageDataByPage((numPage - 1) * AMOUNT_BOOK_TITLES_IN_ONE_PAGE,
                     AMOUNT_BOOK_TITLES_IN_ONE_PAGE);
         } catch (final Exception exception) {
             return Collections.emptyList();
@@ -41,9 +41,9 @@ public final class BookTitleController {
     }
 
     @GetMapping("/details")
-    public BookTitleImageData getBookTitleById(@RequestParam("id") final String idString) {
+    public BookTitleImageData findBookTitlesImageDataById(@RequestParam("id") final String idString) {
         try {
-            return this.service.getBookTitleImageDataById(Integer.valueOf(idString));
+            return this.service.findBookTitleImageDataById(Integer.valueOf(idString));
         } catch (final Exception exception) {
             return null;
         }

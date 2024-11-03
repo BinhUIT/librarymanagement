@@ -1,5 +1,6 @@
 package com.library.librarymanagement.service;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +12,7 @@ import com.library.librarymanagement.request.BookStatusUpdateRequest;
 import com.library.librarymanagement.entity.BookStatus;
 
 @Service
-public final class BookStatusService {
+public class BookStatusService {
     private final BookStatusRepository repository;
 
     @Autowired(required = true)
@@ -20,38 +21,50 @@ public final class BookStatusService {
     }
 
     public List<BookStatus> getAllBookStatus() {
-        return this.repository.findAll();
+        if (this.repository != null) {
+            return this.repository.findAll();
+        } else {
+            return Collections.emptyList();
+        }
     }
 
-    public BookStatus getBookStatusById(final Byte id) {
-        return this.repository.findById(id).orElse(null);
+    public BookStatus findBookStatusById(final Byte id) {
+        if ((this.repository != null) && (id != null)) {
+            return this.repository.findById(id).orElse(null);
+        } else {
+            return null;
+        }
     }
 
     public boolean createBookStatus(final BookStatusCreationRequest request) {
-        boolean result = false;
-
-        if ((request != null) && (request.getName() != null)) {
-            final var newBookStatus = new BookStatus(request.getName());
-            this.repository.save(newBookStatus);
-            result = true;
+        if ((request == null) || (this.repository == null)) {
+            return false;
         }
 
-        return result;
+        final var newBookStatusName = request.getName();
+        if (newBookStatusName == null) {
+            return false;
+        }
+
+        final var newBookStatus = new BookStatus(newBookStatusName);
+        this.repository.save(newBookStatus);
+        return true;
     }
 
     public boolean updateBookStatus(final BookStatusUpdateRequest request) {
-        boolean result = true;
-
-        if ((request != null) && (request.getId() != null) && (request.getName() != null)) {
-            var bookStatus = this.repository.findById(request.getId()).orElse(null);
-            if (bookStatus != null) {
-                bookStatus.setName(request.getName());
-                this.repository.save(bookStatus);
-                result = true;
-            }
+        if ((request == null) || (this.repository == null)) {
+            return false;
         }
 
-        return result;
+        var bookStatus = this.findBookStatusById(request.getId());
+        if (bookStatus == null) {
+            return false;
+        }
 
+        if (bookStatus.setNameIfNotBlank(request.getName())) {
+            this.repository.save(bookStatus);
+        }
+
+        return true;
     }
 }

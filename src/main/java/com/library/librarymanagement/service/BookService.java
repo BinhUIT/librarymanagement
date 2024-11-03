@@ -5,14 +5,12 @@ import org.springframework.stereotype.Service;
 
 import com.library.librarymanagement.entity.BookImageData;
 import com.library.librarymanagement.entity.BookImagePath;
-import com.library.librarymanagement.entity.BookStatus;
-import com.library.librarymanagement.entity.BookTitleImagePath;
 import com.library.librarymanagement.repository.BookRepository;
 import com.library.librarymanagement.request.BookCreationRequest;
 import com.library.librarymanagement.request.BookUpdateRequest;
 
 @Service
-public final class BookService {
+public class BookService {
     private final BookRepository repository;
     private final BookTitleService bookTitleService;
     private final BookStatusService bookStatusService;
@@ -26,111 +24,59 @@ public final class BookService {
     }
 
     public BookImagePath getBookImagePathById(final Integer id) {
-        final BookImagePath result;
-
-        if (id != null) {
-            result = this.repository.findById(id).orElse(null);
+        if ((id != null) && (this.repository != null)) {
+            return this.repository.findById(id).orElse(null);
         } else {
-            result = null;
+            return null;
         }
-
-        return result;
     }
 
-    public BookImageData getBookImageDataById(final Integer id) {
+    public BookImageData findBookImageDataById(final Integer id) {
         final var bookImagePath = this.getBookImagePathById(id);
-
-        final BookImageData result;
         if (bookImagePath != null) {
-            result = new BookImageData(bookImagePath);
+            return new BookImageData(bookImagePath);
         } else {
-            result = null;
+            return null;
         }
-
-        return result;
     }
 
     public boolean createBook(final BookCreationRequest request) {
-        boolean result = false;
-
-        final BookTitleImagePath bookTitleImagePath;
-        if (request != null) {
-            bookTitleImagePath = this.bookTitleService.getBookTitleImagePathById(request.getTitleId());
-        } else {
-            bookTitleImagePath = null;
+        if ((request == null) || (this.repository == null) || (this.bookStatusService == null)
+                || (this.bookTitleService == null)) {
+            return false;
         }
 
-        final BookStatus bookStatus;
-        if (bookTitleImagePath != null) {
-            bookStatus = this.bookStatusService.getBookStatusById(request.getStatusId());
-        } else {
-            bookStatus = null;
+        final var bookStatus = this.bookStatusService.findBookStatusById(request.getStatusId());
+        if (bookStatus == null) {
+            return false;
         }
 
-        if (bookStatus != null) {
-            final var newBook = new BookImagePath(bookTitleImagePath, bookStatus, request.isUsable());
-            this.repository.save(newBook);
-            result = true;
+        final var bookTitleImagePath = this.bookTitleService.getBookTitleImagePathById(request.getTitleId());
+        if (bookTitleImagePath == null) {
+            return false;
         }
 
-        return result;
+        final var newBook = new BookImagePath(bookTitleImagePath, bookStatus, request.isUsable());
+        this.repository.save(newBook);
+        return true;
     }
 
     public boolean updateBook(final BookUpdateRequest request) {
-        boolean result = false;
-
-        final Integer bookId;
-        if (request != null) {
-            bookId = request.getId();
-        } else {
-            bookId = null;
+        if ((request == null) || (this.repository == null) || (this.bookStatusService == null)
+                || (this.bookTitleService == null)) {
+            return false;
         }
 
-        final BookImagePath book;
-        if (bookId != null) {
-            book = this.repository.findById(bookId).orElse(null);
-        } else {
-            book = null;
+        var bookImagePath = this.getBookImagePathById(request.getId());
+        if (bookImagePath == null) {
+            return false;
         }
 
-        final BookTitleImagePath newBookTitleImagePath;
-        if (book != null) {
-            newBookTitleImagePath = this.bookTitleService.getBookTitleImagePathById(request.getTitleId());
-        } else {
-            newBookTitleImagePath = null;
-        }
+        bookImagePath.setStatusIfNotNull(this.bookStatusService.findBookStatusById(request.getStatusId()));
+        bookImagePath.setTitleIfNotNull(this.bookTitleService.getBookTitleImagePathById(request.getTitleId()));
+        bookImagePath.setUsableIfNotNull(request.getIsUsable());
+        this.repository.save(bookImagePath);
 
-        if (newBookTitleImagePath != null) {
-            book.setTitle(newBookTitleImagePath);
-        }
-
-        final BookStatus newBookStatus;
-        if (book != null) {
-            newBookStatus = this.bookStatusService.getBookStatusById(request.getStatusId());
-        } else {
-            newBookStatus = null;
-        }
-
-        if (newBookStatus != null) {
-            book.setStatus(newBookStatus);
-        }
-
-        final Boolean newBookIsUsable;
-        if (book != null) {
-            newBookIsUsable = request.getIsUsable();
-        } else {
-            newBookIsUsable = null;
-        }
-
-        if (newBookIsUsable != null) {
-            book.setUsable(newBookIsUsable);
-        }
-
-        if (book != null) {
-            this.repository.save(book);
-            result = true;
-        }
-
-        return result;
+        return true;
     }
 }

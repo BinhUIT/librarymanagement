@@ -29,7 +29,7 @@ public final class BookStatusController {
     }
 
     @GetMapping
-    public List<BookStatus> getAllBookStatus() {
+    public List<BookStatus> findAllBookStatus() {
         try {
             return this.service.getAllBookStatus();
         } catch (final Exception exception) {
@@ -38,9 +38,9 @@ public final class BookStatusController {
     }
 
     @GetMapping("/details")
-    public BookStatus getBookStatusById(@RequestParam("id") final String idString) {
+    public BookStatus findBookStatusById(@RequestParam("id") final String idString) {
         try {
-            return this.service.getBookStatusById(Byte.valueOf(idString));
+            return this.service.findBookStatusById(Byte.valueOf(idString));
         } catch (final Exception exception) {
             return null;
         }

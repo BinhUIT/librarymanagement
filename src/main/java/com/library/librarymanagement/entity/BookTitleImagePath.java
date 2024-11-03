@@ -68,8 +68,8 @@ public final class BookTitleImagePath {
         this.name = name;
     }
 
-    public boolean setNameIfNotNull(final String name) {
-        if (name != null) {
+    public boolean setNameIfNotBlank(final String name) {
+        if ((name != null) && (!name.isBlank())) {
             this.name = name;
             return true;
         } else {
@@ -118,8 +118,8 @@ public final class BookTitleImagePath {
         this.author = author;
     }
 
-    public boolean setAuthorIfNotNull(final String author) {
-        if (author != null) {
+    public boolean setAuthorIfNotBlank(final String author) {
+        if ((author != null) && (!author.isBlank())) {
             this.author = author;
             return true;
         } else {

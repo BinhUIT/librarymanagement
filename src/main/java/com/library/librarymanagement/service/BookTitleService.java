@@ -41,7 +41,7 @@ public class BookTitleService {
         return result;
     }
 
-    public List<BookTitleImageData> getBookTitlesImageDataByPage(final Integer start, final Integer amount) {
+    public List<BookTitleImageData> findBookTitlesImageDataByPage(final Integer start, final Integer amount) {
         List<BookTitleImageData> result = new ArrayList<>();
 
         final var listBookTitleImagePath = this.getBookTitlesImagePathByPage(start, amount);
@@ -53,24 +53,20 @@ public class BookTitleService {
     }
 
     public BookTitleImagePath getBookTitleImagePathById(final Integer id) {
-        BookTitleImagePath result = null;
-
         if ((this.repository != null) && (id != null)) {
-            result = this.repository.findById(id).orElse(null);
+            return this.repository.findById(id).orElse(null);
+        } else {
+            return null;
         }
-
-        return result;
     }
 
-    public BookTitleImageData getBookTitleImageDataById(final Integer id) {
-        BookTitleImageData result = null;
-
+    public BookTitleImageData findBookTitleImageDataById(final Integer id) {
         final var bookTitleImagePath = this.getBookTitleImagePathById(id);
         if (bookTitleImagePath != null) {
-            result = new BookTitleImageData(bookTitleImagePath);
+            return new BookTitleImageData(bookTitleImagePath);
+        } else {
+            return null;
         }
-
-        return result;
     }
 
     @Transactional
@@ -146,10 +142,10 @@ public class BookTitleService {
         }
 
         bookTitleImagePath.setTypeIfNotNull(this.bookTypeService.getBookTypeImagePathById(request.getTypeId()));
-        bookTitleImagePath.setAuthorIfNotNull(request.getAuthor());
+        bookTitleImagePath.setAuthorIfNotBlank(request.getAuthor());
 
         final var bookTitleNewName = request.getName();
-        if (!bookTitleImagePath.setNameIfNotNull(bookTitleNewName)) {
+        if (!bookTitleImagePath.setNameIfNotBlank(bookTitleNewName)) {
             this.repository.save(bookTitleImagePath);
             return true;
         }
