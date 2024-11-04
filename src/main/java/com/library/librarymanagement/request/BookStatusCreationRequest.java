@@ -9,15 +9,11 @@ public final class BookStatusCreationRequest {
     private String name = null;
 
     @JsonCreator
-    public BookStatusCreationRequest(final String name) {
+    private BookStatusCreationRequest(final String name) {
         this.name = name;
     }
 
     public String getName() {
         return this.name;
-    }
-
-    public void setName(final String name) {
-        this.name = name;
     }
 }

@@ -15,7 +15,7 @@ public final class BookUpdateRequest {
     private Boolean isUsable = true;
 
     @JsonCreator
-    public BookUpdateRequest(Integer id, Integer titleId, Byte statusId, Boolean isUsable) {
+    private BookUpdateRequest(Integer id, Integer titleId, Byte statusId, Boolean isUsable) {
         this.id = id;
         this.titleId = titleId;
         this.statusId = statusId;
@@ -30,23 +30,11 @@ public final class BookUpdateRequest {
         return titleId;
     }
 
-    public void setTitleId(Integer typeId) {
-        this.titleId = typeId;
-    }
-
     public Byte getStatusId() {
         return statusId;
     }
 
-    public void setStatusId(Byte statusId) {
-        this.statusId = statusId;
-    }
-
     public Boolean getIsUsable() {
         return isUsable;
-    }
-
-    public void setIsUsable(Boolean isUsable) {
-        this.isUsable = isUsable;
     }
 }

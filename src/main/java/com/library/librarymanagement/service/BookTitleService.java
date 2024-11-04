@@ -69,6 +69,7 @@ public class BookTitleService {
         }
     }
 
+
     @Transactional
     public boolean createBookTitle(final BookTitleCreationRequest request) {
         boolean succeed = this.createBookTitleBusinessLogic(request);

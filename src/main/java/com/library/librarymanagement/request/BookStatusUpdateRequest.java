@@ -11,7 +11,7 @@ public final class BookStatusUpdateRequest {
     private String name = null;
 
     @JsonCreator
-    public BookStatusUpdateRequest(final Byte id, final String name) {
+    private BookStatusUpdateRequest(final Byte id, final String name) {
         this.id = id;
         this.name = name;
     }
@@ -22,9 +22,5 @@ public final class BookStatusUpdateRequest {
 
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 }

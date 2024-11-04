@@ -13,7 +13,7 @@ public final class BookTypeCreationRequest {
     private byte[] imageData = null;
 
     @JsonCreator
-    public BookTypeCreationRequest(final String name, final byte[] image) {
+    private BookTypeCreationRequest(final String name, final byte[] image) {
         this.name = name;
 
         if (image != null) {
@@ -27,10 +27,6 @@ public final class BookTypeCreationRequest {
         return this.name;
     }
 
-    public void setName(final String name) {
-        this.name = name;
-    }
-
     public byte[] getImageData() {
         byte[] result = null;
 
@@ -40,13 +36,4 @@ public final class BookTypeCreationRequest {
 
         return result;
     }
-
-    public void setImageData(final byte[] imageData) {
-        if (imageData != null) {
-            this.imageData = imageData.clone();
-        } else {
-            this.imageData = null;
-        }
-    }
-
 }

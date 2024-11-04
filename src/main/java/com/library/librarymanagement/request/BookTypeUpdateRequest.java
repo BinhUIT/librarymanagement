@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 
 import jakarta.validation.constraints.NotNull;
 
-public class BookTypeUpdateRequest {
+public final class BookTypeUpdateRequest {
     @NotNull(message = "BookType Id in update request cannot be null!")
     private Short id = null;
 
@@ -13,7 +13,7 @@ public class BookTypeUpdateRequest {
     private byte[] imageData = null;
 
     @JsonCreator
-    public BookTypeUpdateRequest(final Short id, final String name, final byte[] imageData) {
+    private BookTypeUpdateRequest(final Short id, final String name, final byte[] imageData) {
         this.id = id;
         this.name = name;
 
@@ -32,10 +32,6 @@ public class BookTypeUpdateRequest {
         return this.name;
     }
 
-    public void setName(final String name) {
-        this.name = name;
-    }
-
     public byte[] getImageData() {
         byte[] result = null;
 
@@ -44,13 +40,5 @@ public class BookTypeUpdateRequest {
         }
 
         return result;
-    }
-
-    public void setImageData(final byte[] imageData) {
-        if (imageData != null) {
-            this.imageData = imageData.clone();
-        } else {
-            this.imageData = null;
-        }
     }
 }

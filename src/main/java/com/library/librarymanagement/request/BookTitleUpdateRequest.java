@@ -17,7 +17,7 @@ public final class BookTitleUpdateRequest {
     private byte[] imageData = null;
 
     @JsonCreator
-    public BookTitleUpdateRequest(final Integer id, final String name, final Short typeId, final String author,
+    private BookTitleUpdateRequest(final Integer id, final String name, final Short typeId, final String author,
             final byte[] imageData) {
         this.id = id;
         this.name = name;
@@ -39,26 +39,13 @@ public final class BookTitleUpdateRequest {
         return this.name;
     }
 
-    public void setName(final String name) {
-        this.name = name;
-    }
-
     public Short getTypeId() {
         return this.typeId;
-    }
-
-    public void setTypeId(final Short typeId) {
-        this.typeId = typeId;
     }
 
     public String getAuthor() {
         return this.author;
     }
-
-    public void setAuthor(final String author) {
-        this.author = author;
-    }
-
     public byte[] getImageData() {
         byte[] result = null;
 
@@ -67,13 +54,4 @@ public final class BookTitleUpdateRequest {
         }
         return result;
     }
-
-    public void setImageData(byte[] imageData) {
-        if (imageData != null) {
-            this.imageData = imageData.clone();
-        } else {
-            this.imageData = null;
-        }
-    }
-
 }
