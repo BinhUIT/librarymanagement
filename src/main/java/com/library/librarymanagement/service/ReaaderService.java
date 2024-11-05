@@ -14,6 +14,7 @@ import com.library.librarymanagement.entity.BookImagePath;
 import com.library.librarymanagement.entity.BookStatus;
 import com.library.librarymanagement.entity.BookTitleImagePath;
 import com.library.librarymanagement.entity.BorrowingCardDetail;
+import com.library.librarymanagement.entity.CartDetail;
 import com.library.librarymanagement.entity.Notification;
 import com.library.librarymanagement.entity.ServiceType;
 import com.library.librarymanagement.entity.User;
@@ -21,12 +22,15 @@ import com.library.librarymanagement.repository.BookRepository;
 import com.library.librarymanagement.repository.BookStatusRepository;
 import com.library.librarymanagement.repository.BookTitleRepository;
 import com.library.librarymanagement.repository.BorrowingCardDetailRepository;
+import com.library.librarymanagement.repository.CartDetailRepository;
 import com.library.librarymanagement.repository.NotificationRepository;
 import com.library.librarymanagement.repository.ServiceRepository;
 import com.library.librarymanagement.repository.ServiceTypeRepository;
 import com.library.librarymanagement.repository.UserRepository;
+import com.library.librarymanagement.request.AddCartDetailRequest;
 import com.library.librarymanagement.request.BorrowingDetailRequest;
 import com.library.librarymanagement.request.BorrowingRequest;
+import com.library.librarymanagement.request.CartDetailUpdateRequest;
 
 
 @Service
@@ -47,7 +51,9 @@ public class ReaaderService {
    @Autowired 
    private BorrowingCardDetailRepository borrowingDetailRepo; 
    @Autowired 
-   private NotificationRepository notifRepo;
+   private NotificationRepository notifRepo; 
+   @Autowired 
+   private CartDetailRepository cartDetailRepo;
    public ResponseEntity<String> borrowingBook(BorrowingRequest request) 
    {   
         List<BorrowingDetailRequest> listBookTitle = request.getListBook();  
@@ -163,8 +169,71 @@ public ResponseEntity<Notification> readANotification(int userId, int notifId)
         notification.setIsread(true);  
         notifRepo.save(notification);
         return new ResponseEntity<>(notification, HttpStatus.OK);
-   }
+   } 
 
+   @SuppressWarnings("null")
+public ResponseEntity<List<CartDetail>> getCart(int userId) 
+   { 
+    User user= userRepo.findById(userId).orElse(null); 
+    if(user==null) return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+    List<CartDetail> cart= cartDetailRepo.findByUser(user); 
+    return new ResponseEntity<>(cart, HttpStatus.OK);
+   } 
+
+   public ResponseEntity<String> addToCart(AddCartDetailRequest request) 
+   { 
+    User user= userRepo.findById(request.getUserId()).orElse(null); 
+    if(user==null) return new ResponseEntity<>("User does not exist", HttpStatus.BAD_REQUEST);  
+    BookTitleImagePath bookTitle = bookTitleRepo.findById(request.getBookTitleId()).orElse(null); 
+    if(bookTitle==null) return new ResponseEntity<>("Book title does not exists", HttpStatus.BAD_REQUEST);
+    CartDetail cartDetail = new CartDetail(0, user, bookTitle, request.getAmount()); 
+    cartDetailRepo.save(cartDetail); 
+    return new ResponseEntity<>("Added to cart", HttpStatus.OK);
+
+   } 
+
+   public ResponseEntity<String> removeFromCart(int cartDetailId) 
+   { 
+        CartDetail cartDetail = cartDetailRepo.findById(cartDetailId).orElse(null); 
+        if(cartDetail==null) return new ResponseEntity<>("This cart detail does not exists", HttpStatus.OK);  
+        cartDetailRepo.delete(cartDetail); 
+        return new ResponseEntity<>("Deleted item", HttpStatus.OK);
+   } 
+
+   public ResponseEntity<String> clearCart(int userId) 
+   { 
+        User user = userRepo.findById(userId).orElse(null); 
+        if(user==null) return new ResponseEntity<>("User does not exists", HttpStatus.BAD_REQUEST);  
+        List<CartDetail> listCartByUser = cartDetailRepo.findByUser(user); 
+        for(CartDetail i : listCartByUser) 
+        {
+            cartDetailRepo.delete(i);
+        } 
+        return new ResponseEntity<>("Deleted", HttpStatus.OK);
+
+   } 
+
+   public ResponseEntity<String> updateCart(CartDetailUpdateRequest cartUpdateRequest, int userId) 
+   {  
+        if(!validateCartUpdateRequest(cartUpdateRequest, userId)) return new ResponseEntity<>("Wrong information", HttpStatus.BAD_REQUEST);
+        CartDetail cartDetail = cartDetailRepo.findById(cartUpdateRequest.getCartDetailId()).orElse(null);  
+        cartDetail.setAmount(cartUpdateRequest.getAmount()); 
+        cartDetailRepo.save(cartDetail);
+        return new ResponseEntity<>("Updated item", HttpStatus.OK);
+   }
+   private boolean validateCartUpdateRequest(CartDetailUpdateRequest cartUpdateRequest, int userId) 
+   { 
+        if(cartUpdateRequest.getUserId()!=userId) return false;
+        User user = userRepo.findById(cartUpdateRequest.getUserId()).orElse(null);  
+        if(user==null) return false;
+        CartDetail cartDetail = cartDetailRepo.findById(cartUpdateRequest.getCartDetailId()).orElse(null); 
+        if(cartDetail==null) return false;
+        List<CartDetail> listCart= cartDetailRepo.findByUser(user); 
+        for(CartDetail i: listCart) {
+            if(cartUpdateRequest.getCartDetailId()==i.getId()) return true;
+        } 
+        return false;
+   }
     
 
 
