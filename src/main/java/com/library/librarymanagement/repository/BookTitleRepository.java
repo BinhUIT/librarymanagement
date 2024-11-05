@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import com.library.librarymanagement.entity.BookTitleImagePath;
 
 @Repository
-public interface BookTitleRepository extends JpaRepository<BookTitleImagePath, Integer> {
+public interface BookTitleRepository
+        extends JpaRepository<BookTitleImagePath, Integer>, BookTitleCriteriaByPageRepository {
     boolean existsByName(final String name);
 }

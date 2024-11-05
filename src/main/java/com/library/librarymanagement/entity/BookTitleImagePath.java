@@ -35,7 +35,7 @@ public final class BookTitleImagePath {
     private Integer amountRemaining = null;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "TypeId", columnDefinition = "smallint", nullable = false, referencedColumnName = "id")
+    @JoinColumn(name = "TypeId", columnDefinition = "smallint", nullable = false, referencedColumnName = "Id")
     private BookTypeImagePath type = null;
 
     @Column(name = "Author", columnDefinition = "varchar(45)", nullable = false)

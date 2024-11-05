@@ -51,7 +51,7 @@ public class BookService {
             return false;
         }
 
-        final var bookTitleImagePath = this.bookTitleService.getBookTitleImagePathById(request.getTitleId());
+        final var bookTitleImagePath = this.bookTitleService.findBookTitleImagePathById(request.getTitleId());
         if (bookTitleImagePath == null) {
             return false;
         }
@@ -73,7 +73,7 @@ public class BookService {
         }
 
         bookImagePath.setStatusIfNotNull(this.bookStatusService.findBookStatusById(request.getStatusId()));
-        bookImagePath.setTitleIfNotNull(this.bookTitleService.getBookTitleImagePathById(request.getTitleId()));
+        bookImagePath.setTitleIfNotNull(this.bookTitleService.findBookTitleImagePathById(request.getTitleId()));
         bookImagePath.setUsableIfNotNull(request.getIsUsable());
         this.repository.save(bookImagePath);
 

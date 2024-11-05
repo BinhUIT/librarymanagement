@@ -2,10 +2,12 @@ package com.library.librarymanagement.service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
@@ -30,21 +32,18 @@ public class BookTitleService {
         this.bookTypeService = bookTypeService;
     }
 
-    public List<BookTitleImagePath> getBookTitlesImagePathByPage(final Integer start, final Integer amount) {
-        List<BookTitleImagePath> result = Collections.emptyList();
-
-        if ((this.repository != null) && (start >= 0) && (amount > 0)) {
-            final var pageable = PageRequest.of(start, amount);
-            result = this.repository.findAll(pageable).getContent();
+    public List<BookTitleImagePath> findBookTitlesImagePathByPage(final Pageable pageable) {
+        if ((this.repository != null) && (pageable != null)) {
+            return this.repository.findAll(pageable).getContent();
+        } else {
+            return Collections.emptyList();
         }
-
-        return result;
     }
 
-    public List<BookTitleImageData> findBookTitlesImageDataByPage(final Integer start, final Integer amount) {
+    public List<BookTitleImageData> findBookTitlesImageDataByPage(final Pageable pageable) {
         List<BookTitleImageData> result = new ArrayList<>();
 
-        final var listBookTitleImagePath = this.getBookTitlesImagePathByPage(start, amount);
+        final var listBookTitleImagePath = this.findBookTitlesImagePathByPage(pageable);
         for (final var bookTitleImagePath : listBookTitleImagePath) {
             result.add(new BookTitleImageData(bookTitleImagePath));
         }
@@ -52,7 +51,7 @@ public class BookTitleService {
         return result;
     }
 
-    public BookTitleImagePath getBookTitleImagePathById(final Integer id) {
+    public BookTitleImagePath findBookTitleImagePathById(final Integer id) {
         if ((this.repository != null) && (id != null)) {
             return this.repository.findById(id).orElse(null);
         } else {
@@ -61,7 +60,7 @@ public class BookTitleService {
     }
 
     public BookTitleImageData findBookTitleImageDataById(final Integer id) {
-        final var bookTitleImagePath = this.getBookTitleImagePathById(id);
+        final var bookTitleImagePath = this.findBookTitleImagePathById(id);
         if (bookTitleImagePath != null) {
             return new BookTitleImageData(bookTitleImagePath);
         } else {
@@ -69,6 +68,28 @@ public class BookTitleService {
         }
     }
 
+    private List<BookTitleImagePath> findBookTitlesImagePathByPageWithCriteria(final Pageable pageable,
+            final String bookTitleNameKeyword, final String bookTitleAuthorKeyword, final Set<Short> bookTypesIdSet) {
+        if ((this.repository != null) && (pageable != null)) {
+            return this.repository.findByPageWithCriteria(pageable, bookTitleNameKeyword,
+                    bookTitleAuthorKeyword, bookTypesIdSet).getContent();
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
+    public List<BookTitleImageData> findBookTitlesImageDataByPageWithCriteria(final Pageable pageable,
+            final String bookTitleNameKeyword, final String bookTitleAuthorKeyword, final Set<Short> bookTypesIdSet) {
+        List<BookTitleImageData> result = new ArrayList<>();
+
+        final var listBookTitleImagePath = this.findBookTitlesImagePathByPageWithCriteria(
+                pageable, bookTitleNameKeyword, bookTitleAuthorKeyword, bookTypesIdSet);
+        for (final var bookTitleImagePath : listBookTitleImagePath) {
+            result.add(new BookTitleImageData(bookTitleImagePath));
+        }
+
+        return result;
+    }
 
     @Transactional
     public boolean createBookTitle(final BookTitleCreationRequest request) {
@@ -132,7 +153,7 @@ public class BookTitleService {
             return false;
         }
 
-        var bookTitleImagePath = this.getBookTitleImagePathById(request.getId());
+        var bookTitleImagePath = this.findBookTitleImagePathById(request.getId());
         if (bookTitleImagePath == null) {
             return false;
         }
