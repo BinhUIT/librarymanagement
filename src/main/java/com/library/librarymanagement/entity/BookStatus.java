@@ -28,6 +28,11 @@ public final class BookStatus {
 
     public BookStatus(final String name) {
         this.name = name;
+    } 
+    public BookStatus(Byte id, String name) 
+    {
+        this.id=id;
+        this.name=name;
     }
 
     public Byte getId() {

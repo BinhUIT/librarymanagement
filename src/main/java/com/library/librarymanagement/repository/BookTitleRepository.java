@@ -7,5 +7,6 @@ import com.library.librarymanagement.entity.BookTitleImagePath;
 
 @Repository
 public interface BookTitleRepository extends JpaRepository<BookTitleImagePath, Integer> {
-    boolean existsByName(final String name);
+    boolean existsByName(final String name); 
+   
 }

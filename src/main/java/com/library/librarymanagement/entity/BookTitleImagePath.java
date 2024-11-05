@@ -11,7 +11,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-
 import lombok.experimental.FieldNameConstants;
 
 @Entity
@@ -98,5 +97,13 @@ public final class BookTitleImagePath {
 
     public void setImagePath(final String imagePath) {
         this.imagePath = imagePath;
+    } 
+    public void setAmount(int amount) 
+    { 
+        this.amount=amount;
+    } 
+    public void setAmountRemaining(int amountRemaining) 
+    { 
+        this.amountRemaining=amountRemaining;
     }
 }

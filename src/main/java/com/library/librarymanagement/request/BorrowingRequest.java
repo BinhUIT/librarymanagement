@@ -1,35 +1,27 @@
 package com.library.librarymanagement.request;
-
-import java.util.Date;
+ 
+import java.util.List;
 
 public class BorrowingRequest { 
-    private int readerId;
-    private Date implementDate; 
-    private int requestTypeId; 
-
+    private ServiceRequest serviceRequest;
+    private List<BorrowingDetailRequest> listBook;
     public BorrowingRequest() 
-    { 
+    {
 
     } 
-    public BorrowingRequest(int readerId, Date implementDate, int requestTypeId) 
-    { 
-        this.readerId=readerId;
-        this.implementDate=implementDate; 
-        this.requestTypeId=requestTypeId;
-    } 
+    public BorrowingRequest(ServiceRequest serviceRequest, List<BorrowingDetailRequest> listBook) 
+    {
+        this.serviceRequest=serviceRequest; 
+        this.listBook=listBook;
 
-    public int getReaderId() 
-    {
-        return this.readerId;
     } 
-    public Date getImplementDate() 
-    {
-        return this.implementDate;
+    public ServiceRequest getServiceRequest() 
+    { 
+        return this.serviceRequest;
     } 
-    public int getRequestTypeId() 
+    public List<BorrowingDetailRequest> getListBook() 
     {
-        return this.requestTypeId;
+        return this.listBook;
     }
-
 
 }
