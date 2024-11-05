@@ -18,6 +18,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -31,7 +32,12 @@ public class BookTitleCriteriaByPageRepositoryImpl implements BookTitleCriteriaB
 
     public BookTitleCriteriaByPageRepositoryImpl(EntityManager entityManager) {
         this.entityManager = entityManager;
-        this.criteriaBuilder = entityManager.getCriteriaBuilder();
+
+        if (this.entityManager != null) {
+            this.criteriaBuilder = entityManager.getCriteriaBuilder();
+        } else {
+            this.criteriaBuilder = null;
+        }
     }
 
     @Override
@@ -40,6 +46,16 @@ public class BookTitleCriteriaByPageRepositoryImpl implements BookTitleCriteriaB
             final String bookTitleNameKeyword,
             final String bookTitleAuthorKeyword,
             final Set<Short> bookTypesIdSet) {
+        if ((pageable == null) || (pageable.getOffset() > Integer.MAX_VALUE) || (this.criteriaBuilder == null)) {
+            return null;
+        }
+
+        // Tạo truy vấn để đếm tổng số bản ghi
+        final var totalRecords = countTotalRecords(bookTitleNameKeyword, bookTitleAuthorKeyword, bookTypesIdSet);
+        if (totalRecords == null) {
+            return null;
+        }
+
         final var query = this.criteriaBuilder.createQuery(BookTitleImagePath.class);
         final var root = query.from(BookTitleImagePath.class);
 
@@ -64,15 +80,16 @@ public class BookTitleCriteriaByPageRepositoryImpl implements BookTitleCriteriaB
         // Lấy danh sách kết quả
         final var results = typedQuery.getResultList();
 
-        // Tạo truy vấn để đếm tổng số bản ghi
-        final long totalRecords = countTotalRecords(bookTitleNameKeyword, bookTitleAuthorKeyword, bookTypesIdSet);
-
         // Trả về Page kết quả
         return new PageImpl<>(results, pageable, totalRecords);
     }
 
     private List<Predicate> buildPredicates(final Root<BookTitleImagePath> root,
             final String bookTitleNameKeyword, final String bookTitleAuthorKeyword, final Set<Short> bookTypesIdSet) {
+        if ((root == null) || (this.criteriaBuilder == null)) {
+            return Collections.emptyList();
+        }
+
         final List<Predicate> predicates = new ArrayList<>();
 
         if (bookTitleNameKeyword != null && !bookTitleNameKeyword.isBlank()) {
@@ -92,8 +109,12 @@ public class BookTitleCriteriaByPageRepositoryImpl implements BookTitleCriteriaB
         return predicates;
     }
 
-    private long countTotalRecords(final String bookTitleNameKeyword,
+    private Long countTotalRecords(final String bookTitleNameKeyword,
             final String bookTitleAuthorKeyword, final Set<Short> bookTypesIdSet) {
+        if (this.criteriaBuilder == null) {
+            return null;
+        }
+
         final var countQuery = this.criteriaBuilder.createQuery(Long.class);
         final var countRoot = countQuery.from(BookTitleImagePath.class);
         final var countPredicates = buildPredicates(countRoot,

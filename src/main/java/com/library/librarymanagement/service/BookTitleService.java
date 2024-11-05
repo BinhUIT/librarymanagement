@@ -70,12 +70,16 @@ public class BookTitleService {
 
     private List<BookTitleImagePath> findBookTitlesImagePathByPageWithCriteria(final Pageable pageable,
             final String bookTitleNameKeyword, final String bookTitleAuthorKeyword, final Set<Short> bookTypesIdSet) {
-        if ((this.repository != null) && (pageable != null)) {
-            return this.repository.findByPageWithCriteria(pageable, bookTitleNameKeyword,
-                    bookTitleAuthorKeyword, bookTypesIdSet).getContent();
-        } else {
+        if (this.repository == null) {
             return Collections.emptyList();
         }
+
+        final var page = this.repository.findByPageWithCriteria(pageable, bookTitleNameKeyword,
+                bookTitleAuthorKeyword, bookTypesIdSet);
+        if (page == null) {
+            return Collections.emptyList();
+        }
+        return page.getContent();
     }
 
     public List<BookTitleImageData> findBookTitlesImageDataByPageWithCriteria(final Pageable pageable,
