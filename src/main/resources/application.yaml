@@ -17,3 +17,14 @@ spring:
                 implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyComponentPathImpl
                 physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
         show-sql: true
+    mail:
+        host: smtp.gmail.com
+        port: 587
+        username: ${YOUR_EMAIL}
+        password: ${APP_PASSWORD}
+        properties:
+            mail:
+                smtp:
+                    auth: true
+                    starttls:
+                        enable: true
