@@ -23,7 +23,7 @@ public class BookTypeService {
     private final BookTypeRepository repository;
 
     @Autowired(required = true)
-    public BookTypeService(final BookTypeRepository repository) {
+    private BookTypeService(final BookTypeRepository repository) {
         this.repository = repository;
     }
 
@@ -39,7 +39,7 @@ public class BookTypeService {
         return result;
     }
 
-    public BookTypeImagePath getBookTypeImagePathById(final Short id) {
+    public BookTypeImagePath findBookTypeImagePathById(final Short id) {
         if ((this.repository != null) && (id != null)) {
             return this.repository.findById(id).orElse(null);
         } else {
@@ -48,7 +48,7 @@ public class BookTypeService {
     }
 
     public BookTypeImageData findBookTypeImageDataById(final Short id) {
-        final var bookTypeImagePath = this.getBookTypeImagePathById(id);
+        final var bookTypeImagePath = this.findBookTypeImagePathById(id);
         if (bookTypeImagePath != null) {
             return new BookTypeImageData(bookTypeImagePath);
         } else {
@@ -106,7 +106,7 @@ public class BookTypeService {
             return false;
         }
 
-        var bookTypeImagePath = this.getBookTypeImagePathById(request.getId());
+        var bookTypeImagePath = this.findBookTypeImagePathById(request.getId());
         if (bookTypeImagePath == null) {
             return false;
         }

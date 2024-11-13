@@ -6,7 +6,6 @@ import java.util.Set;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -27,7 +26,7 @@ public class BookTitleService {
     private final BookTypeService bookTypeService;
 
     @Autowired(required = true)
-    public BookTitleService(final BookTitleRepository repository, final BookTypeService bookTypeService) {
+    private BookTitleService(final BookTitleRepository repository, final BookTypeService bookTypeService) {
         this.repository = repository;
         this.bookTypeService = bookTypeService;
     }
@@ -119,7 +118,7 @@ public class BookTitleService {
             return false;
         }
 
-        final var bookTypeImagePath = this.bookTypeService.getBookTypeImagePathById(request.getTypeId());
+        final var bookTypeImagePath = this.bookTypeService.findBookTypeImagePathById(request.getTypeId());
         if (bookTypeImagePath == null) {
             return false;
         }
@@ -167,7 +166,7 @@ public class BookTitleService {
             return false;
         }
 
-        bookTitleImagePath.setTypeIfNotNull(this.bookTypeService.getBookTypeImagePathById(request.getTypeId()));
+        bookTitleImagePath.setTypeIfNotNull(this.bookTypeService.findBookTypeImagePathById(request.getTypeId()));
         bookTitleImagePath.setAuthorIfNotBlank(request.getAuthor());
 
         final var bookTitleNewName = request.getName();

@@ -16,7 +16,7 @@ public class BookStatusService {
     private final BookStatusRepository repository;
 
     @Autowired(required = true)
-    public BookStatusService(final BookStatusRepository repository) {
+    private BookStatusService(final BookStatusRepository repository) {
         this.repository = repository;
     }
 
