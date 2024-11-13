@@ -19,3 +19,14 @@ spring:
                 physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
         show-sql: true
         format-sql: true
+    mail:
+        host: smtp.gmail.com
+        port: 587
+        username: ${YOUR_EMAIL}
+        password: ${APP_PASSWORD}
+        properties:
+            mail:
+                smtp:
+                    auth: true
+                    starttls:
+                        enable: true
