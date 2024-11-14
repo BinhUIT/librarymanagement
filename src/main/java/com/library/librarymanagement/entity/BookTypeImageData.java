@@ -5,11 +5,19 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.library.librarymanagement.databind.ByteArraySerializer;
 import com.library.librarymanagement.ulti.File;
 
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+
+@Data
 public final class BookTypeImageData {
     private Short id = null;
 
     private String name = null;
 
+    @Getter(value = AccessLevel.NONE)
+    @Setter(value = AccessLevel.NONE)
     @JsonSerialize(using = ByteArraySerializer.class)
     private byte[] imageData = null;
 
@@ -23,34 +31,19 @@ public final class BookTypeImageData {
         }
     }
 
-    public Short getId() {
-        return this.id;
-    }
-
-    public String getName() {
-        return this.name;
-    }
-
-    public void setName(final String name) {
-        this.name = name;
-    }
-
     public byte[] getImageData() {
-        byte[] result = null;
-
         if (this.imageData != null) {
-            result = this.imageData.clone();
+            return this.imageData.clone();
+        } else {
+            return new byte[] {};
         }
-
-        return result;
     }
 
     public void setImageData(final byte[] imageData) {
         if (imageData != null) {
             this.imageData = imageData.clone();
         } else {
-            this.imageData = null;
+            this.imageData = new byte[] {};
         }
     }
-
 }

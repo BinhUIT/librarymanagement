@@ -16,7 +16,7 @@ public class BookService {
     private final BookStatusService bookStatusService;
 
     @Autowired(required = true)
-    private BookService(final BookRepository repository, final BookTitleService bookTitleService,
+    public BookService(final BookRepository repository, final BookTitleService bookTitleService,
             final BookStatusService bookStatusService) {
         this.repository = repository;
         this.bookTitleService = bookTitleService;

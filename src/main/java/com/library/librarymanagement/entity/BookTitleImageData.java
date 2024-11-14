@@ -4,7 +4,14 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.library.librarymanagement.databind.ByteArraySerializer;
 import com.library.librarymanagement.ulti.File;
 
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+
+@Data
 public final class BookTitleImageData {
+    @Setter(value = AccessLevel.NONE)
     private Integer id = null;
 
     private String name = null;
@@ -17,6 +24,8 @@ public final class BookTitleImageData {
 
     private String author = null;
 
+    @Getter(value = AccessLevel.NONE)
+    @Setter(value = AccessLevel.NONE)
     @JsonSerialize(using = ByteArraySerializer.class)
     private byte[] imageData = null;
 
@@ -34,57 +43,19 @@ public final class BookTitleImageData {
         }
     }
 
-    public Integer getId() {
-        return this.id;
-    }
-
-    public String getName() {
-        return this.name;
-    }
-
-    public void setName(final String name) {
-        this.name = name;
-    }
-
-    public Integer getAmount() {
-        return this.amount;
-    }
-
-    public Integer getAmountRemaining() {
-        return this.amountRemaining;
-    }
-
-    public BookTypeImageData getType() {
-        return this.type;
-    }
-
-    public void setType(final BookTypeImageData type) {
-        this.type = type;
-    }
-
-    public String getAuthor() {
-        return this.author;
-    }
-
-    public void setAuthor(final String author) {
-        this.author = author;
-    }
-
     public byte[] getImageData() {
-        byte[] result = null;
-
         if (this.imageData != null) {
-            result = imageData.clone();
+            return imageData.clone();
+        } else {
+            return new byte[] {};
         }
-
-        return result;
     }
 
     public void setImageData(final byte[] imageData) {
         if (imageData != null) {
             this.imageData = imageData.clone();
         } else {
-            this.imageData = null;
+            this.imageData = new byte[] {};
         }
     }
 

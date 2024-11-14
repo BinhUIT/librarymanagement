@@ -23,7 +23,7 @@ public class BookTypeService {
     private final BookTypeRepository repository;
 
     @Autowired(required = true)
-    private BookTypeService(final BookTypeRepository repository) {
+    public BookTypeService(final BookTypeRepository repository) {
         this.repository = repository;
     }
 

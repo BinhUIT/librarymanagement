@@ -134,17 +134,13 @@ public class File {
 
     public byte[] readBytes() {
         try {
-            final byte[] result;
-
             if (this.core != null) {
-                result = Files.readAllBytes(this.core.toPath());
+                return Files.readAllBytes(this.core.toPath());
             } else {
-                result = null;
+                return new byte[] {};
             }
-
-            return result;
         } catch (final Throwable throwable) {
-            return null;
+            return new byte[] {};
         }
     }
 }

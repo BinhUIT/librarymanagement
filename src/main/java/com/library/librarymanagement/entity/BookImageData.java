@@ -1,6 +1,12 @@
 package com.library.librarymanagement.entity;
 
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.Setter;
+
+@Data
 public final class BookImageData {
+    @Setter(value = AccessLevel.NONE)
     private Integer id = null;
 
     private BookTitleImageData title = null;
@@ -14,36 +20,7 @@ public final class BookImageData {
             this.id = bookImagePath.getId();
             this.title = new BookTitleImageData(bookImagePath.getTitle());
             this.status = bookImagePath.getStatus();
-            this.isUsable = bookImagePath.getIsUsable();
+            this.isUsable = bookImagePath.isUsable();
         }
     }
-
-    public Integer getId() {
-        return this.id;
-    }
-
-    public BookTitleImageData getTitle() {
-        return this.title;
-    }
-
-    public void setTitle(final BookTitleImageData title) {
-        this.title = title;
-    }
-
-    public BookStatus getStatus() {
-        return this.status;
-    }
-
-    public void setStatus(final BookStatus status) {
-        this.status = status;
-    }
-
-    public boolean isUsable() {
-        return this.isUsable;
-    }
-
-    public void setUsable(final boolean isUsable) {
-        this.isUsable = isUsable;
-    }
-
 }
