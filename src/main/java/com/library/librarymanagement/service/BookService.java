@@ -15,7 +15,6 @@ public class BookService {
     private final BookTitleService bookTitleService;
     private final BookStatusService bookStatusService;
 
-    @Autowired(required = true)
     public BookService(final BookRepository repository, final BookTitleService bookTitleService,
             final BookStatusService bookStatusService) {
         this.repository = repository;
@@ -23,7 +22,7 @@ public class BookService {
         this.bookStatusService = bookStatusService;
     }
 
-    public BookImagePath getBookImagePathById(final Integer id) {
+    public BookImagePath findBookImagePathById(final Integer id) {
         if ((id != null) && (this.repository != null)) {
             return this.repository.findById(id).orElse(null);
         } else {
@@ -32,7 +31,7 @@ public class BookService {
     }
 
     public BookImageData findBookImageDataById(final Integer id) {
-        final var bookImagePath = this.getBookImagePathById(id);
+        final var bookImagePath = this.findBookImagePathById(id);
         if (bookImagePath != null) {
             return new BookImageData(bookImagePath);
         } else {
@@ -67,7 +66,7 @@ public class BookService {
             return false;
         }
 
-        var bookImagePath = this.getBookImagePathById(request.getId());
+        var bookImagePath = this.findBookImagePathById(request.getId());
         if (bookImagePath == null) {
             return false;
         }

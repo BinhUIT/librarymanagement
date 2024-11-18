@@ -3,7 +3,6 @@ package com.library.librarymanagement.controller;
 import java.util.List;
 import java.util.Set;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,8 +25,7 @@ public final class BookTitleController {
 
     private final BookTitleService service;
 
-    @Autowired(required = true)
-    private BookTitleController(final BookTitleService service) {
+    public BookTitleController(final BookTitleService service) {
         this.service = service;
     }
 

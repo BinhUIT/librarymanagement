@@ -3,7 +3,6 @@ package com.library.librarymanagement.service;
 import java.util.Collections;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.library.librarymanagement.repository.BookStatusRepository;
@@ -15,7 +14,6 @@ import com.library.librarymanagement.entity.BookStatus;
 public class BookStatusService {
     private final BookStatusRepository repository;
 
-    @Autowired(required = true)
     public BookStatusService(final BookStatusRepository repository) {
         this.repository = repository;
     }

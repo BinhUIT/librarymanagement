@@ -3,7 +3,6 @@ package com.library.librarymanagement.controller;
 import java.util.List;
 import java.util.Collections;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,8 +22,7 @@ import jakarta.validation.Valid;
 public final class BookTypeController {
     private final BookTypeService service;
 
-    @Autowired(required = true)
-    private BookTypeController(final BookTypeService service) {
+    public BookTypeController(final BookTypeService service) {
         this.service = service;
     }
 

@@ -3,9 +3,7 @@ package com.library.librarymanagement.service;
 import java.util.List;
 import java.util.ArrayList;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import com.library.librarymanagement.request.BookTypeCreationRequest;
@@ -22,7 +20,6 @@ import jakarta.transaction.Transactional;
 public class BookTypeService {
     private final BookTypeRepository repository;
 
-    @Autowired(required = true)
     public BookTypeService(final BookTypeRepository repository) {
         this.repository = repository;
     }

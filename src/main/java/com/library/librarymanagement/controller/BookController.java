@@ -1,6 +1,5 @@
 package com.library.librarymanagement.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,8 +19,7 @@ import jakarta.validation.Valid;
 public final class BookController {
     private final BookService service;
 
-    @Autowired(required = true)
-    private BookController(final BookService service) {
+    public BookController(final BookService service) {
         this.service = service;
     }
 

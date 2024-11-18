@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.ArrayList;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -25,7 +24,6 @@ public class BookTitleService {
     private final BookTitleRepository repository;
     private final BookTypeService bookTypeService;
 
-    @Autowired(required = true)
     public BookTitleService(final BookTitleRepository repository, final BookTypeService bookTypeService) {
         this.repository = repository;
         this.bookTypeService = bookTypeService;
