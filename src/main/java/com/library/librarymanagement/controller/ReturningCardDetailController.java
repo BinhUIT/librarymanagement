@@ -8,6 +8,8 @@ import com.library.librarymanagement.request.ReturningCardDetailDeletionRequest;
 import com.library.librarymanagement.request.ReturningCardDetailUpdateRequest;
 import com.library.librarymanagement.service.ReturningCardDetailService;
 
+import jakarta.validation.Valid;
+
 import java.util.Collections;
 import java.util.Set;
 
@@ -43,7 +45,7 @@ public final class ReturningCardDetailController {
     }
 
     @PostMapping
-    public boolean createReturningCardDetails(@RequestBody final ReturningCardDetailCreationRequest request) {
+    public boolean createReturningCardDetails(@RequestBody @Valid final ReturningCardDetailCreationRequest request) {
         if (this.service == null) {
             return false;
         }
@@ -56,7 +58,7 @@ public final class ReturningCardDetailController {
     }
 
     @PutMapping
-    public boolean updateReturningCardDetails(@RequestBody final ReturningCardDetailUpdateRequest request) {
+    public boolean updateReturningCardDetails(@RequestBody @Valid final ReturningCardDetailUpdateRequest request) {
         if (this.service == null) {
             return false;
         }
@@ -69,7 +71,8 @@ public final class ReturningCardDetailController {
     }
 
     @DeleteMapping
-    public boolean deleteReturningCardDetail(@RequestBody final ReturningCardDetailDeletionRequest request) {
+    public boolean deleteReturningCardDetail(
+            @RequestBody @Valid final ReturningCardDetailDeletionRequest request) {
         if (this.service == null) {
             return false;
         }

@@ -46,7 +46,7 @@ public final class BookStatusController {
     }
 
     @PostMapping
-    public boolean createBookStatus(@RequestBody(required = true) @Valid final BookStatusCreationRequest request) {
+    public boolean createBookStatus(@RequestBody @Valid final BookStatusCreationRequest request) {
         try {
             return this.service.createBookStatus(request);
         } catch (final Exception exception) {
@@ -55,7 +55,7 @@ public final class BookStatusController {
     }
 
     @PutMapping
-    public boolean updateBookStatus(@RequestBody(required = true) @Valid final BookStatusUpdateRequest request) {
+    public boolean updateBookStatus(@RequestBody @Valid final BookStatusUpdateRequest request) {
         try {
             return this.service.updateBookStatus(request);
         } catch (final Exception exception) {

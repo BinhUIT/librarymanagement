@@ -5,6 +5,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.library.librarymanagement.entity.ReturningCard;
 import com.library.librarymanagement.request.ReturningCardCreationRequest;
 import com.library.librarymanagement.service.ReturningCardService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,7 +38,7 @@ public final class ReturningCardController {
     }
 
     @PostMapping
-    public boolean createReturningCard(@RequestBody final ReturningCardCreationRequest request) {
+    public boolean createReturningCard(@RequestBody @Valid final ReturningCardCreationRequest request) {
         if (this.service == null) {
             return false;
         }
