@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
@@ -39,7 +40,7 @@ public final class ReturningCardDetailController {
         }
     }
 
-    @PostMapping("/create")
+    @PostMapping
     public boolean createReturningCardDetails(@RequestBody final ReturningCardDetailCreationRequest request) {
         if (this.service == null) {
             return false;
@@ -52,7 +53,7 @@ public final class ReturningCardDetailController {
         }
     }
 
-    @PostMapping("/update")
+    @PutMapping
     public boolean updateReturningCardDetails(@RequestBody final ReturningCardDetailUpdateRequest request) {
         if (this.service == null) {
             return false;

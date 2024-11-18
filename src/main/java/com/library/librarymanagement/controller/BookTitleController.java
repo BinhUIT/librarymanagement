@@ -6,6 +6,7 @@ import java.util.Set;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,7 +30,7 @@ public final class BookTitleController {
         this.service = service;
     }
 
-    @GetMapping
+    @GetMapping("/all")
     public List<BookTitleImageData> findBookTitlesImageDataByPage(@RequestParam("page") final String numPageString) {
         try {
             final var numPage = Integer.valueOf(numPageString) - 1;
@@ -40,7 +41,7 @@ public final class BookTitleController {
         }
     }
 
-    @GetMapping("/details")
+    @GetMapping
     public BookTitleImageData findBookTitleImageDataById(@RequestParam("id") final String idString) {
         try {
             return this.service.findBookTitleImageDataById(Integer.valueOf(idString));
@@ -65,7 +66,7 @@ public final class BookTitleController {
         }
     }
 
-    @PostMapping("/create")
+    @PostMapping
     public boolean createBookTitle(@RequestBody @Valid final BookTitleCreationRequest request) {
         try {
             return this.service.createBookTitle(request);
@@ -74,7 +75,7 @@ public final class BookTitleController {
         }
     }
 
-    @PostMapping("/update")
+    @PutMapping
     public boolean updateBookTitle(@RequestBody @Valid final BookTitleUpdateRequest request) {
         try {
             return this.service.updateBookTitle(request);
@@ -82,5 +83,4 @@ public final class BookTitleController {
             return false;
         }
     }
-
 }

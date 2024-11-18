@@ -5,6 +5,7 @@ import java.util.Collections;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -26,7 +27,7 @@ public final class BookStatusController {
         this.service = service;
     }
 
-    @GetMapping
+    @GetMapping("/all")
     public List<BookStatus> findAllBookStatus() {
         try {
             return this.service.getAllBookStatus();
@@ -35,7 +36,7 @@ public final class BookStatusController {
         }
     }
 
-    @GetMapping("/details")
+    @GetMapping
     public BookStatus findBookStatusById(@RequestParam("id") final String idString) {
         try {
             return this.service.findBookStatusById(Byte.valueOf(idString));
@@ -44,7 +45,7 @@ public final class BookStatusController {
         }
     }
 
-    @PostMapping("/create")
+    @PostMapping
     public boolean createBookStatus(@RequestBody(required = true) @Valid final BookStatusCreationRequest request) {
         try {
             return this.service.createBookStatus(request);
@@ -53,7 +54,7 @@ public final class BookStatusController {
         }
     }
 
-    @PostMapping("/update")
+    @PutMapping
     public boolean updateBookStatus(@RequestBody(required = true) @Valid final BookStatusUpdateRequest request) {
         try {
             return this.service.updateBookStatus(request);

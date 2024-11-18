@@ -20,7 +20,7 @@ public final class ReturningCardController {
         this.service = service;
     }
 
-    @GetMapping("/details")
+    @GetMapping
     public ReturningCard findReturningCardById(@RequestParam("id") String idString) {
         if (this.service == null) {
             return null;
@@ -34,7 +34,7 @@ public final class ReturningCardController {
         }
     }
 
-    @PostMapping("/create")
+    @PostMapping
     public boolean createReturningCard(@RequestBody final ReturningCardCreationRequest request) {
         if (this.service == null) {
             return false;
