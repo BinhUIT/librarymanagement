@@ -1,0 +1,110 @@
+*{
+    margin: 0;
+}
+.background {
+    background-image: url("../assets/bg_login.png");
+    background-size: cover; 
+    background-position: center; 
+    background-repeat: no-repeat; 
+    height: 100vh; 
+    width: 100%;
+    overflow: hidden;
+}
+
+.login_area{
+    background-color: white;
+    width: 700px;
+    height: 400px;
+    border-radius: 10px;
+    margin: 150px 100px ;
+    padding: 40px;
+    box-sizing: border-box;
+}
+.highlight{
+    text-decoration-color: #A27430;
+}
+.login_area .input-box{
+    position: relative;
+    width: 100%;
+    height: 50px;
+    margin: 30px 0;
+    
+}
+.input-box input{
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    outline: none;
+    border: 2px solid #8F8F8F;
+    border-radius: 20px;
+    font-size: 16px;
+    padding-left:10px;
+    padding-right: 10px;
+    box-sizing: border-box;
+}
+.input-box input::placeholder{
+    color: #8F8F8F;
+}
+.login_area .remember-forgot{
+    display: flex;
+    justify-content: space-between;
+
+}
+.submit-btn{
+    width: 100%;
+    height: 45px;
+    border: none;
+    outline: none;
+    border-radius: 30px;
+    box-sizing: border-box;
+    margin-top: 10px;
+    cursor: pointer;
+    background-color: #A27430;
+    font-weight: 700;
+    font-size: large;
+    color: #fff;
+    transition: background-color 0.3s ease;
+}
+.submit-btn:hover{
+    background-color: #575757;
+}
+.submit-btn img{
+    width: 30px;
+    height: 15px;
+    justify-content: center;
+}
+.navbar {
+    background-color: #000000; /* Dark background color */
+}
+
+/* Styles for the unordered list in the nav */
+.navbar ul {
+    list-style: none; /* Remove default bullet points */
+    margin: 0;        /* Remove margin */
+    padding: 20px;       /* Remove padding */
+    display: flex;    /* Display list items in a row */
+    justify-content: left; /* Center the navigation bar */
+}
+
+/* Styles for list items in the nav */
+.navbar ul li {
+    margin: 0 15px; /* Add space between items */
+}
+
+/* Styles for links in the nav */
+.navbar ul li a {
+    color: white; /* White text color */
+    text-decoration: none; /* Remove underline from links */
+    font-size: 18px; /* Font size for links */
+    font-family: Arial, sans-serif;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease; /* Smooth hover effect */
+}
+
+/* Hover effect for links */
+.navbar ul li a:hover {
+    background-color: #575757; /* Slightly lighter gray on hover */
+    color: #fff; /* Keep text white */
+}
