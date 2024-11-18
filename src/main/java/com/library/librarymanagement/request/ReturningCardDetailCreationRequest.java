@@ -1,0 +1,29 @@
+package com.library.librarymanagement.request;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.library.librarymanagement.entity.ReturningCardDetailId;
+
+import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.Setter;
+
+@Data
+@Setter(value = AccessLevel.NONE)
+public final class ReturningCardDetailCreationRequest {
+    @NotNull(message = "Returning Card Id in Returning Card Detail Creation request can not be null")
+    private Integer returningCardId = null;
+
+    @NotNull(message = "Book Title Id in Returning Card Detail Creation request can not be null")
+    private Integer bookTitleId = null;
+
+    @JsonCreator
+    private ReturningCardDetailCreationRequest(final Integer returningCardId, final Integer bookTitleId) {
+        this.returningCardId = returningCardId;
+        this.bookTitleId = bookTitleId;
+    }
+
+    public ReturningCardDetailId getReturningCardDetailId() {
+        return new ReturningCardDetailId(this.returningCardId, this.bookTitleId);
+    }
+}
