@@ -26,7 +26,7 @@ public class ReturningCardService {
     }
 
     public boolean createReturningCard(final ReturningCardCreationRequest request) {
-        if ((request == null) || (this.repository == null)) {
+        if ((request == null) || (this.repository == null) || (this.userService == null)) {
             return false;
         }
 

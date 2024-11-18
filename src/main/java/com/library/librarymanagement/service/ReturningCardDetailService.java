@@ -41,7 +41,7 @@ public class ReturningCardDetailService {
             return Collections.emptySet();
         }
 
-        final var returningCardDetails = this.repository.findByReturingCardId(returningCardId);
+        final var returningCardDetails = this.repository.findByReturningCardId(returningCardId);
         final var result = new HashSet<BookImagePath>(returningCardDetails.size());
         for (final var returningCardDetail : returningCardDetails) {
             result.add(returningCardDetail.getBook());
@@ -63,8 +63,8 @@ public class ReturningCardDetailService {
             return false;
         }
 
-        final var bookTitle = this.bookService.findBookImagePathById(id.getBookId());
-        if (bookTitle == null) {
+        final var book = this.bookService.findBookImagePathById(id.getBookId());
+        if (book == null) {
             return false;
         }
 
@@ -73,7 +73,7 @@ public class ReturningCardDetailService {
             return false;
         }
 
-        final var returningCardDetail = new ReturningCardDetail(returningCard, bookTitle);
+        final var returningCardDetail = new ReturningCardDetail(returningCard, book);
         this.repository.save(returningCardDetail);
         return true;
     }
@@ -83,12 +83,12 @@ public class ReturningCardDetailService {
             return false;
         }
 
-        final var bookTitle = this.bookService.findBookImagePathById(bookTitleId);
-        if (bookTitle == null) {
+        final var book = this.bookService.findBookImagePathById(bookTitleId);
+        if (book == null) {
             return false;
         }
 
-        final var returningCardDetail = new ReturningCardDetail(returningCard, bookTitle);
+        final var returningCardDetail = new ReturningCardDetail(returningCard, book);
         this.repository.save(returningCardDetail);
         return true;
     }
@@ -108,7 +108,7 @@ public class ReturningCardDetailService {
             return false;
         }
 
-        final var newBookTitleId = request.getNewBookTitleId();
+        final var newBookTitleId = request.getNewBookId();
         final BookImagePath newBook;
         if ((bookService != null) && (newBookTitleId != null)) {
             newBook = bookService.findBookImagePathById(newBookTitleId);
@@ -135,7 +135,7 @@ public class ReturningCardDetailService {
         }
 
         if (newReturningCard != null) {
-            returningCardDetail.setReturingCard(newReturningCard);
+            returningCardDetail.setReturningCard(newReturningCard);
         }
 
         if (newBook != null) {
@@ -153,7 +153,7 @@ public class ReturningCardDetailService {
 
         return this.deleteReturningCardDetail(
                 this.returningCardService.findReturningCardById(request.getReturningCardId()),
-                this.bookService.findBookImagePathById(request.getBookTitleId()));
+                this.bookService.findBookImagePathById(request.getBookId()));
     }
 
     private boolean deleteReturningCardDetail(final ReturningCard returningCard, final BookImagePath bookTitle) {

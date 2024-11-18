@@ -7,5 +7,5 @@ import com.library.librarymanagement.entity.ReturningCardDetailId;
 import java.util.List;
 
 public interface ReturningCardDetailRepository extends JpaRepository<ReturningCardDetail, ReturningCardDetailId> {
-    List<ReturningCardDetail> findByReturingCardId(Integer returingCardId);
+    List<ReturningCardDetail> findByReturningCardId(final Integer returingCardId);
 }

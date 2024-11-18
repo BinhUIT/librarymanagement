@@ -14,16 +14,16 @@ public final class ReturningCardDetailDeletionRequest {
     @NotNull(message = "Returning Card Id in Returning Card Detail Deletion request can not be null")
     private Integer returningCardId = null;
 
-    @NotNull(message = "Book Title Id in Returning Card Detail Deletion request can not be null")
-    private Integer bookTitleId = null;
+    @NotNull(message = "Book Id in Returning Card Detail Deletion request can not be null")
+    private Integer bookId = null;
 
     @JsonCreator
-    private ReturningCardDetailDeletionRequest(final Integer returningCardId, final Integer bookTitleId) {
+    private ReturningCardDetailDeletionRequest(final Integer returningCardId, final Integer bookId) {
         this.returningCardId = returningCardId;
-        this.bookTitleId = bookTitleId;
+        this.bookId = bookId;
     }
 
     public ReturningCardDetailId getReturningCardDetailId() {
-        return new ReturningCardDetailId(this.returningCardId, this.bookTitleId);
+        return new ReturningCardDetailId(this.returningCardId, this.bookId);
     }
 }

@@ -15,29 +15,29 @@ public final class ReturningCardDetailUpdateRequest {
     @NotNull(message = "Old returning Card Id in Returning Card Detail Update request can not be null")
     private Integer oldReturningCardId = null;
 
-    @NotNull(message = "Old book Title Id in Returning Card Detail Update request can not be null")
-    private Integer oldBookTitleId = null;
+    @NotNull(message = "Old book Id in Returning Card Detail Update request can not be null")
+    private Integer oldBookId = null;
 
     private Integer newReturningCardId = null;
 
-    private Integer newBookTitleId = null;
+    private Integer newBookId = null;
 
     @JsonCreator
-    private ReturningCardDetailUpdateRequest(final Integer oldReturningCardId, final Integer oldBookTitleId,
-            final Integer newReturningCardId, final Integer newBookTitleId) {
-        this.oldReturningCardId = oldBookTitleId;
-        this.oldBookTitleId = oldBookTitleId;
+    private ReturningCardDetailUpdateRequest(final Integer oldReturningCardId, final Integer oldBookId,
+            final Integer newReturningCardId, final Integer newBookId) {
+        this.oldReturningCardId = oldBookId;
+        this.oldBookId = oldBookId;
         this.newReturningCardId = newReturningCardId;
-        this.newBookTitleId = newBookTitleId;
+        this.newBookId = newBookId;
     }
 
     @AssertTrue(message = "Returning Card Detail Update request is not valid")
     public boolean isValid() {
-        return (this.oldReturningCardId != null) && (this.oldBookTitleId != null) &&
-                ((this.newReturningCardId != null) || (this.newBookTitleId != null));
+        return (this.oldReturningCardId != null) && (this.oldBookId != null) &&
+                ((this.newReturningCardId != null) || (this.newBookId != null));
     }
 
     public ReturningCardDetailId getOldReturningCardDetailId() {
-        return new ReturningCardDetailId(this.oldReturningCardId, this.oldBookTitleId);
+        return new ReturningCardDetailId(this.oldReturningCardId, this.oldBookId);
     }
 }

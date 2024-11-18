@@ -2,6 +2,9 @@ package com.library.librarymanagement.entity;
 
 import java.time.LocalDate;
 
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -21,6 +24,8 @@ import lombok.experimental.FieldNameConstants;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @FieldNameConstants
 @Table(name = "ReturningCard")
+@DynamicInsert
+@DynamicUpdate
 public final class ReturningCard {
     @Id
     @Column(name = "Id", nullable = false, unique = true, insertable = false, updatable = false)
