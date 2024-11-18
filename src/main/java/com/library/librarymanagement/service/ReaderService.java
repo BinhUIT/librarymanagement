@@ -16,7 +16,7 @@ import com.library.librarymanagement.repository.UserRepository;
 import com.library.librarymanagement.request.BorrowingRequest;
 
 @Service
-public class ReaaderService {
+public class ReaderService {
 
     @Autowired 
     private RequestRepository requestRepo; 

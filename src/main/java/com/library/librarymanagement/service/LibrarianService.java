@@ -46,20 +46,5 @@ public class LibrarianService {
         request.setLibrarianId(response.getLibrarianId()); 
         requestRepo.save(request); 
         return new ResponseEntity<>("Checked request", HttpStatus.OK);
-        
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }

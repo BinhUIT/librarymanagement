@@ -10,12 +10,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.library.librarymanagement.request.BorrowingRequest;
 import com.library.librarymanagement.security.TokenSecurity;
-import com.library.librarymanagement.service.ReaaderService;
+import com.library.librarymanagement.service.ReaderService;
 
 @RestController
 public class ReaderController { 
     @Autowired 
-    private ReaaderService readerService; 
+    private ReaderService readerService;
 
     @Autowired 
     private TokenSecurity tokenSecurity;
