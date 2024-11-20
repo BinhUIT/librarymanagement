@@ -40,8 +40,9 @@ public class TokenSecurity {
         {  
             token = token +Integer.toString(user.getUserId());
         }
+        
+        token=Integer.toString(user.getRole())+token; 
         addToTableToken(token);
-        token=Integer.toString(user.getRole())+token;
         return token;
     }   
     public void addToTableToken(String token) 
@@ -68,7 +69,8 @@ public class TokenSecurity {
     } 
     public int extractUserId(String token) 
     {
-        String id= token.substring(6);  
+        String id= token.substring(7);   
+        
         return Integer.parseInt(id);
 
     } 
@@ -94,6 +96,19 @@ public class TokenSecurity {
     {  
         return Character.getNumericValue(token.charAt(0));
     }
-    
+     
+    public int getUserIdAndCheckLibrarian(String authHeader) 
+    { 
+        if(authHeader==null||!authHeader.startsWith("Bearer ") || !validateToken(authHeader.substring(7))||extractRole(authHeader)<1) 
+        {
+            return -1;
+
+        } 
+        return extractUserId(authHeader.substring(7)); 
+    } 
+    public boolean userExist(int userId)  
+    {
+        return userRepo.findById(userId).orElse(null)!=null;
+    }
 
 }

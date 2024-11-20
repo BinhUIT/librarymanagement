@@ -5,7 +5,9 @@ import java.util.Collections;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,7 +46,13 @@ public final class BookTypeController {
         } catch (final Exception exception) {
             return null;
         }
-    }
+    } 
+    
+   @GetMapping("/findByName/{name}") 
+   public ResponseEntity<BookTypeImageData> findByName(@PathVariable String name) 
+   {
+        return service.findByName(name);
+   }
 
     @GetMapping(value = "/image", produces = MediaType.IMAGE_PNG_VALUE)
     public byte[] getImageBookTypeById(@RequestParam("id") final String idString) {

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body> 
+    <form id="search_book_title">
+        <label for="search_type">Tìm kiếm theo: </label>
+        <input list="type", id="search_type"> 
+        <datalist id="type">
+            <option value="Thể loại sách"></option> 
+            <option value="Tên sách"></option> 
+            <option value="Tác giả"></option>
+        </datalist> 
+        <br>
+
+        <label for="search">Thông tin cần tìm: </label> 
+        <input id="search", type="text">
+        <br> 
+        <input type="submit", value="Tìm">
+    </form> 
+    <br>
+    <div id="book_title_area">
+        
+    </div> 
+    <script src="http://localhost:8080/Test/js/bookTitle.js"></script>
+</body>
+</html>

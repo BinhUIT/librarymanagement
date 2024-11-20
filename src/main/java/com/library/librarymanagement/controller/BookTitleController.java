@@ -3,7 +3,9 @@ package com.library.librarymanagement.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,10 +40,26 @@ public final class BookTitleController {
         } catch (final Exception exception) {
             return Collections.emptyList();
         }
-    }
+    } 
+    @GetMapping("/get/byBookType/{id}") 
+    public ResponseEntity<List<BookTitleImageData>> getBookTitlesByBookType(@PathVariable short id) 
+    { 
+        return service.getBookTitleByType(id);
+    } 
 
-    @GetMapping("/details")
-    public BookTitleImageData getBookTitleById(@RequestParam("id") final String idString) {
+   @GetMapping("/get/byAuthor/{author}") 
+   public ResponseEntity<List<BookTitleImageData>> getBookTitlesByAuthor(@PathVariable String author) 
+   { 
+    return service.getBookTitleByAuthor(author);
+   }
+
+   @GetMapping("/get/byName/{name}") 
+   public ResponseEntity<BookTitleImageData> getBookTitleByName(@PathVariable String name) 
+   { 
+    return service.findByName(name);
+   }
+    @GetMapping("/details/{idString}")
+    public BookTitleImageData getBookTitleById(@PathVariable final String idString) {
         try {
             return this.service.getBookTitleImageDataById(Integer.valueOf(idString));
         } catch (final Exception exception) {
@@ -65,6 +83,9 @@ public final class BookTitleController {
         } catch (final Exception exception) {
             return false;
         }
-    }
+    } 
+
+
+    
 
 }

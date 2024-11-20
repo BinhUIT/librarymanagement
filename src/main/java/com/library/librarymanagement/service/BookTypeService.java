@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
@@ -244,6 +246,11 @@ public final class BookTypeService {
         }
 
         return result;
+    } 
+
+    public ResponseEntity<BookTypeImageData> findByName(String name)
+    { 
+        return new ResponseEntity<>(new BookTypeImageData(repository.findByName(name)), HttpStatus.OK);
     }
 
 }

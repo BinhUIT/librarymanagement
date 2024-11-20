@@ -4,8 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.experimental.FieldNameConstants;
@@ -16,7 +14,7 @@ import lombok.experimental.FieldNameConstants;
 public final class BookTypeImagePath {
     @Id
     @Column(name = "Id", columnDefinition = "smallint", nullable = false, unique = true, insertable = false, updatable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Short id = null;
 
     @Column(name = "Name", columnDefinition = "varchar(45)", nullable = false, unique = true)
@@ -32,6 +30,12 @@ public final class BookTypeImagePath {
     public BookTypeImagePath(final String name, final String imagePath) {
         this.name = name;
         this.imagePath = imagePath;
+    } 
+    public BookTypeImagePath(short id, String name, String imagePath) 
+    { 
+        this.id=id; 
+        this.name=name; 
+        this.imagePath=imagePath;
     }
 
     public Short getId() {

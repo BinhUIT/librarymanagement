@@ -9,5 +9,8 @@ import com.library.librarymanagement.entity.BookTypeImagePath;
 public interface BookTypeRepository extends JpaRepository<BookTypeImagePath, Short> {
     boolean existsByName(final String name);
 
-    boolean existsByImagePath(final String imagePath);
+    boolean existsByImagePath(final String imagePath); 
+
+
+    public BookTypeImagePath findByName(String name);
 }

@@ -6,6 +6,8 @@ import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.library.librarymanagement.request.BookTitleCreationRequest;
@@ -13,6 +15,7 @@ import com.library.librarymanagement.request.BookTitleUpdateRequest;
 import com.library.librarymanagement.resource.ResourceStrings;
 import com.library.librarymanagement.entity.BookTitleImageData;
 import com.library.librarymanagement.entity.BookTitleImagePath;
+import com.library.librarymanagement.entity.BookTypeImagePath;
 import com.library.librarymanagement.repository.BookTitleRepository;
 import com.library.librarymanagement.repository.BookTypeRepository;
 import com.library.librarymanagement.ulti.File;
@@ -70,6 +73,23 @@ public final class BookTitleService {
         }
 
         return result;
+    } 
+    public ResponseEntity<List<BookTitleImageData>> getBookTitleByType(short typeId) 
+    { 
+        BookTypeImagePath bookType = bookTypeRepository.findById(typeId).orElse(null); 
+        if(bookType==null) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        } 
+        List<BookTitleImagePath> listBookTitle= bookTitleRepository.findByType(bookType); 
+        List<BookTitleImageData> listBookTitleImageData = new ArrayList<>();
+        for(int i=0;i<listBookTitle.size();i++) 
+        {
+            BookTitleImageData bookTitleImageData= new BookTitleImageData(listBookTitle.get(i)); 
+            listBookTitleImageData.add(bookTitleImageData); 
+
+        }  
+        return new ResponseEntity<>(listBookTitleImageData, HttpStatus.OK);
+
     }
 
     public boolean createBookTitle(final BookTitleCreationRequest request) {
@@ -139,5 +159,24 @@ public final class BookTitleService {
         this.bookTitleRepository.save(bookTitleImagePath);
 
         return true;
+    } 
+
+
+    public ResponseEntity<List<BookTitleImageData>> getBookTitleByAuthor(String author) 
+    {
+        List<BookTitleImagePath> listBookTitleImagePath = bookTitleRepository.findByAuthor(author);  
+        List<BookTitleImageData> listBookTitleImageData = new ArrayList<>();
+        for(int i=0;i<listBookTitleImagePath.size();i++)
+        {
+            BookTitleImageData bookTitleImageData = new BookTitleImageData(listBookTitleImagePath.get(i)); 
+            listBookTitleImageData.add(bookTitleImageData);
+        } 
+        return new ResponseEntity<>(listBookTitleImageData, HttpStatus.OK);
+    } 
+
+    public ResponseEntity<BookTitleImageData> findByName(String name) 
+    { 
+        BookTitleImagePath bookTitleImagePath = bookTitleRepository.findByName(name); 
+        return new ResponseEntity<>(new BookTitleImageData(bookTitleImagePath), HttpStatus.OK);
     }
 }

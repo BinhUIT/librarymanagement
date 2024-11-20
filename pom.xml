@@ -71,7 +71,7 @@
     		<groupId>io.github.cdimascio</groupId>
     		<artifactId>dotenv-java</artifactId>
     		<version>3.0.0</version>
-		</dependency> 
+		</dependency>
 		<dependency> <groupId>org.springframework.security</groupId> <artifactId>spring-security-core</artifactId> </dependency> 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -84,8 +84,13 @@
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
+				<artifactId>spring-boot-maven-plugin</artifactId> 
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin> 
+			
 		</plugins>
 	</build>
 

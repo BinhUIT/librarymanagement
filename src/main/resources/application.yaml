@@ -7,9 +7,9 @@ spring:
     config:
         import: optional:file:.env[.properties]
     datasource:
-        url: ${DB_URL}
-        username: ${DB_USERNAME}
-        password: ${DB_PASSWORD}
+        url: jdbc:mysql://localhost:3306/LIBRARY
+        username: root
+        password: your_password
     jpa:
         hibernate:
             ddl-auto: none
@@ -20,8 +20,8 @@ spring:
     mail:
         host: smtp.gmail.com
         port: 587
-        username: ${YOUR_EMAIL}
-        password: ${APP_PASSWORD}
+        username: leyen15121971@gmail.com
+        password: ijxl pylv ektk fbmi
         properties:
             mail:
                 smtp:

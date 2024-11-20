@@ -1,5 +1,8 @@
 package com.library.librarymanagement.entity;
 
+import java.util.Date;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -19,18 +22,22 @@ public class BorrowingCardDetail {
 
     @ManyToOne
     @JoinColumn(name="BOOKID", columnDefinition="INT", referencedColumnName="ID") 
-    private BookImagePath book; 
+    private BookImagePath book;  
+
+    @Column(name="EXPIREDATE", columnDefinition="DATE") 
+    private Date expireDate;
 
     public BorrowingCardDetail() 
     {
 
     }  
-    public BorrowingCardDetail(int id,Service service, BookImagePath book) 
+    public BorrowingCardDetail(int id,Service service, BookImagePath book, Date expireDate) 
     {  
 
         this.id=id;
         this.service=service; 
-        this.book=book;
+        this.book=book; 
+        this.expireDate= expireDate;
     }  
     public int getId() 
     { 
@@ -51,6 +58,14 @@ public class BorrowingCardDetail {
     public void setBook(BookImagePath book) 
     { 
         this.book=book;
+    } 
+    public Date getExpireDate() 
+    {
+        return this.expireDate;
+    } 
+    public void setExpireDate(Date expireDate) 
+    { 
+        this.expireDate = expireDate;
     }
 
 }

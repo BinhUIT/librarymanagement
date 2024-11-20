@@ -5,8 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -19,17 +17,17 @@ import lombok.experimental.FieldNameConstants;
 public final class BookTitleImagePath {
     @Id
     @Column(name = "Id", columnDefinition = "int", nullable = false, unique = true, insertable = false, updatable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id = null;
 
     @Column(name = "Name", columnDefinition = "varchar(45)", nullable = false, unique = true)
     private String name = null;
 
-    @Column(name = "Amount", columnDefinition = "int", nullable = false, insertable = false, updatable = false)
+    @Column(name = "Amount", columnDefinition = "int", nullable = false, insertable = true)
     @ColumnDefault(value = "0")
     private Integer amount = null;
 
-    @Column(name = "AmountRemaining", columnDefinition = "int", nullable = false, insertable = false, updatable = false)
+    @Column(name = "AmountRemaining", columnDefinition = "int", nullable = false, insertable = true)
     @ColumnDefault(value = "0")
     private Integer amountRemaining = null;
 
@@ -53,6 +51,16 @@ public final class BookTitleImagePath {
         this.type = type;
         this.author = author;
         this.imagePath = imagePath;
+    } 
+    public BookTitleImagePath(int id, String name, BookTypeImagePath type, String author, String imagePath) 
+    { 
+        this.id=id;
+        this.name = name;
+        this.type = type;
+        this.author = author;
+        this.imagePath = imagePath; 
+        this.amount=0; 
+        this.amountRemaining=0;
     }
 
     public Integer getId() {

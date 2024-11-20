@@ -5,13 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-
 import lombok.experimental.FieldNameConstants;
 
 @Entity
@@ -20,7 +17,7 @@ import lombok.experimental.FieldNameConstants;
 public final class BookImagePath {
     @Id
     @Column(name = "id", columnDefinition = "int", nullable = false, unique = true, insertable = false, updatable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id = null;
 
     @ManyToOne(optional = false)
@@ -37,6 +34,12 @@ public final class BookImagePath {
 
     @Autowired(required = true)
     private BookImagePath() {
+    } 
+    public BookImagePath(int id,final BookTitleImagePath title, final BookStatus status, final boolean isUsable) { 
+        this.id=id;
+        this.title = title;
+        this.status = status;
+        this.isUsable = isUsable;
     }
 
     public BookImagePath(final BookTitleImagePath title, final BookStatus status, final boolean isUsable) {

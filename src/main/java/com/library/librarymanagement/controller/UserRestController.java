@@ -20,6 +20,7 @@ import com.library.librarymanagement.request.RegisterRequest;
 import com.library.librarymanagement.request.UpdateNormalInfoRequest;
 import com.library.librarymanagement.request.UpdatePasswordRequest;
 import com.library.librarymanagement.response.LoginResponse;
+import com.library.librarymanagement.security.TokenSecurity;
 import com.library.librarymanagement.service.UserService;
 
 import jakarta.mail.MessagingException;
@@ -29,6 +30,9 @@ import jakarta.servlet.http.HttpServletRequest;
 public class UserRestController {  
     @Autowired
     private UserService userService;  
+    
+    @Autowired 
+    private TokenSecurity tokenSecurity;
      
     @PostMapping("/login") 
     public ResponseEntity<LoginResponse> userLogin(@RequestBody LoginRequest request) 
@@ -44,8 +48,16 @@ public class UserRestController {
         
     } 
     @PostMapping("/register") 
-    public ResponseEntity<String> userRegister(@RequestBody RegisterRequest request, HttpServletRequest http) throws MessagingException, UnsupportedEncodingException 
+    public ResponseEntity<String> userRegister(@RequestHeader("Authorization") String authHeader,@RequestBody RegisterRequest request, HttpServletRequest http) throws MessagingException, UnsupportedEncodingException 
     { 
+        if(request.getRole()==1) 
+        { 
+            if(authHeader==null||!authHeader.startsWith("Bearer ") || !tokenSecurity.checkToken(authHeader.substring(7))||tokenSecurity.extractRole(authHeader)<1) 
+            {
+                return new ResponseEntity<>("Denied", HttpStatus.UNAUTHORIZED);
+
+            }
+        } 
         return userService.handleRegister(request, getSiteURL(http));
     } 
     private String getSiteURL(HttpServletRequest http) 

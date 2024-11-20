@@ -59,7 +59,7 @@ public class User {
         this.address=request.getAddress(); 
         this.phoneNumber = request.getPhoneNumber(); 
         this.email= request.getEmail(); 
-        
+        this.role=request.getRole();
         this.enable=false; 
         this.verificationCode="";
     }

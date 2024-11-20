@@ -62,7 +62,7 @@ public class UserService {
         } 
         if(user.getEnable()==false) 
         {
-            return new ResponseEntity<>(new LoginResponse(-1,"You can not use this account",-1), HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(new LoginResponse(user.getUserId(),"You can not use this account, the userId is: " ,-1), HttpStatus.UNAUTHORIZED);
         } 
         
 

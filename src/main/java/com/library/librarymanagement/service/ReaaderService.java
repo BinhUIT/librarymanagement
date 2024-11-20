@@ -1,6 +1,7 @@
 package com.library.librarymanagement.service;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,7 +17,9 @@ import com.library.librarymanagement.entity.BookTitleImagePath;
 import com.library.librarymanagement.entity.BorrowingCardDetail;
 import com.library.librarymanagement.entity.CartDetail;
 import com.library.librarymanagement.entity.Notification;
+import com.library.librarymanagement.entity.RenewalCardDetail;
 import com.library.librarymanagement.entity.ServiceType;
+import com.library.librarymanagement.entity.UnlockRequest;
 import com.library.librarymanagement.entity.User;
 import com.library.librarymanagement.repository.BookRepository;
 import com.library.librarymanagement.repository.BookStatusRepository;
@@ -24,13 +27,18 @@ import com.library.librarymanagement.repository.BookTitleRepository;
 import com.library.librarymanagement.repository.BorrowingCardDetailRepository;
 import com.library.librarymanagement.repository.CartDetailRepository;
 import com.library.librarymanagement.repository.NotificationRepository;
+import com.library.librarymanagement.repository.RenewalDetailRepository;
 import com.library.librarymanagement.repository.ServiceRepository;
 import com.library.librarymanagement.repository.ServiceTypeRepository;
+import com.library.librarymanagement.repository.UnlockRequestRepository;
 import com.library.librarymanagement.repository.UserRepository;
 import com.library.librarymanagement.request.AddCartDetailRequest;
 import com.library.librarymanagement.request.BorrowingDetailRequest;
 import com.library.librarymanagement.request.BorrowingRequest;
 import com.library.librarymanagement.request.CartDetailUpdateRequest;
+import com.library.librarymanagement.request.RenewalCardDetailRequest;
+import com.library.librarymanagement.request.RenewalRequest;
+import com.library.librarymanagement.security.TokenSecurity;
 
 
 @Service
@@ -53,7 +61,17 @@ public class ReaaderService {
    @Autowired 
    private NotificationRepository notifRepo; 
    @Autowired 
-   private CartDetailRepository cartDetailRepo;
+   private CartDetailRepository cartDetailRepo; 
+
+   @Autowired 
+   private RenewalDetailRepository renewalDetailRepo; 
+
+   @Autowired 
+   private TokenSecurity tokenSecurity; 
+
+    @Autowired 
+   private UnlockRequestRepository unlockRequestRepo;
+   
    public ResponseEntity<String> borrowingBook(BorrowingRequest request) 
    {   
         List<BorrowingDetailRequest> listBookTitle = request.getListBook();  
@@ -97,8 +115,13 @@ public class ReaaderService {
                 if(book.getStatus().getId()==0) {  
                     Integer val=1;
                     book.setStatus(new BookStatus(val.byteValue(),"Borrowing"));
-                    bookRepo.save(book); 
-                    BorrowingCardDetail newDetail = new BorrowingCardDetail(borrowingDetailAmount, newService, book);  
+                    bookRepo.save(book);  
+                    Date sendDate = request.getServiceRequest().getImplementDate(); 
+                    Calendar calendar = Calendar.getInstance(); 
+                    calendar.setTime(sendDate); 
+                    calendar.add(Calendar.DAY_OF_MONTH, 30); 
+                    Date expireDate = calendar.getTime();
+                    BorrowingCardDetail newDetail = new BorrowingCardDetail(borrowingDetailAmount, newService, book,expireDate);  
                     borrowingDetailAmount++;
                     detailList.add(newDetail);  
                     bookIndex++;
@@ -116,7 +139,8 @@ public class ReaaderService {
         serviceRepo.save(newService);  
         for(BorrowingCardDetail i: detailList) 
         {
-            borrowingDetailRepo.save(i);
+            borrowingDetailRepo.save(i); 
+            
         } 
         
         Date sendDate= request.getServiceRequest().getImplementDate();
@@ -156,7 +180,7 @@ public class ReaaderService {
    } 
 
    @SuppressWarnings("null")
-public ResponseEntity<Notification> readANotification(int userId, int notifId) 
+    public ResponseEntity<Notification> readANotification(int userId, int notifId) 
    { 
         User user = userRepo.findById(userId).orElse(null); 
         if(user==null) return new ResponseEntity<>(new Notification(-1,null, null, false, "User does not exits",""), HttpStatus.BAD_REQUEST);
@@ -172,7 +196,7 @@ public ResponseEntity<Notification> readANotification(int userId, int notifId)
    } 
 
    @SuppressWarnings("null")
-public ResponseEntity<List<CartDetail>> getCart(int userId) 
+    public ResponseEntity<List<CartDetail>> getCart(int userId) 
    { 
     User user= userRepo.findById(userId).orElse(null); 
     if(user==null) return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
@@ -233,7 +257,73 @@ public ResponseEntity<List<CartDetail>> getCart(int userId)
             if(cartUpdateRequest.getCartDetailId()==i.getId()) return true;
         } 
         return false;
+   }  
+
+
+   public ResponseEntity<String> sendRenewalRequest(RenewalRequest request, int userId) 
+   {
+        int newServiceId = serviceRepo.findAll().size();  
+        List<RenewalCardDetail> detailList = new ArrayList<>(); 
+        if(userId!=request.getServiceRequest().getReaderId()) 
+        {
+            return new ResponseEntity<>("Wrong information", HttpStatus.BAD_REQUEST);
+        }
+        User reader = userRepo.findById(request.getServiceRequest().getReaderId()).orElse(null); 
+        if(reader==null) 
+        { 
+            return new ResponseEntity<>("Reader does not exists", HttpStatus.BAD_REQUEST);
+        } 
+        ServiceType serviceType = serviceTypeRepo.findById(request.getServiceRequest().getServiceTypeId()).orElse(null);
+        if(serviceType==null) 
+        { 
+            return new ResponseEntity<>("We do not have this service", HttpStatus.BAD_REQUEST);
+        } 
+        com.library.librarymanagement.entity.Service newService = new com.library.librarymanagement.entity.Service(newServiceId,
+        reader, new Date(), serviceType);  
+        for(RenewalCardDetailRequest detailRequest: request.getListRenewalDetails()) 
+        {  
+            BorrowingCardDetail borrowingDetail = borrowingDetailRepo.findById(detailRequest.getBorrowingCardDetailId()).orElse(null); 
+            if(borrowingDetail==null) return new ResponseEntity<>("Renewal Failed", HttpStatus.BAD_REQUEST); 
+            if(borrowingDetail.getService().getReader().getUserId()!=request.getServiceRequest().getReaderId()) 
+            return new ResponseEntity<>("Renewal send failed", HttpStatus.BAD_REQUEST);  
+            User defaultLibrarian= userRepo.findById(-1).orElse(null);
+            RenewalCardDetail newDetail = new RenewalCardDetail(Integer.MAX_VALUE,newService,defaultLibrarian,borrowingDetail ); 
+            detailList.add(newDetail);
+        }  
+        serviceRepo.save(newService);   
+        for(RenewalCardDetail detail: detailList) 
+        {  
+            renewalDetailRepo.save(detail);
+        } 
+        return new ResponseEntity<>("Send renewal success, please wait for librarian to response", HttpStatus.OK);
+   } 
+
+
+   public ResponseEntity<String> sendUnlockRequest(String authHeader) 
+   { 
+        int userId= tokenSecurity.extractUserId(authHeader);  
+        User reader= userRepo.findById(userId).orElse(null); 
+        if(reader.getEnable()==true) 
+        { 
+            return new ResponseEntity<>("User account is not locked", HttpStatus.BAD_REQUEST); 
+
+        } 
+        User defaultLibrarian = userRepo.findById(-1).orElse(null); 
+        int maxValue= Integer.MAX_VALUE;
+        UnlockRequest unlockRequest = new UnlockRequest(maxValue, reader, false, defaultLibrarian, null); 
+        unlockRequestRepo.save(unlockRequest); 
+        return new ResponseEntity<>("You sent unlock request, please wait for librarian to response", HttpStatus.OK);
    }
+
+
+   
+
+
+   
+
+
+
+   
     
 
 
