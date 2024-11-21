@@ -26,7 +26,7 @@ function displayCart(cart)
         const cartDetail = document.createElement('tr');   
 
         const cartDetailId = document.createElement('th'); 
-        cartDetailId.innerHTML= cart[i].bookTitle.id;
+        cartDetailId.innerHTML= cart[i].bookTitleImagePath.id;
 
         const cartDetailName = document.createElement('th'); 
         cartDetailName.innerHTML = cart[i].bookTitleImagePath.name; 
@@ -35,9 +35,9 @@ function displayCart(cart)
         const cartDetailAmountInput = document.createElement('input'); 
         cartDetailAmountInput.type="number"; 
         cartDetailAmountInput.min="1";
-        cartDetailAmountInput.max=cart[i].bookTitle.amountRemaining;
-        cartDetailAmountInput.value= cart.amount;
-        cartDetailAmount.appendChild(cartDetailInput);
+        cartDetailAmountInput.max=cart[i].bookTitleImagePath.amountRemaining;
+        cartDetailAmountInput.value= cart[i].amount;
+        cartDetailAmount.appendChild(cartDetailAmountInput);
 
         const saveButtonTh = document.createElement('th'); 
         const saveButton = document.createElement("button"); 
@@ -97,12 +97,52 @@ function displayCart(cart)
 
 
     }
-} 
+}  
+async function setupBorrowingButton(cart) 
+{ 
+    const listRequest =[];
+    for(let i=0;i<cart.length;i++) 
+    {
+        const newRequest = {
+            bookTitleId:cart[i].bookTitleImagePath.id,
+            amount:cart[i].amount
+        };
+        listRequest.push(newRequest);
+    }
+    
+    const borrowingRequest={
+        serviceRequest: {
+            readerId:localStorage.getItem("userId"),
+            implementDate:new Date(),
+            serviceTypeId:1
+
+        },
+        listBook:listRequest
+    };
+    const response = await fetch("http://localhost:8080/Test/reader/borrow",{
+        method:'POST',
+        headers:{
+            "Content-Type":'application/json',
+            "Authorization":bearerToken
+        },
+        body:JSON.stringify(borrowingRequest)
+    });
+    if(!response.ok)
+    {
+        alert("Thất bại, vui lòng thử lại"); 
+        return;
+    } 
+    const responseData = await response.json();
+    console.log(responseData.data);
+}
 async function mainFunction() 
 { 
     const cartData= await fetchBookCart();  
     
-    displayCart(cartData);
+    displayCart(cartData); 
+    document.getElementById("borrow_Book").addEventListener("click", async function() {
+        setupBorrowingButton(cartData);
+    });
     
 }
 mainFunction();

@@ -22,6 +22,7 @@ import com.library.librarymanagement.request.BorrowingRequest;
 import com.library.librarymanagement.request.CartDetailUpdateRequest;
 import com.library.librarymanagement.request.GetNotificationRequest;
 import com.library.librarymanagement.request.RenewalRequest;
+import com.library.librarymanagement.response.ResponseData;
 import com.library.librarymanagement.security.TokenSecurity;
 import com.library.librarymanagement.service.ReaaderService;
 
@@ -35,10 +36,10 @@ public class ReaderController {
     private TokenSecurity tokenSecurity; 
 
     @PostMapping("/reader/borrow") 
-    public ResponseEntity<String> borrowBook(@RequestHeader("Authorization") String authHeader , @RequestBody BorrowingRequest request)
+    public ResponseEntity<ResponseData> borrowBook(@RequestHeader("Authorization") String authHeader , @RequestBody BorrowingRequest request)
     { 
         if(authHeader==null||!authHeader.startsWith("Bearer ") || !tokenSecurity.checkToken(authHeader.substring(7))) 
-            return new ResponseEntity<>("Denied", HttpStatus.UNAUTHORIZED); 
+            return new ResponseEntity<>(new ResponseData("Denied",null), HttpStatus.UNAUTHORIZED); 
 
         return readerService.borrowingBook(request);
     }  

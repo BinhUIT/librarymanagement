@@ -38,6 +38,7 @@ import com.library.librarymanagement.request.BorrowingRequest;
 import com.library.librarymanagement.request.CartDetailUpdateRequest;
 import com.library.librarymanagement.request.RenewalCardDetailRequest;
 import com.library.librarymanagement.request.RenewalRequest;
+import com.library.librarymanagement.response.ResponseData;
 import com.library.librarymanagement.security.TokenSecurity;
 
 
@@ -72,7 +73,7 @@ public class ReaaderService {
     @Autowired 
    private UnlockRequestRepository unlockRequestRepo;
    
-   public ResponseEntity<String> borrowingBook(BorrowingRequest request) 
+   public ResponseEntity<ResponseData> borrowingBook(BorrowingRequest request) 
    {   
         List<BorrowingDetailRequest> listBookTitle = request.getListBook();  
         int borrowingDetailAmount = borrowingDetailRepo.findAll().size();  
@@ -81,12 +82,12 @@ public class ReaaderService {
         User reader = userRepo.findById(request.getServiceRequest().getReaderId()).orElse(null); 
         if(reader==null) 
         { 
-            return new ResponseEntity<>("Reader does not exists", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResponseData("Reader does not exists",null), HttpStatus.BAD_REQUEST);
         } 
         ServiceType serviceType = serviceTypeRepo.findById(request.getServiceRequest().getServiceTypeId()).orElse(null);
         if(serviceType==null) 
         { 
-            return new ResponseEntity<>("We do not have this service", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResponseData("We do not have this service",null), HttpStatus.BAD_REQUEST);
         } 
         com.library.librarymanagement.entity.Service newService = new com.library.librarymanagement.entity.Service(newServiceId,
         reader, new Date(), serviceType);
@@ -96,11 +97,11 @@ public class ReaaderService {
             BookTitleImagePath bookTitle = bookTitleRepo.findById(i.getBookTitleId()).orElse(null);
             if(bookTitle==null) 
             { 
-                return new ResponseEntity<>("Book does not exists", HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(new ResponseData("Book does not exists",null), HttpStatus.BAD_REQUEST);
             } 
             if(bookTitle.getAmountRemaining()<i.getAmount()) 
             { 
-               return new ResponseEntity<>("Not enough book", HttpStatus.BAD_REQUEST);
+               return new ResponseEntity<>(new ResponseData("Not enough book",null), HttpStatus.BAD_REQUEST);
             }  
             
             List<BookImagePath> listBookWithTitle = bookRepo.findByTitle(bookTitle);
@@ -146,7 +147,7 @@ public class ReaaderService {
         Date sendDate= request.getServiceRequest().getImplementDate();
         int readerId = request.getServiceRequest().getReaderId(); 
         sendNotification(readerId, sendDate, "You borrowed our book, please go to the library and take your book", "Borrow Book");
-        return new ResponseEntity<>("Borrowing books success, please go to library and take your book", HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseData("Borrowing books success, please go to library and take your book", detailList), HttpStatus.OK);
    }   
 
    public void sendNotification(int readerId, Date sendDate, String message, String subject)  
