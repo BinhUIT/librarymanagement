@@ -34,3 +34,6 @@ build/
 
 ### Environment file ###
 .env
+
+## p6spy log file ##
+spy.log
