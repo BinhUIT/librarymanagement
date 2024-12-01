@@ -7,9 +7,9 @@ spring:
     config:
         import: optional:file:.env[.properties]
     datasource:
-        url: jdbc:mysql://localhost:3306/LIBRARY
-        username: root
-        password: your_password
+        url: ${DB_URL}
+        username: ${DB_USERNAME}
+        password: ${DB_PASSWORD}
     jpa:
         hibernate:
             ddl-auto: none

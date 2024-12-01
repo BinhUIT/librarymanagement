@@ -3,6 +3,10 @@ package com.library.librarymanagement.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +17,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
+
+import java.sql.Date;
+
+import java.text.SimpleDateFormat;
 import java.util.Collections;
 import com.library.librarymanagement.request.BookTitleCreationRequest;
 import com.library.librarymanagement.request.BookTitleUpdateRequest;
@@ -85,7 +93,26 @@ public final class BookTitleController {
         }
     } 
 
+    @GetMapping("/report")
+    public ResponseEntity<byte[]> exportReportBorrowingByTypeAndDateRange(@RequestParam("id") String bookTypeIdString,
+            @RequestParam("startDate") String startDateString, @RequestParam("endDate") String endDateString) {
+        try {
+            final var bookTypeId = Short.valueOf(bookTypeIdString);
+            final var startDate = Date.valueOf(startDateString);
+            final var endDate = Date.valueOf(endDateString);
 
-    
+            final var pdfBytes = this.service.exportReportBorrowingByTypeAndDateRange(bookTypeId, startDate, endDate);
 
+            final var headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDisposition(ContentDisposition.builder("attachment")
+                    .filename("report.pdf")
+                    .build());
+
+            return ResponseEntity.ok().headers(headers).body(pdfBytes);
+        } catch (final Exception exception) {
+            exception.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }

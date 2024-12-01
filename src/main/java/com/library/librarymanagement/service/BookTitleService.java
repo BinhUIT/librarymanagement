@@ -1,10 +1,14 @@
 package com.library.librarymanagement.service;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,16 +24,24 @@ import com.library.librarymanagement.repository.BookTitleRepository;
 import com.library.librarymanagement.repository.BookTypeRepository;
 import com.library.librarymanagement.ulti.File;
 
+import java.sql.Date;
+import javax.sql.DataSource;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+
 @Service
 public final class BookTitleService {
     private final BookTitleRepository bookTitleRepository;
     private final BookTypeRepository bookTypeRepository;
+    private final DataSource dataSource;
 
-    @Autowired(required = true)
     private BookTitleService(final BookTitleRepository bookTitleRepository,
-            final BookTypeRepository bookTypeRepository) {
+            final BookTypeRepository bookTypeRepository, final DataSource dataSource) {
         this.bookTitleRepository = bookTitleRepository;
         this.bookTypeRepository = bookTypeRepository;
+        this.dataSource = dataSource;
     }
 
     public List<BookTitleImagePath> getBookTitlesImagePathByPage(final Integer start, final Integer amount) {
@@ -178,5 +190,27 @@ public final class BookTitleService {
     { 
         BookTitleImagePath bookTitleImagePath = bookTitleRepository.findByName(name); 
         return new ResponseEntity<>(new BookTitleImageData(bookTitleImagePath), HttpStatus.OK);
+    }
+
+    public byte[] exportReportBorrowingByTypeAndDateRange(
+            final Short bookTypeId, final Date startDate, final Date endDate) throws JRException, SQLException {
+        final InputStream reportStream = getClass().getResourceAsStream(
+                "/reports/BookTitleReport/BookTitleBorrowing.jasper");
+
+        // JasperReport jasperReport = JasperCompileManager.compileReport(
+        // "src/main/resources/reports/BookTitleReport/BookTitleBorrowing.jrxml");
+
+        final Map<String, Object> parameters = new HashMap<>(3);
+        parameters.put("BookTypeId", bookTypeId);
+        parameters.put("ReportStartDate", startDate);
+        parameters.put("ReportEndDate", endDate);
+
+        try (final var connection = dataSource.getConnection()) {
+            final JasperPrint jasperPrint = JasperFillManager.fillReport(reportStream, parameters, connection);
+
+            final var outputStream = new ByteArrayOutputStream();
+            JasperExportManager.exportReportToPdfStream(jasperPrint, outputStream);
+            return outputStream.toByteArray();
+        }
     }
 }
