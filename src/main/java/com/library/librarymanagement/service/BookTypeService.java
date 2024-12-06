@@ -1,7 +1,15 @@
 package com.library.librarymanagement.service;
 
 import java.util.List;
+import java.util.Map;
+
+import javax.sql.DataSource;
+
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.sql.Date;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,15 +27,25 @@ import com.library.librarymanagement.entity.BookTypeImageData;
 import com.library.librarymanagement.entity.BookTypeImagePath;
 import com.library.librarymanagement.repository.BookTypeRepository;
 import com.library.librarymanagement.ulti.File;
+import com.library.librarymanagement.ulti.Report;
+
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
 
 @Service
 public final class BookTypeService {
     private final BookTypeRepository repository;
+    private final DataSource dataSource;
     private PlatformTransactionManager transactionManager;
 
-    @Autowired(required = true)
-    public BookTypeService(final BookTypeRepository repository, final PlatformTransactionManager transactionManager) {
+    public BookTypeService(final BookTypeRepository repository,
+            final DataSource dataSource,
+            final PlatformTransactionManager transactionManager) {
         this.repository = repository;
+        this.dataSource = dataSource;
         this.transactionManager = transactionManager;
     }
 
@@ -253,4 +271,11 @@ public final class BookTypeService {
         return new ResponseEntity<>(new BookTypeImageData(repository.findByName(name)), HttpStatus.OK);
     }
 
+    public byte[] exportReportBorrowingByDateRange(final Date startDate, final Date endDate) throws Exception {
+        final HashMap<String, Object> parameters = HashMap.newHashMap(2);
+        parameters.put("ReportStartDate", startDate);
+        parameters.put("ReportEndDate", endDate);
+
+        return Report.exportReportFromJasper("/reports/BookTypeBorrowing.jasper", parameters, dataSource);
+    }
 }
