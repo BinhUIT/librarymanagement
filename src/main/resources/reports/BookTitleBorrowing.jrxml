@@ -167,7 +167,7 @@ limit 1]]></query>
 						<column kind="single" uuid="05c5d559-a7ea-4875-b09f-599de6da5b83" width="450">
 							<columnHeader height="30" rowSpan="1" style="Table_CH">
 								<element kind="staticText" uuid="8e886b79-8077-4c1f-9c2a-66ca30ccdb36" key="" x="0" y="0" width="450" height="30" fontName="Calibri" fontSize="13.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
-									<text><![CDATA[Book Title Amount]]></text>
+									<text><![CDATA[Book Title Name]]></text>
 									<box leftPadding="10" rightPadding="10"/>
 								</element>
 							</columnHeader>
@@ -188,7 +188,7 @@ limit 1]]></query>
 						<column kind="single" uuid="f27f4b4e-373d-4dd4-9771-55b2090c9109" width="100">
 							<columnHeader height="30" rowSpan="1" style="Table_CH">
 								<element kind="staticText" uuid="cd0e6d00-0262-4e2b-bc40-8603b4335222" x="0" y="0" width="100" height="30" fontName="Calibri" fontSize="13.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
-									<text><![CDATA[Book Title Name]]></text>
+									<text><![CDATA[Amount]]></text>
 									<box leftPadding="10" rightPadding="10"/>
 								</element>
 							</columnHeader>
