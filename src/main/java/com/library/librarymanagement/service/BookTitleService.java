@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.sql.SQLException;
 import java.util.ArrayList;
 
 import org.springframework.data.domain.PageRequest;
@@ -23,10 +22,10 @@ import com.library.librarymanagement.entity.BookTypeImagePath;
 import com.library.librarymanagement.repository.BookTitleRepository;
 import com.library.librarymanagement.repository.BookTypeRepository;
 import com.library.librarymanagement.ulti.File;
+import com.library.librarymanagement.ulti.Report;
 
 import java.sql.Date;
 import javax.sql.DataSource;
-import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -37,7 +36,7 @@ public final class BookTitleService {
     private final BookTypeRepository bookTypeRepository;
     private final DataSource dataSource;
 
-    private BookTitleService(final BookTitleRepository bookTitleRepository,
+    public BookTitleService(final BookTitleRepository bookTitleRepository,
             final BookTypeRepository bookTypeRepository, final DataSource dataSource) {
         this.bookTitleRepository = bookTitleRepository;
         this.bookTypeRepository = bookTypeRepository;
@@ -174,43 +173,29 @@ public final class BookTitleService {
     } 
 
 
-    public ResponseEntity<List<BookTitleImageData>> getBookTitleByAuthor(String author) 
-    {
+    public ResponseEntity<List<BookTitleImageData>> getBookTitleByAuthor(String author) {
         List<BookTitleImagePath> listBookTitleImagePath = bookTitleRepository.findByAuthor(author);  
         List<BookTitleImageData> listBookTitleImageData = new ArrayList<>();
-        for(int i=0;i<listBookTitleImagePath.size();i++)
+        for (int i = 0; i < listBookTitleImagePath.size(); i++)
         {
             BookTitleImageData bookTitleImageData = new BookTitleImageData(listBookTitleImagePath.get(i)); 
             listBookTitleImageData.add(bookTitleImageData);
-        } 
+        }
         return new ResponseEntity<>(listBookTitleImageData, HttpStatus.OK);
     } 
 
-    public ResponseEntity<BookTitleImageData> findByName(String name) 
-    { 
+    public ResponseEntity<BookTitleImageData> findByName(String name) {
         BookTitleImagePath bookTitleImagePath = bookTitleRepository.findByName(name); 
         return new ResponseEntity<>(new BookTitleImageData(bookTitleImagePath), HttpStatus.OK);
     }
 
     public byte[] exportReportBorrowingByTypeAndDateRange(
-            final Short bookTypeId, final Date startDate, final Date endDate) throws JRException, SQLException {
-        final InputStream reportStream = getClass().getResourceAsStream(
-                "/reports/BookTitleReport/BookTitleBorrowing.jasper");
-
-        // JasperReport jasperReport = JasperCompileManager.compileReport(
-        // "src/main/resources/reports/BookTitleReport/BookTitleBorrowing.jrxml");
-
-        final Map<String, Object> parameters = new HashMap<>(3);
+            final Short bookTypeId, final Date startDate, final Date endDate) throws Exception {
+        final HashMap<String, Object> parameters = HashMap.newHashMap(3);
         parameters.put("BookTypeId", bookTypeId);
         parameters.put("ReportStartDate", startDate);
         parameters.put("ReportEndDate", endDate);
 
-        try (final var connection = dataSource.getConnection()) {
-            final JasperPrint jasperPrint = JasperFillManager.fillReport(reportStream, parameters, connection);
-
-            final var outputStream = new ByteArrayOutputStream();
-            JasperExportManager.exportReportToPdfStream(jasperPrint, outputStream);
-            return outputStream.toByteArray();
-        }
+        return Report.exportReportFromJasper("/reports/BookTitleBorrowing.jasper", parameters, dataSource);
     }
 }
