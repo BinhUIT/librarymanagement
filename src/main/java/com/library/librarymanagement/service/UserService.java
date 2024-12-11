@@ -1,6 +1,7 @@
 package com.library.librarymanagement.service;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Random;
 import java.util.regex.Matcher;
@@ -78,28 +79,34 @@ public class UserService {
 
     }  
 
-
+    private String utf8String(String utf8String) 
+    { 
+        byte[] utf8Bytes = utf8String.getBytes(StandardCharsets.UTF_8); 
+        String decodedString = new String(utf8Bytes, StandardCharsets.UTF_8); 
+        return decodedString;
+    }
 
     public ResponseEntity<String> handleRegister(RegisterRequest request, String siteURL) throws MessagingException, UnsupportedEncodingException
     { 
+        
         User user = userRepo.findByFullName(request.getFullName()); 
         if(user!=null) 
         {
-            return new ResponseEntity<>("User with this name is already exist", HttpStatus.ALREADY_REPORTED); 
+            return new ResponseEntity<>("Người dùng đã tồn tại", HttpStatus.ALREADY_REPORTED); 
 
         }
         user = userRepo.findByEmail(request.getEmail()); 
         if(user!=null) 
         {
-            return new ResponseEntity<>("User with this email is already exist", HttpStatus.ALREADY_REPORTED);
+            return new ResponseEntity<>("Email này đã được đăng ký", HttpStatus.ALREADY_REPORTED);
         }  
         if(!checkEmail(request.getEmail())) 
         {  
-            return new ResponseEntity<>("Email address are not valid", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Email không hợp lệ", HttpStatus.BAD_REQUEST);
         } 
         if(!checkUserName(request.getFullName())) 
         {
-            return new ResponseEntity<>("Username are not valid", HttpStatus.BAD_GATEWAY);
+            return new ResponseEntity<>("Thông tin không hợp lệ", HttpStatus.BAD_GATEWAY);
         }
         user = new User(request); 
         List<User> users = userRepo.findAll(); 
@@ -122,7 +129,7 @@ public class UserService {
         content= content.replace("[[URL]]", verifyURL);  
         sendEmail(user,content, subject);
 
-        return new ResponseEntity<>("Register success, we sent verification email to your email address, check your mail and activate your account so that you can use our web", HttpStatus.OK);
+        return new ResponseEntity<>("Đăng kí thành công, vui lòng kiểm tra email để kích hoạt tài khoản", HttpStatus.OK);
     } 
     private void sendEmail(User user, String content, String subject) throws MessagingException, UnsupportedEncodingException
     {    
@@ -263,14 +270,12 @@ public class UserService {
     {  
         
         User user = new User(); 
-        if(nameOrEmail.contains("@")) 
-        { 
-            user = userRepo.findByEmail(nameOrEmail);
-        } 
-        else user= userRepo.findByFullName(nameOrEmail); 
+        
+        user = userRepo.findByEmail(nameOrEmail);
+        
         if(user==null) 
         { 
-            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Chúng tôi đã gửi mật khẩu mới đến email của bạn, dùng mật khẩu đó để đăng nhập và thay đổi mật khẩu", HttpStatus.OK);
         } 
         String randomPassword = Integer.toString(rand.nextInt(100000)); 
         user.setPassword(BCrypt.hashpw(randomPassword, bcryptSalt.getSalt())); 
@@ -285,7 +290,7 @@ public class UserService {
         content=content.replace("[[name]]", user.getFullname()); 
         content = content.replace("[[newPassword]]", randomPassword); 
         sendEmail(user, content, subject); 
-        return new ResponseEntity<>("We sent new password to your email, check your email and use that password to login", HttpStatus.OK); 
+        return new ResponseEntity<>("Chúng tôi đã gửi mật khẩu mới đến email của bạn, dùng mật khẩu đó để đăng nhập và thay đổi mật khẩu", HttpStatus.OK); 
         
         
     } 

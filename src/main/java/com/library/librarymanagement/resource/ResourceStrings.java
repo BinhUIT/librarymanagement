@@ -18,10 +18,11 @@ public final class ResourceStrings {
     private static final Dotenv dotenv = Dotenv.configure() .directory("E:\\New Library\\librarymanagement\\.env") .load();
 
     static {
-        DIR_BOOK_TITLE_IMAGE = dotenv.get(ResourceStrings.Fields.DIR_BOOK_TITLE_IMAGE);
-        DIR_BOOK_TYPE_IMAGE = dotenv.get(ResourceStrings.Fields.DIR_BOOK_TYPE_IMAGE);
+        DIR_BOOK_TITLE_IMAGE = "D:/BookTitleImage";
+        DIR_BOOK_TYPE_IMAGE = "D:/BookTypeImage";
     }
 
     private ResourceStrings() {
+
     }
 }

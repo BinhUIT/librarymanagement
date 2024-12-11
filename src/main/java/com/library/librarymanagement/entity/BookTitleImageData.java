@@ -15,7 +15,17 @@ public final class BookTitleImageData {
 
     private BookTypeImageData type = null;
 
-    private String author = null;
+    private String author = null; 
+
+    private String nxb=null;
+
+    private Integer year=null;
+
+    private String language= null;
+
+    private Integer pageAmount=null;
+
+    private String review = null;
 
     @JsonSerialize(using = ByteArraySerializer.class)
     private byte[] imageData = null;
@@ -27,11 +37,56 @@ public final class BookTitleImageData {
             this.amount = bookTitleImagePath.getAmount();
             this.amountRemaining = bookTitleImagePath.getAmountRemaining();
             this.type = new BookTypeImageData(bookTitleImagePath.getType());
-            this.author = bookTitleImagePath.getAuthor();
+            this.author = bookTitleImagePath.getAuthor(); 
+            this.nxb = bookTitleImagePath.getNxb();
+            this.language= bookTitleImagePath.getLanguage();
+            this.year=bookTitleImagePath.getYear();
+            this.pageAmount= bookTitleImagePath.getPageAmount();
+            this.review= bookTitleImagePath.getReview();
 
             final var file = new File(bookTitleImagePath.getImagePath());
             this.imageData = file.readBytes();
         }
+    }
+    public String getNxb() 
+    {
+        return this.nxb;
+    } 
+    public int getYear() 
+    {
+        return this.year;
+    } 
+    public String getLanguage() 
+    {
+        return this.language;
+    } 
+    public int getPageAmount() 
+    {
+        return this.pageAmount;
+    } 
+    public String getReview() 
+    {
+        return this.review;
+    } 
+    public void setNxb(String nxb) 
+    {
+        this.nxb=nxb;
+    }
+    public void setYear(int year) 
+    {
+        this.year=year;
+    } 
+    public void setLanguage(String language) 
+    {
+        this.language=language;
+    } 
+    public void setPageAmount(int pageAmount) 
+    {
+        this.pageAmount=pageAmount;
+    } 
+    public void setReview(String review) 
+    {
+        this.review=review;
     }
 
     public Integer getId() {

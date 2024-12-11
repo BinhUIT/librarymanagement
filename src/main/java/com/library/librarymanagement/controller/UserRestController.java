@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,8 +26,9 @@ import com.library.librarymanagement.service.UserService;
 
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
-
+@CrossOrigin
 @RestController
+
 public class UserRestController {  
     @Autowired
     private UserService userService;  
@@ -47,17 +49,10 @@ public class UserRestController {
         return "library/VerifyFail";
         
     } 
-    @PostMapping("/register") 
-    public ResponseEntity<String> userRegister(@RequestHeader("Authorization") String authHeader,@RequestBody RegisterRequest request, HttpServletRequest http) throws MessagingException, UnsupportedEncodingException 
+    @PostMapping(value="/register", consumes = "application/json" ) 
+    public ResponseEntity<String> userRegister(@RequestBody RegisterRequest request, HttpServletRequest http) throws MessagingException, UnsupportedEncodingException 
     { 
-        if(request.getRole()==1) 
-        { 
-            if(authHeader==null||!authHeader.startsWith("Bearer ") || !tokenSecurity.checkToken(authHeader.substring(7))||tokenSecurity.extractRole(authHeader)<1) 
-            {
-                return new ResponseEntity<>("Denied", HttpStatus.UNAUTHORIZED);
-
-            }
-        } 
+       System.out.println("Start");
         return userService.handleRegister(request, getSiteURL(http));
     } 
     private String getSiteURL(HttpServletRequest http) 
@@ -110,7 +105,7 @@ public class UserRestController {
         return userService.changeEmail(newEmail, token, getSiteURL(http));
     }
 
-    @GetMapping("/forget_password") 
+    @PutMapping("/forget_password") 
     public ResponseEntity<String> forgetPassword(@RequestBody String nameOrEmail) throws MessagingException, UnsupportedEncodingException
     {  
         return userService.forgetPassword(nameOrEmail);

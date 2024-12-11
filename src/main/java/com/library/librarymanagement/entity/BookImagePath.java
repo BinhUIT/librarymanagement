@@ -68,11 +68,11 @@ public final class BookImagePath {
         this.status = status;
     }
 
-    public boolean isUsable() {
+    public boolean getIsUsable() {
         return this.isUsable;
     }
 
-    public void setUsable(final boolean isUsable) {
+    public void setIsUsable(final boolean isUsable) {
         this.isUsable = isUsable;
     }
 

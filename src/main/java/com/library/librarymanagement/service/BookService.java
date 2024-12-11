@@ -123,7 +123,7 @@ public final class BookService {
         }
 
         if (newBookIsUsable != null) {
-            book.setUsable(newBookIsUsable);
+            book.setIsUsable(newBookIsUsable);
         }
 
         if (book != null) {

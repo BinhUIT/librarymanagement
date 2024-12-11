@@ -13,4 +13,6 @@ public interface BookTypeRepository extends JpaRepository<BookTypeImagePath, Sho
 
 
     public BookTypeImagePath findByName(String name);
+
+    
 }

@@ -1,6 +1,9 @@
 package com.library.librarymanagement.service;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -14,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.library.librarymanagement.entity.BookImagePath;
 import com.library.librarymanagement.entity.BookStatus;
+import com.library.librarymanagement.entity.BookTitleImageData;
 import com.library.librarymanagement.entity.BookTitleImagePath;
 import com.library.librarymanagement.entity.BookTypeImagePath;
 import com.library.librarymanagement.entity.BorrowingCardDetail;
@@ -44,6 +48,7 @@ import com.library.librarymanagement.repository.ServiceTypeRepository;
 import com.library.librarymanagement.repository.UnlockRequestRepository;
 import com.library.librarymanagement.repository.UserRepository;
 import com.library.librarymanagement.request.BookTitleCreateRequest;
+import com.library.librarymanagement.request.BookTitleUpdateRequest;
 import com.library.librarymanagement.request.BookTypeCreateRequest;
 import com.library.librarymanagement.request.BuyBookBillDetailRequest;
 import com.library.librarymanagement.request.BuyBookBillRequest;
@@ -53,6 +58,7 @@ import com.library.librarymanagement.request.SellBookBillCreateRequest;
 import com.library.librarymanagement.request.SellBookBillDetailRequest;
 import com.library.librarymanagement.request.UnlockResponse;
 import com.library.librarymanagement.resource.ResourceStrings;
+import com.library.librarymanagement.response.BookBorrowingDetailResponse;
 import com.library.librarymanagement.ulti.File;
 
 
@@ -206,8 +212,8 @@ public class LibrarianService {
             return new ResponseEntity<>("Book type does not exits", HttpStatus.BAD_REQUEST);
         }  
         if(bookTitleRepo.existsByName(request.getName())) return new ResponseEntity<>("Book with this title is already exists", HttpStatus.OK);
-        BookTitleImagePath  newBookTitle = new BookTitleImagePath(newBookTitleId,request.getName(), bookType,request.getAuthor(), imagePath); 
-        bookTitleRepo.save(newBookTitle); 
+        BookTitleImagePath  newBookTitle = new BookTitleImagePath(newBookTitleId,request.getName(), bookType,request.getAuthor(), imagePath, request.getNxb(), request.getYear(), request.getLanguage(), request.getPageAmount(), request.getReview()); 
+        bookTitleRepo.save(newBookTitle);
         return new ResponseEntity<>("Created new book title", HttpStatus.OK);
     }
     public boolean createNewBookTypeImage(MultipartFile imageFile) 
@@ -421,6 +427,71 @@ public class LibrarianService {
 
         return new ResponseEntity<>("Response sent", HttpStatus.OK);
     }
+
+    public ResponseEntity<String> updateBookTitleImage(MultipartFile imageFile, int bookTitleId) 
+    {
+        Path filePath=Paths.get( resourceStrings.DIR_BOOK_TITLE_IMAGE +"/BookTitle"+Integer.toString(bookTitleId)+".png");  
+        try {
+            Files.delete(filePath); 
+            byte[] imageBytes= imageFile.getBytes();
+            String path = resourceStrings.DIR_BOOK_TITLE_IMAGE +"/BookTitle"+Integer.toString(bookTitleId)+".png"; 
+            
+            File newFile = new File(path); 
+            newFile.createAndWrite(imageBytes) ; 
+            return new ResponseEntity<>("Update success", HttpStatus.OK);
+        }
+        catch(IOException e) 
+        {
+            return new ResponseEntity<>("Fail", HttpStatus.OK);
+        }
+
+    } 
+
+    public ResponseEntity<String> updateBookTitleInfo(BookTitleUpdateRequest request) 
+    {
+        BookTitleImagePath bookTitle= bookTitleRepo.findById(request.getId()).orElse(null); 
+        if(bookTitle==null) 
+        {
+            return new ResponseEntity<>("Book title not found", HttpStatus.OK);
+        }   
+
+        BookTypeImagePath bookType= bookTypeRepo.findById(request.getTypeId()).orElse(null); 
+        if(bookType==null) 
+        {
+            return new ResponseEntity<>("Book type not found", HttpStatus.OK);
+        } 
+
+        bookTitle.setName(request.getName());
+        bookTitle.setType(bookType);
+        bookTitle.setNxb(request.getNxb());
+        bookTitle.setYear(request.getYear()); 
+        bookTitle.setLanguage(request.getLanguage());
+        bookTitle.setPageAmount(request.getPageAmount()); 
+        bookTitle.setReview(request.getReview());
+        bookTitleRepo.save(bookTitle);
+        return new ResponseEntity<>("Success", HttpStatus.OK);
+
+
+
+    }
+
+
+    public ResponseEntity<List<BookBorrowingDetailResponse>> getAllBorrowingCardDetail() 
+    {
+        List<BorrowingCardDetail> listBorrowingCard= borrowingCardDetailRepo.findAll();
+        List<BookBorrowingDetailResponse> listRes= new ArrayList<>();
+        for(int i=0;i<listBorrowingCard.size();i++) 
+        {
+            listRes.add(new BookBorrowingDetailResponse(listBorrowingCard.get(i)));
+        } 
+        return new ResponseEntity<>(listRes, HttpStatus.OK);
+    } 
+
+
+
+    
+
+    
 
 
     

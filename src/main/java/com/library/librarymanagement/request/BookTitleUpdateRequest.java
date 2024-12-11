@@ -14,11 +14,21 @@ public final class BookTitleUpdateRequest {
 
     private String author = null;
 
-    private byte[] imageData = null;
+    private byte[] imageData = null; 
+
+    private String nxb=null;
+
+    private Integer year=null;
+
+    private String language=null;
+
+    private Integer pageAmount=null;
+
+    private String review=null;
 
     @JsonCreator
     public BookTitleUpdateRequest(final Integer id, final String name, final Short typeId, final String author,
-            final byte[] imageData) {
+            final byte[] imageData, String nxb, int year, String language, int pageAmount, String review) {
         this.id = id;
         this.name = name;
         this.typeId = typeId;
@@ -28,7 +38,12 @@ public final class BookTitleUpdateRequest {
             this.imageData = imageData.clone();
         } else {
             this.imageData = null;
-        }
+        } 
+        this.nxb=nxb;
+        this.year=year; 
+        this.language=language;
+        this.pageAmount=pageAmount;
+        this.review=review;
     }
 
     public Integer getId() {
@@ -74,6 +89,26 @@ public final class BookTitleUpdateRequest {
         } else {
             this.imageData = null;
         }
-    }
+    } 
 
+    public String getNxb() 
+    {
+        return this.nxb;
+    } 
+    public int getYear() 
+    {
+        return this.year;
+    } 
+    public String getLanguage() 
+    {
+        return this.language;
+    } 
+    public int getPageAmount() 
+    {
+        return this.pageAmount;
+    } 
+    public String getReview() 
+    {
+        return this.review;
+    }
 }

@@ -1,3 +1,4 @@
+import displayOnUi from "./borrowingCard";
 const bearerToken = "Bearer "+localStorage.getItem("token"); 
 const cartTable = document.getElementById("cart_Table");
 async function fetchBookCart() 
@@ -130,18 +131,26 @@ async function setupBorrowingButton(cart)
     if(!response.ok)
     {
         alert("Thất bại, vui lòng thử lại"); 
-        return;
+        return null;
     } 
     const responseData = await response.json();
-    console.log(responseData.data);
+    console.log(responseData.data); 
+    return responseData.data;
+}
+function displayBorrowingCard(borrowingResponse) {
+    const serviceInfo = borrowingResponse[0].service;
+
+    const borrowingZone = document.getElementById("borrowing_card_zone");
+    borrowingZone.innerHTML= displayOnUi(borrowingResponse);
+
 }
 async function mainFunction() 
 { 
     const cartData= await fetchBookCart();  
-    
+    let borrowingResponse = null;
     displayCart(cartData); 
     document.getElementById("borrow_Book").addEventListener("click", async function() {
-        setupBorrowingButton(cartData);
+        borrowingResponse= await setupBorrowingButton(cartData);
     });
     
 }
