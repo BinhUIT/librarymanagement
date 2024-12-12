@@ -179,4 +179,15 @@ public final class BookTitleService {
         BookTitleImagePath bookTitleImagePath = bookTitleRepository.findByName(name); 
         return new ResponseEntity<>(new BookTitleImageData(bookTitleImagePath), HttpStatus.OK);
     }
+
+    public List<BookTitleImageData> getAll() 
+    {
+        List<BookTitleImagePath> listBookTitleImagePath= bookTitleRepository.findAll();
+        List<BookTitleImageData> listBookTitleImageData= new ArrayList<>();
+        for(int i=0;i<listBookTitleImagePath.size();i++) 
+        {
+            listBookTitleImageData.add(new BookTitleImageData(listBookTitleImagePath.get(i)));
+        } 
+        return listBookTitleImageData;
+    }
 }

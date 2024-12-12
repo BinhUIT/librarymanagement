@@ -85,6 +85,12 @@ public final class BookTitleController {
         }
     } 
 
+    @GetMapping("/all") 
+    public List<BookTitleImageData> getAll() 
+    {
+        return service.getAll();
+    }
+
 
     
 
