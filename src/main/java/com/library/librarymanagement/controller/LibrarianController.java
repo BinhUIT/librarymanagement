@@ -20,6 +20,7 @@ import com.library.librarymanagement.entity.User;
 import com.library.librarymanagement.request.BookTitleCreateRequest;
 import com.library.librarymanagement.request.BookTitleUpdateRequest;
 import com.library.librarymanagement.request.BookTypeCreateRequest;
+import com.library.librarymanagement.request.BookTypeUpdateRequest;
 import com.library.librarymanagement.request.BuyBookBillRequest;
 import com.library.librarymanagement.request.SellBookBillCreateRequest;
 import com.library.librarymanagement.request.UnlockResponse;
@@ -231,6 +232,37 @@ public class LibrarianController {
             return new ResponseEntity<>("No permission", HttpStatus.BAD_REQUEST);
         } 
         return librarianService.updateBookTitleInfo(request);
+    } 
+
+    @PutMapping("/librarian/update/bookType/image/{id}") 
+    public ResponseEntity<String> updateBookTypeImage(@RequestHeader("Authorization") String authHeader, @PathVariable int id, @RequestParam("file") MultipartFile file) 
+    
+    {
+        int userId = tokenSecurity.getUserIdAndCheckLibrarian(authHeader);
+        if(userId<=-1) 
+        {
+            return new ResponseEntity<>("No permission", HttpStatus.OK);
+        } 
+        if(!tokenSecurity.userExist(userId))  
+        { 
+            return new ResponseEntity<>("No permission", HttpStatus.OK);
+        }  
+        return librarianService.updateBookTypeImage(id, file);
+    } 
+
+    @PutMapping("/librarian/update/bookType/info") 
+    public ResponseEntity<String> updateBookTypeInfo(@RequestHeader("Authorization") String authHeader, @RequestBody BookTypeUpdateRequest request) 
+    {
+        int userId = tokenSecurity.getUserIdAndCheckLibrarian(authHeader);
+        if(userId<=-1) 
+        {
+            return new ResponseEntity<>("No permission", HttpStatus.OK);
+        } 
+        if(!tokenSecurity.userExist(userId))  
+        { 
+            return new ResponseEntity<>("No permission", HttpStatus.OK);
+        } 
+        return librarianService.updateBookTypeInfo(request);
     }
 
 

@@ -39,8 +39,8 @@ public final class BookTypeController {
         }
     }
 
-    @GetMapping("/details")
-    public BookTypeImageData getBookTypeById(@RequestParam("id") final String idString) {
+    @GetMapping("/details/{idString}")
+    public BookTypeImageData getBookTypeById(@PathVariable String idString) {
         try {
             return this.service.getBookTypeImageById(Short.valueOf(idString));
         } catch (final Exception exception) {

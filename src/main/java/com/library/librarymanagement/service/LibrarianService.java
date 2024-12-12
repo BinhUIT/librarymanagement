@@ -50,6 +50,7 @@ import com.library.librarymanagement.repository.UserRepository;
 import com.library.librarymanagement.request.BookTitleCreateRequest;
 import com.library.librarymanagement.request.BookTitleUpdateRequest;
 import com.library.librarymanagement.request.BookTypeCreateRequest;
+import com.library.librarymanagement.request.BookTypeUpdateRequest;
 import com.library.librarymanagement.request.BuyBookBillDetailRequest;
 import com.library.librarymanagement.request.BuyBookBillRequest;
 import com.library.librarymanagement.request.ReturningDetailRequest;
@@ -487,6 +488,39 @@ public class LibrarianService {
         return new ResponseEntity<>(listRes, HttpStatus.OK);
     } 
 
+    public ResponseEntity<String> updateBookTypeImage(int id, MultipartFile imageFile) 
+    { 
+        BookTypeImagePath bookTypeImagePath= bookTypeRepo.findById((short)id).orElse(null);
+        if(bookTypeImagePath==null) 
+        {
+            return new ResponseEntity<>("Không tìm thấy hiệu sách", HttpStatus.OK);
+        }
+        Path filePath=Paths.get( resourceStrings.DIR_BOOK_TYPE_IMAGE +"/BookType"+Integer.toString(id)+".png");  
+        try {
+            Files.delete(filePath); 
+            byte[] imageBytes= imageFile.getBytes();
+            String path = resourceStrings.DIR_BOOK_TYPE_IMAGE +"/BookType"+Integer.toString(id)+".png"; 
+            
+            File newFile = new File(path); 
+            newFile.createAndWrite(imageBytes) ; 
+            return new ResponseEntity<>("Update success", HttpStatus.OK);
+        }
+        catch(IOException e) 
+        {
+            return new ResponseEntity<>("Fail", HttpStatus.OK);
+        }
+    } 
+    public ResponseEntity<String> updateBookTypeInfo(BookTypeUpdateRequest request) 
+    {
+        BookTypeImagePath bookType= bookTypeRepo.findById(request.getId()).orElse(null);
+        if(bookType==null) 
+        {
+            return new ResponseEntity<>("Không tìm thấy thể loại sách", HttpStatus.OK);
+        } 
+        bookType.setName(request.getName()); 
+        bookTypeRepo.save(bookType);
+        return new ResponseEntity<>("Cập nhật thông tin thành công", HttpStatus.OK);
+    }
 
 
     
