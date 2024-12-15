@@ -265,6 +265,36 @@ public class LibrarianController {
         return librarianService.updateBookTypeInfo(request);
     }
 
+    @GetMapping("/librarian/getAllReader") 
+    public ResponseEntity<List<User>> getAllUser(@RequestHeader("Authorization") String authHeader)
+ 
+    {
+        int userId = tokenSecurity.getUserIdAndCheckLibrarian(authHeader);
+        if(userId<=-1) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } 
+        if(!tokenSecurity.userExist(userId))  
+        { 
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } 
+        return librarianService.getAllReader();
+    } 
+
+    @PostMapping("/librarian/unlock/user/{id}") 
+    public ResponseEntity<User> unLockUser(@RequestHeader("Authorization") String authHeader, @PathVariable int id) 
+    {
+        int userId = tokenSecurity.getUserIdAndCheckLibrarian(authHeader);
+        if(userId<=-1) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } 
+        if(!tokenSecurity.userExist(userId))  
+        { 
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } 
+        return librarianService.unLockUser(id);
+    }
 
 
 

@@ -312,7 +312,9 @@ public class LibrarianService {
             bookTitle.setAmountRemaining(bookTitle.getAmountRemaining()-1);  
             Integer status=2;
             BookStatus soldStatus = bookStatusRepo.findById(status.byteValue()).orElse(null);  
-            soldBook.setStatus(soldStatus);
+            soldBook.setStatus(soldStatus); 
+            soldBook.setIsUsable(false);
+            bookRepo.save(soldBook);
             bookTitleRepo.save(bookTitle); 
             sellBookBillDetailRepo.save(i);
         } 
@@ -404,13 +406,33 @@ public class LibrarianService {
         } 
         if(user.getEnable()==false)  
         { 
-            return new ResponseEntity<>(null, HttpStatus.ALREADY_REPORTED);
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         } 
 
         user.setEnable(false); 
         userRepo.save(user); 
         return new ResponseEntity<>(user, HttpStatus.OK);
     } 
+
+    public ResponseEntity<User> unLockUser(int userId) 
+    {
+        User user = userRepo.findById(userId).orElse(null); 
+        if(user==null) 
+        { 
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        } 
+        if(user.getRole()!=0) 
+        { 
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        } 
+        if(user.getEnable()==true)  
+        { 
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        } 
+        user.setEnable(true); 
+        userRepo.save(user);
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
 
 
     public ResponseEntity<String> responseUnlockRequest(int librarianId, UnlockResponse unlockResponse) 
@@ -520,6 +542,11 @@ public class LibrarianService {
         bookType.setName(request.getName()); 
         bookTypeRepo.save(bookType);
         return new ResponseEntity<>("Cập nhật thông tin thành công", HttpStatus.OK);
+    }
+
+    public ResponseEntity<List<User>> getAllReader() 
+    {
+        return new ResponseEntity<>(userRepo.findByRole(0), HttpStatus.OK);
     }
 
 
