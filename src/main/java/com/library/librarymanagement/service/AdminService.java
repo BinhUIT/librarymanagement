@@ -57,7 +57,7 @@ public class AdminService {
         List<User> listUser= userRepo.findAll();
         for(int i=0;i<listUser.size();i++) 
         {
-            if(listUser.get(i).getRole()==1&&listUser.get(i).getEnable()==true) 
+            if(listUser.get(i).getRole()==1) 
             {
                 listRes.add(listUser.get(i));
             }
@@ -81,7 +81,8 @@ public class AdminService {
         int newId= userRepo.findAll().size();
         newUser.setUserId(newId);
         newUser.setPassword(BCrypt.hashpw(request.getPassword(), bcryptSalt.getSalt())); 
-        newUser.setRole(1);
+        newUser.setRole(1); 
+        newUser.setEnable(true);
         userRepo.save(newUser);
         return new ResponseEntity<>(newUser, HttpStatus.OK);
     }
