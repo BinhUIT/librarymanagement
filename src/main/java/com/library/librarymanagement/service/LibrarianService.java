@@ -31,6 +31,7 @@ import com.library.librarymanagement.entity.SellBookBillDetail;
 import com.library.librarymanagement.entity.ServiceType;
 import com.library.librarymanagement.entity.UnlockRequest;
 import com.library.librarymanagement.entity.User;
+import com.library.librarymanagement.entity.WorkDetail;
 import com.library.librarymanagement.repository.BookRepository;
 import com.library.librarymanagement.repository.BookStatusRepository;
 import com.library.librarymanagement.repository.BookTitleRepository;
@@ -47,6 +48,7 @@ import com.library.librarymanagement.repository.ServiceRepository;
 import com.library.librarymanagement.repository.ServiceTypeRepository;
 import com.library.librarymanagement.repository.UnlockRequestRepository;
 import com.library.librarymanagement.repository.UserRepository;
+import com.library.librarymanagement.repository.WorkDetailRepository;
 import com.library.librarymanagement.request.BookTitleCreateRequest;
 import com.library.librarymanagement.request.BookTitleUpdateRequest;
 import com.library.librarymanagement.request.BookTypeCreateRequest;
@@ -105,7 +107,10 @@ public class LibrarianService {
     private BorrowingCardDetailRepository borrowingCardDetailRepo; 
 
     @Autowired 
-    private ReturningCardDetailRpository returningCardDetailRepo; 
+    private ReturningCardDetailRpository returningCardDetailRepo;
+    
+    @Autowired
+    private WorkDetailRepository workDetailRepo;
 
     @Autowired 
     private UnlockRequestRepository unlockRequestRepo;
@@ -547,6 +552,36 @@ public class LibrarianService {
     public ResponseEntity<List<User>> getAllReader() 
     {
         return new ResponseEntity<>(userRepo.findByRole(0), HttpStatus.OK);
+    } 
+    
+    public ResponseEntity<List<WorkDetail>> getAllWorkDetail(int librarianId) 
+    {
+        User librarian= userRepo.findById(librarianId).orElse(null);
+        if(librarian==null) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(workDetailRepo.findByLibrarian(librarian), HttpStatus.OK);
+    } 
+
+    public ResponseEntity<List<WorkDetail>> getFutureWorkDetail(int librarianId) 
+    {
+        User librarian= userRepo.findById(librarianId).orElse(null);
+        if(librarian==null) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        } 
+        List<WorkDetail> listRes = new ArrayList<>();
+        List<WorkDetail> listWorkDetail= workDetailRepo.findByLibrarian(librarian); 
+        Date currentDate= new Date();
+        for(int i=0;i<listWorkDetail.size();i++)
+        {
+            if(!listWorkDetail.get(i).getWorkDate().before(currentDate)) 
+            {
+                listRes.add(listWorkDetail.get(i));
+            }
+        } 
+        return new ResponseEntity<>(listRes, HttpStatus.OK);
     }
 
 

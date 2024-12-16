@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.library.librarymanagement.entity.BorrowingCardDetail;
 import com.library.librarymanagement.entity.User;
+import com.library.librarymanagement.entity.WorkDetail;
 import com.library.librarymanagement.request.BookTitleCreateRequest;
 import com.library.librarymanagement.request.BookTitleUpdateRequest;
 import com.library.librarymanagement.request.BookTypeCreateRequest;
@@ -294,6 +295,36 @@ public class LibrarianController {
             return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
         } 
         return librarianService.unLockUser(id);
+    }
+
+    @GetMapping("/librarian/getAllWorkDate") 
+    public ResponseEntity<List<WorkDetail>> getAllWorkDetail(@RequestHeader("Authorization") String authHeader) 
+    {
+        int userId = tokenSecurity.getUserIdAndCheckLibrarian(authHeader);
+        if(userId<=-1) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } 
+        if(!tokenSecurity.userExist(userId))  
+        { 
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } 
+        return librarianService.getAllWorkDetail(userId);
+    } 
+
+    @GetMapping("/librarian/getFutureWorkDate") 
+    public ResponseEntity<List<WorkDetail>> getFutureWorkDetail(@RequestHeader("Authorization") String authHeader) 
+    {
+        int userId = tokenSecurity.getUserIdAndCheckLibrarian(authHeader);
+        if(userId<=-1) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } 
+        if(!tokenSecurity.userExist(userId))  
+        { 
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } 
+        return librarianService.getFutureWorkDetail(userId);
     }
 
 
