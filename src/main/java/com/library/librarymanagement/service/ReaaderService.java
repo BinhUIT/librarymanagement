@@ -211,22 +211,43 @@ public class ReaaderService {
     return new ResponseEntity<>(listRes, HttpStatus.OK);
    } 
 
-   public ResponseEntity<String> addToCart(AddCartDetailRequest request) 
+   public ResponseEntity<String> addToCart(AddCartDetailRequest request, int userId) 
    { 
-    User user= userRepo.findById(request.getUserId()).orElse(null); 
-    if(user==null) return new ResponseEntity<>("User does not exist", HttpStatus.BAD_REQUEST);  
-    BookTitleImagePath bookTitle = bookTitleRepo.findById(request.getBookTitleId()).orElse(null); 
-    if(bookTitle==null) return new ResponseEntity<>("Book title does not exists", HttpStatus.BAD_REQUEST);
-    CartDetail cartDetail = new CartDetail(0, user, bookTitle, request.getAmount()); 
-    cartDetailRepo.save(cartDetail); 
-    return new ResponseEntity<>("Added to cart", HttpStatus.OK);
+        User user = userRepo.findById(userId).orElse(null);
+        if(user==null||user.getEnable()==false) 
+        {
+            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+        } 
+        BookTitleImagePath bookTitleImagePath = bookTitleRepo.findById(request.getBookTitleId()).orElse(null);
+        if(bookTitleImagePath==null) 
+        {
+            return new ResponseEntity<>("Book not found", HttpStatus.BAD_REQUEST);
+        } 
+        List<CartDetail> listCartDetail= cartDetailRepo.findByUser(user);
+        for(int i=0;i<listCartDetail.size();i++) 
+        {
+            if(listCartDetail.get(i).getBookTitleImagePath().getId()==request.getBookTitleId())
+            {
+                return new ResponseEntity<>("Added to cart", HttpStatus.OK);
+            }
+        }
+        CartDetail newCartDetail = new CartDetail(user, bookTitleImagePath, 1);
+        cartDetailRepo.save(newCartDetail);
+        return new ResponseEntity<>("Added to cart", HttpStatus.OK);
+       
+        
 
    } 
 
-   public ResponseEntity<String> removeFromCart(int cartDetailId) 
+   public ResponseEntity<String> removeFromCart(int cartDetailId, int userId) 
    { 
+    
         CartDetail cartDetail = cartDetailRepo.findById(cartDetailId).orElse(null); 
-        if(cartDetail==null) return new ResponseEntity<>("This cart detail does not exists", HttpStatus.OK);  
+        if(cartDetail==null) return new ResponseEntity<>("This cart detail does not exists", HttpStatus.BAD_REQUEST);   
+        if(cartDetail.getUser().getUserId()!=userId) 
+        {
+            return new ResponseEntity<>("User id does not match", HttpStatus.BAD_REQUEST);
+        }
         cartDetailRepo.delete(cartDetail); 
         return new ResponseEntity<>("Deleted item", HttpStatus.OK);
    } 
@@ -244,27 +265,30 @@ public class ReaaderService {
 
    } 
 
-   public ResponseEntity<String> updateCart(CartDetailUpdateRequest cartUpdateRequest, int userId) 
-   {  
-        if(!validateCartUpdateRequest(cartUpdateRequest, userId)) return new ResponseEntity<>("Wrong information", HttpStatus.BAD_REQUEST);
-        CartDetail cartDetail = cartDetailRepo.findById(cartUpdateRequest.getCartDetailId()).orElse(null);  
-        cartDetail.setAmount(cartUpdateRequest.getAmount()); 
-        cartDetailRepo.save(cartDetail);
-        return new ResponseEntity<>("Updated item", HttpStatus.OK);
-   }
-   private boolean validateCartUpdateRequest(CartDetailUpdateRequest cartUpdateRequest, int userId) 
-   { 
-        if(cartUpdateRequest.getUserId()!=userId) return false;
-        User user = userRepo.findById(cartUpdateRequest.getUserId()).orElse(null);  
-        if(user==null) return false;
-        CartDetail cartDetail = cartDetailRepo.findById(cartUpdateRequest.getCartDetailId()).orElse(null); 
-        if(cartDetail==null) return false;
-        List<CartDetail> listCart= cartDetailRepo.findByUser(user); 
-        for(CartDetail i: listCart) {
-            if(cartUpdateRequest.getCartDetailId()==i.getId()) return true;
+    
+
+
+   public ResponseEntity<List<CartDetailResponse>> updateReaderCart(List<CartDetailUpdateRequest> listRequest, int userId) 
+   {
+        List<CartDetailResponse> listRes= new ArrayList<>();
+        for(int i=0;i<listRequest.size();i++) 
+        {
+            CartDetail cartDetail = cartDetailRepo.findById(listRequest.get(i).getCartDetailId()).orElse(null);
+            if(cartDetail==null) 
+            {
+                return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            }  
+            if(cartDetail.getUser().getUserId()!=userId)
+            {
+                return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            } 
+            cartDetail.setAmount(listRequest.get(i).getAmount()); 
+            cartDetailRepo.save(cartDetail);
+            listRes.add(new CartDetailResponse(cartDetail));
         } 
-        return false;
-   }  
+        return new ResponseEntity<>(listRes, HttpStatus.OK);
+   }
+    
 
 
    public ResponseEntity<String> sendRenewalRequest(RenewalRequest request, int userId) 

@@ -110,7 +110,7 @@ public class ReaderController {
 
         } 
         int userId = tokenSecurity.extractUserId(authHeader.substring(7)); 
-        return readerService.addToCart(request);
+        return readerService.addToCart(request, userId);
     } 
 
     @DeleteMapping("/reader/deleteItemFromCart/{id}") 
@@ -122,7 +122,7 @@ public class ReaderController {
 
         } 
         int userId = tokenSecurity.extractUserId(authHeader.substring(7));  
-        return readerService.removeFromCart(id);
+        return readerService.removeFromCart(id, userId);
     }  
 
     @DeleteMapping("/reader/clearCart") 
@@ -137,16 +137,16 @@ public class ReaderController {
         return readerService.clearCart(userId);
     } 
 
-    @PutMapping("/reader/cart/updateItem") 
-    public ResponseEntity<String> updateCart(@RequestHeader("Authorization") String authHeader, @RequestBody CartDetailUpdateRequest request) 
+    @PutMapping("/reader/saveCart") 
+    public ResponseEntity<List<CartDetailResponse>> updateCart(@RequestHeader("Authorization") String authHeader, @RequestBody List<CartDetailUpdateRequest> request) 
     {
         if(authHeader==null||!authHeader.startsWith("Bearer ") || !tokenSecurity.checkToken(authHeader.substring(7))) 
         {
-            return new ResponseEntity<>("Denied", HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
         } 
         int userId = tokenSecurity.extractUserId(authHeader.substring(7));  
-        return readerService.updateCart(request, userId);
+        return readerService.updateReaderCart(request, userId);
 
     } 
 

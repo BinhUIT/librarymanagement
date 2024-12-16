@@ -35,13 +35,20 @@ public class CartDetail {
     {
 
     } 
-    public CartDetail(int id, User user, BookTitleImagePath bookTitle, int amount) 
+    public CartDetail(User user, BookTitleImagePath bookTitle, int amount) 
     {
-        this.id=id; 
+        
         this.user=user; 
         this.bookTitle= bookTitle; 
         this.amount=amount; 
-    } 
+    }  
+    public  CartDetail(int id, User user, BookTitleImagePath bookTitle, int amount) 
+    {
+        this.id=id;
+        this.user=user; 
+        this.bookTitle= bookTitle; 
+        this.amount=amount; 
+    }
 
     public int getId() 
     { 
