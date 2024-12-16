@@ -38,6 +38,7 @@ import com.library.librarymanagement.request.BorrowingRequest;
 import com.library.librarymanagement.request.CartDetailUpdateRequest;
 import com.library.librarymanagement.request.RenewalCardDetailRequest;
 import com.library.librarymanagement.request.RenewalRequest;
+import com.library.librarymanagement.response.CartDetailResponse;
 import com.library.librarymanagement.response.ResponseData;
 import com.library.librarymanagement.security.TokenSecurity;
 
@@ -197,12 +198,17 @@ public class ReaaderService {
    } 
 
    @SuppressWarnings("null")
-    public ResponseEntity<List<CartDetail>> getCart(int userId) 
+    public ResponseEntity<List<CartDetailResponse>> getCart(int userId) 
    { 
     User user= userRepo.findById(userId).orElse(null); 
     if(user==null) return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
     List<CartDetail> cart= cartDetailRepo.findByUser(user); 
-    return new ResponseEntity<>(cart, HttpStatus.OK);
+    List<CartDetailResponse> listRes= new ArrayList<>();
+    for(int i=0;i<cart.size();i++) 
+    {
+        listRes.add(new CartDetailResponse(cart.get(i)));
+    }
+    return new ResponseEntity<>(listRes, HttpStatus.OK);
    } 
 
    public ResponseEntity<String> addToCart(AddCartDetailRequest request) 

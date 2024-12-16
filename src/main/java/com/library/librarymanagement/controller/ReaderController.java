@@ -22,6 +22,7 @@ import com.library.librarymanagement.request.BorrowingRequest;
 import com.library.librarymanagement.request.CartDetailUpdateRequest;
 import com.library.librarymanagement.request.GetNotificationRequest;
 import com.library.librarymanagement.request.RenewalRequest;
+import com.library.librarymanagement.response.CartDetailResponse;
 import com.library.librarymanagement.response.ResponseData;
 import com.library.librarymanagement.security.TokenSecurity;
 import com.library.librarymanagement.service.ReaaderService;
@@ -84,7 +85,7 @@ public class ReaderController {
     } 
 
     @GetMapping("/reader/cart") 
-    public ResponseEntity<List<CartDetail>> getCart(@RequestHeader("Authorization") String authHeader) 
+    public ResponseEntity<List<CartDetailResponse>> getCart(@RequestHeader("Authorization") String authHeader) 
     { 
         //System.out.println(authHeader); 
         //System.out.println(authHeader.substring(7));
