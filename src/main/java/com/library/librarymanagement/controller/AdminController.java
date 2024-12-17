@@ -97,7 +97,7 @@ public class AdminController {
     @GetMapping("/admin/getAllWorkDetail") 
     public ResponseEntity<List<WorkDetail>> getAllWorkDetail(@RequestHeader("Authorization") String authHeader) 
     {
-        if(authHeader==null||!authHeader.startsWith("Bearer ") || !tokenSecurity.checkToken(authHeader.substring(7))||tokenSecurity.extractRole(authHeader)<=1) 
+        if(authHeader==null||!authHeader.startsWith("Bearer ") || !tokenSecurity.checkToken(authHeader.substring(7))||tokenSecurity.extractRole(authHeader)!=2) 
         {
             return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED); 
 

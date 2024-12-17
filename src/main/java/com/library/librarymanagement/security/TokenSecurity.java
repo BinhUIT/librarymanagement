@@ -92,8 +92,10 @@ public class TokenSecurity {
         return true;
         
     } 
-    public int extractRole(String token) 
+    public int extractRole(String authHeader) 
     {  
+        String token = authHeader.substring(7);
+        System.out.println(Character.getNumericValue(token.charAt(0)));
         return Character.getNumericValue(token.charAt(0));
     }
      
