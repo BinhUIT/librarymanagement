@@ -1,9 +1,11 @@
 package com.library.librarymanagement.entity;
 
-import java.util.Date;
+import java.sql.Date;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -27,18 +29,34 @@ public class BorrowingCardDetail {
     @Column(name="EXPIREDATE", columnDefinition="DATE") 
     private Date expireDate;
 
+    @Column(name = "Status")
+    @Enumerated(EnumType.STRING)
+    private Status status = Status.PENDING;
+
+    public enum Status {
+        PENDING,
+        CANCELLED,
+        BORROWING,
+        RETURNED,
+    }
+
     public BorrowingCardDetail() 
     {
 
-    }  
-    public BorrowingCardDetail(int id,Service service, BookImagePath book, Date expireDate) 
-    {  
+    }
 
+    public BorrowingCardDetail(int id, Service service, BookImagePath book, java.util.Date expireDate) {
         this.id=id;
         this.service=service; 
-        this.book=book; 
-        this.expireDate= expireDate;
-    }  
+        this.book = book;
+
+        if (expireDate != null) {
+            this.expireDate = new Date(expireDate.getTime());
+        } else {
+            this.expireDate = null;
+        }
+    }
+
     public int getId() 
     { 
         return this.id;
@@ -61,11 +79,37 @@ public class BorrowingCardDetail {
     } 
     public Date getExpireDate() 
     {
-        return this.expireDate;
-    } 
-    public void setExpireDate(Date expireDate) 
-    { 
-        this.expireDate = expireDate;
+        if (this.expireDate != null) {
+            return new Date(this.expireDate.getTime());
+        } else {
+            return null;
+        }
     }
 
+    public void setExpireDate(java.util.Date expireDate) 
+    { 
+        if (expireDate != null) {
+            this.expireDate = new Date(expireDate.getTime());
+        } else {
+            this.expireDate = null;
+        }
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public boolean updateStatus(final Status newStatus) {
+        boolean isValidValue = switch (newStatus) {
+            case BORROWING, CANCELLED -> this.status == Status.PENDING;
+            case RETURNED -> this.status == Status.BORROWING;
+            default -> false;
+        };
+
+        if (isValidValue) {
+            this.status = newStatus;
+        }
+
+        return isValidValue;
+    }
 }
