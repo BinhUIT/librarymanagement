@@ -54,7 +54,10 @@ public final class BookTitleImagePath {
     private int pageAmount;
 
     @Column(name="REVIEW", columnDefinition = "VARCHAR(1000)") 
-    private String review;
+    private String review;   
+
+    @Column(name="ENABLE", columnDefinition = "BOOLEAN") 
+    private boolean enable;
 
     @Autowired(required = true)
     private BookTitleImagePath() {
@@ -65,7 +68,8 @@ public final class BookTitleImagePath {
         this.name = name;
         this.type = type;
         this.author = author;
-        this.imagePath = imagePath;
+        this.imagePath = imagePath; 
+        this.enable=true;
     } 
     public BookTitleImagePath(int id,String name, BookTypeImagePath type, String author, String imagePath, String nxb, int year, String language, int pageAmount, String review) 
     {
@@ -80,7 +84,8 @@ public final class BookTitleImagePath {
         this.pageAmount=pageAmount;
         this.review=review;
         this.amount=0;
-        this.amountRemaining=0;
+        this.amountRemaining=0; 
+        this.enable=true;
     }
     public BookTitleImagePath(int id, String name, BookTypeImagePath type, String author, String imagePath) 
     { 
@@ -90,7 +95,8 @@ public final class BookTitleImagePath {
         this.author = author;
         this.imagePath = imagePath; 
         this.amount=0; 
-        this.amountRemaining=0;
+        this.amountRemaining=0; 
+        this.enable=true;
     }
     public String getNxb() 
     {
@@ -183,5 +189,14 @@ public final class BookTitleImagePath {
     public void setAmountRemaining(int amountRemaining) 
     { 
         this.amountRemaining=amountRemaining;
+    } 
+
+    public boolean getEnable() 
+    {
+        return this.enable;
+    } 
+    public void setEnable(boolean enable) 
+    {
+        this.enable=enable;
     }
 }

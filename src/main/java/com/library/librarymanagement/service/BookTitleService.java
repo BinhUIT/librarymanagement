@@ -185,8 +185,10 @@ public final class BookTitleService {
         List<BookTitleImagePath> listBookTitleImagePath= bookTitleRepository.findAll();
         List<BookTitleImageData> listBookTitleImageData= new ArrayList<>();
         for(int i=0;i<listBookTitleImagePath.size();i++) 
-        {
-            listBookTitleImageData.add(new BookTitleImageData(listBookTitleImagePath.get(i)));
+        { 
+            if(listBookTitleImagePath.get(i).getEnable()) {
+            listBookTitleImageData.add(new BookTitleImageData(listBookTitleImagePath.get(i))); 
+            }
         } 
         return listBookTitleImageData;
     }
