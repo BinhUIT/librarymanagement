@@ -616,8 +616,14 @@ public class LibrarianService {
         } 
         bookImagePath.setIsUsable(false);  
         bookRepo.save(bookImagePath);
+        BookTitleImagePath bookTitleImagePath= bookImagePath.getTitle();
+        bookTitleImagePath.setAmount(bookTitleImagePath.getAmount()-1); 
+        bookTitleImagePath.setAmountRemaining(bookTitleImagePath.getAmountRemaining()-1);
+        bookTitleRepo.save(bookTitleImagePath);
         return new ResponseEntity<>("Success", HttpStatus.OK);
-    }
+    }    
+
+    
 
     
 
