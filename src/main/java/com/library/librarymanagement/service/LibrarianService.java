@@ -478,7 +478,7 @@ public class LibrarianService {
     public ResponseEntity<String> updateBookTitleInfo(BookTitleUpdateRequest request) 
     {
         BookTitleImagePath bookTitle= bookTitleRepo.findById(request.getId()).orElse(null); 
-        if(bookTitle==null) 
+        if(bookTitle==null||bookTitle.getEnable()==false) 
         {
             return new ResponseEntity<>("Book title not found", HttpStatus.OK);
         }   
@@ -582,7 +582,25 @@ public class LibrarianService {
             }
         } 
         return new ResponseEntity<>(listRes, HttpStatus.OK);
-    }
+    }    
+
+    public ResponseEntity<String> deleteABookTitle(int bookTitleId) 
+    {
+        BookTitleImagePath bookTitleImagePath= bookTitleRepo.findById(bookTitleId).orElse(null);
+        if(bookTitleImagePath==null||bookTitleImagePath.getEnable()!=true) 
+        {
+            return new ResponseEntity<>("Cannot delete this book title", HttpStatus.BAD_REQUEST);
+        } 
+        List<BookImagePath> listBookImagePath= bookRepo.findByTitle(bookTitleImagePath);
+        for(int i=0;i<listBookImagePath.size();i++) 
+        {
+            listBookImagePath.get(i).setIsUsable(false); 
+            bookRepo.save(listBookImagePath.get(i));
+        } 
+        bookTitleImagePath.setEnable(false); 
+        bookTitleRepo.save(bookTitleImagePath); 
+        return new ResponseEntity<>("Success", HttpStatus.OK);
+    } 
 
 
     
