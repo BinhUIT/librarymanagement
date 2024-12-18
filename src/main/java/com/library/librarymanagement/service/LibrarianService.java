@@ -607,6 +607,18 @@ public class LibrarianService {
         return new ResponseEntity<>(bookRepo.findByIsUsable(true), HttpStatus.OK);
     }
 
+    public ResponseEntity<String> deleteABook(int id) 
+    {
+        BookImagePath bookImagePath= bookRepo.findById(id).orElse(null);
+        if(bookImagePath==null||bookImagePath.getIsUsable()==false||bookImagePath.getStatus().getId()!=0) 
+        {
+            return new ResponseEntity<>("Can not delete", HttpStatus.BAD_REQUEST);
+        } 
+        bookImagePath.setIsUsable(false);  
+        bookRepo.save(bookImagePath);
+        return new ResponseEntity<>("Success", HttpStatus.OK);
+    }
+
     
 
     

@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -341,6 +342,21 @@ public class LibrarianController {
             return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
         } 
         return librarianService.getAllBook();
+    }
+
+    @DeleteMapping("/librarian/deleteBook/{id}") 
+    public ResponseEntity<String> deleteBook(@RequestHeader("Authorization") String authHeader, @PathVariable int id) 
+    {
+        int userId = tokenSecurity.getUserIdAndCheckLibrarian(authHeader);
+        if(userId<=-1) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } 
+        if(!tokenSecurity.userExist(userId))  
+        { 
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        }  
+       return librarianService.deleteABook(id);
     }
 
 
