@@ -10,5 +10,6 @@ import com.library.librarymanagement.entity.BookTitleImagePath;
 
 @Repository
 public interface BookRepository extends JpaRepository<BookImagePath, Integer> { 
-    public List<BookImagePath> findByTitle(BookTitleImagePath bookTitleImagePath);
+    public List<BookImagePath> findByTitle(BookTitleImagePath bookTitleImagePath); 
+    public List<BookImagePath>  findByIsUsable(boolean isUsable);
 }

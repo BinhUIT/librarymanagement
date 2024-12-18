@@ -602,6 +602,10 @@ public class LibrarianService {
         return new ResponseEntity<>("Success", HttpStatus.OK);
     } 
 
+    public ResponseEntity<List<BookImagePath>> getAllBook() 
+    {
+        return new ResponseEntity<>(bookRepo.findByIsUsable(true), HttpStatus.OK);
+    }
 
     
 

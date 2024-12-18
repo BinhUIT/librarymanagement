@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.library.librarymanagement.entity.BookImagePath;
 import com.library.librarymanagement.entity.BorrowingCardDetail;
 import com.library.librarymanagement.entity.User;
 import com.library.librarymanagement.entity.WorkDetail;
@@ -325,6 +326,21 @@ public class LibrarianController {
             return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
         } 
         return librarianService.getFutureWorkDetail(userId);
+    }
+
+    @GetMapping("/librarian/getAllBook") 
+    public ResponseEntity<List<BookImagePath>> getAllBook(@RequestHeader("Authorization") String authHeader) 
+    {
+        int userId = tokenSecurity.getUserIdAndCheckLibrarian(authHeader);
+        if(userId<=-1) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } 
+        if(!tokenSecurity.userExist(userId))  
+        { 
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } 
+        return librarianService.getAllBook();
     }
 
 
