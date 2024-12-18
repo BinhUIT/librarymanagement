@@ -15,7 +15,7 @@ public class BorrowingCardDetailService {
         this.repository = repository;
     }
 
-    public boolean UpdateBorrowingStatus(final UpdateBorrowingCardDetailRequest request) {
+    public boolean updateBorrowingStatus(final UpdateBorrowingCardDetailRequest request) {
         if ((request == null) || (this.repository == null)) {
             return false;
         }

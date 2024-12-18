@@ -23,7 +23,7 @@ public final class BorrowingCardDetailController {
     @PostMapping
     public boolean updateStatusBorrowing(@RequestBody @Valid final UpdateBorrowingCardDetailRequest request) {
         try {
-            return service.UpdateBorrowingStatus(request);
+            return service.updateBorrowingStatus(request);
         } catch (final Exception e) {
             return false;
         }
