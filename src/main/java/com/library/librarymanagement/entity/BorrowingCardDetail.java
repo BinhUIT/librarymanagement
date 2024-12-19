@@ -1,6 +1,7 @@
 package com.library.librarymanagement.entity;
 
 import java.sql.Date;
+import java.util.Calendar;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -38,6 +39,7 @@ public class BorrowingCardDetail {
         CANCELLED,
         BORROWING,
         RETURNED,
+        RENEWAL
     }
 
     public BorrowingCardDetail() 
@@ -102,12 +104,22 @@ public class BorrowingCardDetail {
     public boolean updateStatus(final Status newStatus) {
         boolean isValidValue = switch (newStatus) {
             case BORROWING, CANCELLED -> this.status == Status.PENDING;
-            case RETURNED -> this.status == Status.BORROWING;
+            case RETURNED -> this.status == Status.BORROWING||this.status==Status.RENEWAL; 
+            case RENEWAL->this.status==Status.BORROWING;
             default -> false;
         };
 
         if (isValidValue) {
-            this.status = newStatus;
+            this.status = newStatus; 
+            if(this.status==Status.RENEWAL) 
+            {
+                java.util.Date utilDate= new java.util.Date(this.expireDate.getTime()); 
+                Calendar calendar = Calendar.getInstance(); 
+                calendar.setTime(utilDate); 
+                calendar.add(Calendar.DAY_OF_MONTH, 7);
+                this.expireDate= new Date(calendar.getTimeInMillis());
+
+            }
         }
 
         return isValidValue;
