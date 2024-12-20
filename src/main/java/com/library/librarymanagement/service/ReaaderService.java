@@ -38,6 +38,7 @@ import com.library.librarymanagement.request.BorrowingRequest;
 import com.library.librarymanagement.request.CartDetailUpdateRequest;
 import com.library.librarymanagement.request.RenewalCardDetailRequest;
 import com.library.librarymanagement.request.RenewalRequest;
+import com.library.librarymanagement.response.BorrowResponse;
 import com.library.librarymanagement.response.CartDetailResponse;
 import com.library.librarymanagement.response.ResponseData;
 import com.library.librarymanagement.security.TokenSecurity;
@@ -74,82 +75,7 @@ public class ReaaderService {
     @Autowired 
    private UnlockRequestRepository unlockRequestRepo;
    
-   public ResponseEntity<ResponseData> borrowingBook(BorrowingRequest request) 
-   {   
-        List<BorrowingDetailRequest> listBookTitle = request.getListBook();  
-        int borrowingDetailAmount = borrowingDetailRepo.findAll().size();  
-        int newServiceId = serviceRepo.findAll().size();  
-        List<BorrowingCardDetail> detailList = new ArrayList<>();
-        User reader = userRepo.findById(request.getServiceRequest().getReaderId()).orElse(null); 
-        if(reader==null) 
-        { 
-            return new ResponseEntity<>(new ResponseData("Reader does not exists",null), HttpStatus.BAD_REQUEST);
-        } 
-        ServiceType serviceType = serviceTypeRepo.findById(request.getServiceRequest().getServiceTypeId()).orElse(null);
-        if(serviceType==null) 
-        { 
-            return new ResponseEntity<>(new ResponseData("We do not have this service",null), HttpStatus.BAD_REQUEST);
-        } 
-        com.library.librarymanagement.entity.Service newService = new com.library.librarymanagement.entity.Service(newServiceId,
-        reader, new Date(), serviceType);
-        
-        for(BorrowingDetailRequest i : listBookTitle) 
-        {   
-            BookTitleImagePath bookTitle = bookTitleRepo.findById(i.getBookTitleId()).orElse(null);
-            if(bookTitle==null) 
-            { 
-                return new ResponseEntity<>(new ResponseData("Book does not exists",null), HttpStatus.BAD_REQUEST);
-            } 
-            if(bookTitle.getAmountRemaining()<i.getAmount()) 
-            { 
-               return new ResponseEntity<>(new ResponseData("Not enough book",null), HttpStatus.BAD_REQUEST);
-            }  
-            
-            List<BookImagePath> listBookWithTitle = bookRepo.findByTitle(bookTitle);
-            int bookIndex=0; 
-            for(BookImagePath book: listBookWithTitle)  
-            { 
-                
-                if(bookIndex>=i.getAmount()) 
-                { 
-                    break;
-                } 
-                if(book.getStatus().getId()==0) {  
-                    Integer val=1;
-                    book.setStatus(new BookStatus(val.byteValue(),"Borrowing"));
-                    bookRepo.save(book);  
-                    Date sendDate = request.getServiceRequest().getImplementDate(); 
-                    Calendar calendar = Calendar.getInstance(); 
-                    calendar.setTime(sendDate); 
-                    calendar.add(Calendar.DAY_OF_MONTH, 30); 
-                    Date expireDate = calendar.getTime();
-                    BorrowingCardDetail newDetail = new BorrowingCardDetail(borrowingDetailAmount, newService, book,expireDate);  
-                    borrowingDetailAmount++;
-                    detailList.add(newDetail);  
-                    bookIndex++;
-
-
-                }
-            } 
-            bookTitle.setAmountRemaining(bookTitle.getAmountRemaining()-i.getAmount()); 
-            bookTitleRepo.save(bookTitle); 
-
-           
-
-
-        } 
-        serviceRepo.save(newService);  
-        for(BorrowingCardDetail i: detailList) 
-        {
-            borrowingDetailRepo.save(i); 
-            
-        } 
-        
-        Date sendDate= request.getServiceRequest().getImplementDate();
-        int readerId = request.getServiceRequest().getReaderId(); 
-        sendNotification(readerId, sendDate, "You borrowed our book, please go to the library and take your book", "Borrow Book");
-        return new ResponseEntity<>(new ResponseData("Borrowing books success, please go to library and take your book", detailList), HttpStatus.OK);
-   }   
+   
 
    public void sendNotification(int readerId, Date sendDate, String message, String subject)  
    {    
@@ -346,6 +272,76 @@ public class ReaaderService {
         return new ResponseEntity<>("You sent unlock request, please wait for librarian to response", HttpStatus.OK);
    }
 
+
+   public ResponseEntity<BorrowResponse> borrowViaCart(BorrowingRequest request, int userId) 
+   { 
+        BorrowResponse borrowResponse= new BorrowResponse("", new ArrayList<>()); 
+        User user = userRepo.findById(userId).orElse(null);
+        for(int i=0;i<request.getListRequest().size();i++) 
+        {
+            CartDetail cartDetail= cartDetailRepo.findById(request.getListRequest().get(i).getCartDetailId()).orElse(null);
+            if(cartDetail==null) 
+            {
+                return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            } 
+            if(cartDetail.getUser().getUserId()!=userId) 
+            {
+                return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            } 
+            BookTitleImagePath bookTitle= bookTitleRepo.findById(cartDetail.getBookTitleImagePath().getId()).orElse(null);
+            if(bookTitle==null||bookTitle.getEnable()==false) 
+            {
+                return new ResponseEntity<>(new BorrowResponse("Not exists",null), HttpStatus.OK);
+            } 
+            if(bookTitle.getAmountRemaining()<request.getListRequest().get(i).getAmount()) 
+            {
+                borrowResponse.setMessage("Not enough"); 
+                borrowResponse.addResponse(bookTitle.getName());
+            }
+        }
+        if(!borrowResponse.getMessage().equals("")) 
+        {
+            return new ResponseEntity<>(borrowResponse, HttpStatus.OK);
+        }
+        ServiceType serviceType= serviceTypeRepo.findById(1).orElse(null); 
+        int newServiceId= serviceRepo.findAll().size()+1; 
+       com.library.librarymanagement.entity.Service service = new com.library.librarymanagement.entity.Service(newServiceId, user, new Date(), serviceType); 
+       serviceRepo.save(service);
+       for(int i=0;i<request.getListRequest().size();i++) 
+       { 
+            CartDetail cartDetail= cartDetailRepo.findById(request.getListRequest().get(i).getCartDetailId()).orElse(null); 
+            BookTitleImagePath bookTitle= bookTitleRepo.findById(cartDetail.getBookTitleImagePath().getId()).orElse(null);
+            List<BookImagePath> listBook= bookRepo.findByTitle(bookTitle);
+            int borrowAmount = request.getListRequest().get(i).getAmount();
+            int beginIndex=0;
+            int newBorrowCardDetailId = borrowingDetailRepo.findAll().size();
+            while(borrowAmount>0) 
+            {
+                if(listBook.get(beginIndex).getStatus().getId()==0) 
+                { 
+                    Date currentDate = new Date();  
+                     Calendar calendar = Calendar.getInstance(); 
+                     calendar.setTime(currentDate); 
+                     calendar.add(Calendar.DAY_OF_MONTH, 7);  
+                     Date expireDate = calendar.getTime();
+                    BorrowingCardDetail borrowingCardDetail = new BorrowingCardDetail(newBorrowCardDetailId, service, listBook.get(beginIndex), expireDate);
+                    BookStatus newStatus= bookStatusRepo.findById((byte)1).orElse(null);
+                    listBook.get(beginIndex).setStatus(newStatus); 
+                    bookRepo.save(listBook.get(beginIndex));
+                    bookTitle.setAmountRemaining(bookTitle.getAmountRemaining()-1); 
+                    bookTitleRepo.save(bookTitle);
+                    borrowingDetailRepo.save(borrowingCardDetail);
+                    borrowResponse.setMessage("Success");
+                    borrowResponse.addResponse(borrowingCardDetail);
+                    borrowAmount--;
+
+                } 
+                beginIndex++;
+            }
+       } 
+       return new ResponseEntity<>(borrowResponse, HttpStatus.OK);
+
+   }
 
    
 

@@ -1,28 +1,28 @@
 package com.library.librarymanagement.request;
 
-import com.library.librarymanagement.entity.BorrowingCardDetail;
+import static org.mockito.ArgumentMatchers.*;
 
 public class BorrowingDetailRequest { 
-    private int bookTitleId; 
-    private int amount; 
-    public BorrowingDetailRequest() 
-    {
+   private int cartDetailId;
+   private int amount;
 
-    } 
-    public BorrowingDetailRequest(int bookTitleId, int amount) 
-    { 
-        this.bookTitleId=bookTitleId; 
-        this.amount=amount;
-    } 
+   public BorrowingDetailRequest() 
+   {
 
-    public int getBookTitleId() 
-    {
-        return this.bookTitleId; 
+   } 
+   public BorrowingDetailRequest(int cartDetailId, int amount) 
+   {
+        this.cartDetailId= cartDetailId;
+        this.amount= amount;
+   } 
 
-    } 
-    public int getAmount() 
-    { 
+   public int getCartDetailId() 
+   {
+        return this.cartDetailId;
+   } 
+   public int getAmount() 
+   {
         return this.amount;
-    }
+   }
 
 }

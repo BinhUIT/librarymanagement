@@ -51,7 +51,7 @@ public class BorrowingCardDetail {
         this.id=id;
         this.service=service; 
         this.book = book;
-
+        this.status= Status.PENDING;
         if (expireDate != null) {
             this.expireDate = new Date(expireDate.getTime());
         } else {

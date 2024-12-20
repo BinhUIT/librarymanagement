@@ -36,14 +36,7 @@ public class ReaderController {
     @Autowired 
     private TokenSecurity tokenSecurity; 
 
-    @PostMapping("/reader/borrow") 
-    public ResponseEntity<ResponseData> borrowBook(@RequestHeader("Authorization") String authHeader , @RequestBody BorrowingRequest request)
-    { 
-        if(authHeader==null||!authHeader.startsWith("Bearer ") || !tokenSecurity.checkToken(authHeader.substring(7))) 
-            return new ResponseEntity<>(new ResponseData("Denied",null), HttpStatus.UNAUTHORIZED); 
-
-        return readerService.borrowingBook(request);
-    }  
+    
 
     @SuppressWarnings("null")
     @GetMapping("/reader/allNotifications") 
@@ -122,6 +115,7 @@ public class ReaderController {
 
         } 
         int userId = tokenSecurity.extractUserId(authHeader.substring(7));  
+        System.out.println(userId);
         return readerService.removeFromCart(id, userId);
     }  
 
