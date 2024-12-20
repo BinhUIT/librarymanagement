@@ -338,6 +338,7 @@ public class ReaaderService {
                 } 
                 beginIndex++;
             }
+            cartDetailRepo.delete(cartDetail);
        } 
        return new ResponseEntity<>(borrowResponse, HttpStatus.OK);
 

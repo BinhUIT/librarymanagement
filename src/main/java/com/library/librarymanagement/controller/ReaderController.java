@@ -22,6 +22,7 @@ import com.library.librarymanagement.request.BorrowingRequest;
 import com.library.librarymanagement.request.CartDetailUpdateRequest;
 import com.library.librarymanagement.request.GetNotificationRequest;
 import com.library.librarymanagement.request.RenewalRequest;
+import com.library.librarymanagement.response.BorrowResponse;
 import com.library.librarymanagement.response.CartDetailResponse;
 import com.library.librarymanagement.response.ResponseData;
 import com.library.librarymanagement.security.TokenSecurity;
@@ -36,8 +37,17 @@ public class ReaderController {
     @Autowired 
     private TokenSecurity tokenSecurity; 
 
-    
+    @PostMapping("/reader/borrow/cart") 
+    public ResponseEntity<BorrowResponse> borrowViaCart(@RequestHeader("Authorization") String authHeader, @RequestBody BorrowingRequest request ) 
+    {
+        if(authHeader==null||!authHeader.startsWith("Bearer ") || !tokenSecurity.checkToken(authHeader.substring(7))) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
+        } 
+        int userId = tokenSecurity.extractUserId(authHeader.substring(7)); 
+        return readerService.borrowViaCart(request, userId);
+    }
     @SuppressWarnings("null")
     @GetMapping("/reader/allNotifications") 
     public ResponseEntity<List<Notification>> getAllNotification(@RequestHeader("Authorization") String authHeader )
