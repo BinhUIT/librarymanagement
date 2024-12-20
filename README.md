@@ -1,4 +1,8 @@
-Note: Once cloning this repo, do the following steps:
-1. Run the following command to prevent Git from tracking any changes in ".env" file:  
-git update-index --skip-worktree ".env"  
-2. Change the value in file ".env" as appropriate.
+Note: Once cloning this repo, create a ".env" file at the root folder of the project with these content: 
+DB_URL = 
+DB_USERNAME =
+DB_PASSWORD = 
+DIR_BOOK_TITLE_IMAGE =
+DIR_BOOK_TYPE_IMAGE =
+YOUR_EMAIL =
+APP_PASSWORD =
