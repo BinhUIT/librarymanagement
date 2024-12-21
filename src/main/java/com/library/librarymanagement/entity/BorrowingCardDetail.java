@@ -108,7 +108,7 @@ public class BorrowingCardDetail {
             case RENEWAL->this.status==Status.BORROWING;
             default -> false;
         };
-
+        System.out.println("Updating");
         if (isValidValue) {
             this.status = newStatus; 
             if(this.status==Status.RENEWAL) 

@@ -12,6 +12,8 @@ import java.util.Set;
 public interface BorrowingCardDetailRepository extends JpaRepository<BorrowingCardDetail, Integer>{
     List<BorrowingCardDetail> findByService_ServiceId(final Integer id);
 
-    List<BorrowingCardDetail> findByService_ServiceIdAndBook_IdIn(Integer serviceId, Set<Integer> bookIds);
+    List<BorrowingCardDetail> findByService_ServiceIdAndBook_IdIn(Integer serviceId, Set<Integer> bookIds); 
+
+    
 
 }

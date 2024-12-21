@@ -21,6 +21,7 @@ import com.library.librarymanagement.entity.RenewalCardDetail;
 import com.library.librarymanagement.entity.ServiceType;
 import com.library.librarymanagement.entity.UnlockRequest;
 import com.library.librarymanagement.entity.User;
+import com.library.librarymanagement.entity.BorrowingCardDetail.Status;
 import com.library.librarymanagement.repository.BookRepository;
 import com.library.librarymanagement.repository.BookStatusRepository;
 import com.library.librarymanagement.repository.BookTitleRepository;
@@ -342,7 +343,47 @@ public class ReaaderService {
        } 
        return new ResponseEntity<>(borrowResponse, HttpStatus.OK);
 
+   }  
+
+
+   public ResponseEntity<List<BorrowingCardDetail>> getAllBorrowingCardDetail(int userId) 
+   {
+        User reader= userRepo.findById(userId).orElse(null); 
+        if(reader==null) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }  
+        List<BorrowingCardDetail> listRes= new ArrayList<>();
+        List<com.library.librarymanagement.entity.Service> listService= serviceRepo.findByReader(reader); 
+        for(int i=0;i<listService.size();i++) 
+        {
+            List<BorrowingCardDetail> listDetail = borrowingDetailRepo.findByService_ServiceId(listService.get(i).getServiceId()); 
+            for(int j=0;j<listDetail.size();j++)
+            {
+                listRes.add(listDetail.get(j));
+            }
+        }
+        return new ResponseEntity<>(listRes, HttpStatus.OK);
+   } 
+
+
+   public ResponseEntity<String> onDestroyBorrowingDetail(int detailId, int userId) 
+   {
+        BorrowingCardDetail borrowingCardDetail = borrowingDetailRepo.findById(detailId).orElse(null);
+        if(borrowingCardDetail==null) 
+        {
+            return new ResponseEntity<>("", HttpStatus.BAD_REQUEST);
+        } 
+        if(borrowingCardDetail.getService().getReader().getUserId()!=userId) 
+        {
+            return new ResponseEntity<>("", HttpStatus.BAD_REQUEST);
+        } 
+        borrowingCardDetail.updateStatus(Status.CANCELLED);
+        borrowingDetailRepo.save(borrowingCardDetail);
+        return new ResponseEntity<>("Success", HttpStatus.OK);
    }
+
+   
 
    
 

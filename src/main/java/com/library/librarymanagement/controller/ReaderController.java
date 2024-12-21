@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.library.librarymanagement.entity.BorrowingCardDetail;
 import com.library.librarymanagement.entity.CartDetail;
 import com.library.librarymanagement.entity.Notification;
 import com.library.librarymanagement.request.AddCartDetailRequest;
@@ -180,6 +181,21 @@ public class ReaderController {
         return readerService.sendUnlockRequest(authHeader);
     }
    
+
+    @GetMapping("/reader/history") 
+    public ResponseEntity<List<BorrowingCardDetail>> getAllBorrowingHistory(@RequestHeader("Authorization") String authHeader) 
+    {
+        if(authHeader==null||!authHeader.startsWith("Bearer ") || !tokenSecurity.checkToken(authHeader.substring(7))) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+
+        } 
+        int userId = tokenSecurity.extractUserId(authHeader.substring(7)); 
+        return readerService.getAllBorrowingCardDetail(userId);
+    } 
+
+
+    
    
 
 }
