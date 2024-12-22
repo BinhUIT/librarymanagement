@@ -10,8 +10,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
+import com.library.librarymanagement.entity.BuyBookBillDetail;
+import com.library.librarymanagement.entity.SellBookBillDetail;
 import com.library.librarymanagement.entity.User;
 import com.library.librarymanagement.entity.WorkDetail;
+import com.library.librarymanagement.repository.BuyBookBillDetailRepository;
+import com.library.librarymanagement.repository.BuyBookBillRepository;
+import com.library.librarymanagement.repository.SellBookBillDetailRepository;
+import com.library.librarymanagement.repository.SellBookBillRepository;
 import com.library.librarymanagement.repository.UserRepository;
 import com.library.librarymanagement.repository.WorkDetailRepository;
 import com.library.librarymanagement.request.AddWorkDetail;
@@ -30,7 +36,18 @@ public class AdminService {
     private BcryptSalt bcryptSalt; 
 
     @Autowired
-    private WorkDetailRepository workDetailRepo;
+    private WorkDetailRepository workDetailRepo; 
+
+    @Autowired
+    private SellBookBillRepository sellBookBillRepo;
+
+    @Autowired 
+    private SellBookBillDetailRepository sellBookBillDetailRepo; 
+    @Autowired
+    private BuyBookBillRepository buyBookBillRepo;
+
+    @Autowired 
+    private BuyBookBillDetailRepository buyBookBillDetailRepo;
 
     public ResponseEntity<String> lockOrUnlockLibrarian(int librarianId, boolean lockOrUnlock) 
     {  
@@ -197,5 +214,13 @@ public class AdminService {
         workDetailRepo.delete(workDetail); 
         return new ResponseEntity<>("Delete success", HttpStatus.OK);
     }
-    
+
+    public ResponseEntity<List<SellBookBillDetail>> getAllSellBookBillDetail() 
+    {
+        return new ResponseEntity<>(sellBookBillDetailRepo.findAll(), HttpStatus.OK);
+    } 
+    public ResponseEntity<List<BuyBookBillDetail>> getAllBuyBookBill() 
+    {
+        return new ResponseEntity<>(buyBookBillDetailRepo.findAll(), HttpStatus.OK);
+    }    
 }

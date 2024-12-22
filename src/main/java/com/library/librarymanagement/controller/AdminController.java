@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.library.librarymanagement.entity.BuyBookBillDetail;
+import com.library.librarymanagement.entity.SellBookBill;
+import com.library.librarymanagement.entity.SellBookBillDetail;
 import com.library.librarymanagement.entity.User;
 import com.library.librarymanagement.entity.WorkDetail;
 import com.library.librarymanagement.request.AddWorkDetail;
@@ -137,6 +140,28 @@ public class AdminController {
 
         }
         return adminService.deleteWorkDetail(id);
+    } 
+
+    @GetMapping("/admin/getSellBookBill") 
+    public ResponseEntity<List<SellBookBillDetail>> getAllSellBookBillDetail(@RequestHeader("Authorization") String authHeader) 
+    {
+        if(authHeader==null||!authHeader.startsWith("Bearer ") || !tokenSecurity.checkToken(authHeader.substring(7))||tokenSecurity.extractRole(authHeader)<=1) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED); 
+
+        } 
+        return adminService.getAllSellBookBillDetail();    
+    } 
+
+    @GetMapping("/admin/getBuyBookBill") 
+    public ResponseEntity<List<BuyBookBillDetail>> getAllBuyBookBillDetail(@RequestHeader("Authorization") String authHeader) 
+    {
+        if(authHeader==null||!authHeader.startsWith("Bearer ") || !tokenSecurity.checkToken(authHeader.substring(7))||tokenSecurity.extractRole(authHeader)<=1) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED); 
+
+        } 
+        return adminService.getAllBuyBookBill();
     }
 
 }
