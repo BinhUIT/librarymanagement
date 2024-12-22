@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -24,6 +27,7 @@ import com.library.librarymanagement.entity.BorrowingCardDetail;
 import com.library.librarymanagement.entity.BuyBookBill;
 import com.library.librarymanagement.entity.BuyBookBillDetail;
 import com.library.librarymanagement.entity.Notification;
+import com.library.librarymanagement.entity.Penalty;
 import com.library.librarymanagement.entity.RenewalCardDetail;
 import com.library.librarymanagement.entity.ReturningCardDetail;
 import com.library.librarymanagement.entity.SellBookBill;
@@ -41,6 +45,7 @@ import com.library.librarymanagement.repository.BorrowingCardDetailRepository;
 import com.library.librarymanagement.repository.BuyBookBillDetailRepository;
 import com.library.librarymanagement.repository.BuyBookBillRepository;
 import com.library.librarymanagement.repository.NotificationRepository;
+import com.library.librarymanagement.repository.PenaltyRepository;
 import com.library.librarymanagement.repository.RenewalDetailRepository;
 import com.library.librarymanagement.repository.ReturningCardDetailRpository;
 import com.library.librarymanagement.repository.SellBookBillDetailRepository;
@@ -61,6 +66,7 @@ import com.library.librarymanagement.request.ReturningRequest;
 import com.library.librarymanagement.request.SellBookBillCreateRequest;
 import com.library.librarymanagement.request.SellBookBillDetailRequest;
 import com.library.librarymanagement.request.UnlockResponse;
+import com.library.librarymanagement.request.UpdatePenaltyRequest;
 import com.library.librarymanagement.resource.ResourceStrings;
 import com.library.librarymanagement.response.BookBorrowingDetailResponse;
 import com.library.librarymanagement.ulti.File;
@@ -112,6 +118,9 @@ public class LibrarianService {
     
     @Autowired
     private WorkDetailRepository workDetailRepo;
+
+    @Autowired 
+    private PenaltyRepository penaltyRepo;
 
     @Autowired 
     private UnlockRequestRepository unlockRequestRepo;
@@ -669,7 +678,21 @@ public class LibrarianService {
         Date currentDate = new Date();
         if(currentDate.before(borrowingCardDetail.getExpireDate())) 
         {
-            response="Late";
+            
+            Penalty newPenalty;  
+            LocalDate startLocalDate = currentDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate(); 
+            LocalDate endLocalDate = borrowingCardDetail.getExpireDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(); // Calculate the number of days between the two dates 
+            int daysBetween =(int) ChronoUnit.DAYS.between(startLocalDate, endLocalDate);
+            int money = 10000*daysBetween;
+            if(penaltyRepo.findAll().size()==0) 
+            {
+                newPenalty = new Penalty(1, "", borrowingCardDetail.getService().getReader(), money);
+            } 
+            else {
+                newPenalty = new Penalty("", borrowingCardDetail.getService().getReader(), money);
+            }  
+            response=Integer.toString(newPenalty.getId());
+            penaltyRepo.save(newPenalty);
 
         }
         else{
@@ -680,6 +703,31 @@ public class LibrarianService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    public ResponseEntity<List<Penalty>> getAllPenalty() 
+    {
+        return new ResponseEntity<>(penaltyRepo.findAll(), HttpStatus.OK);
+    } 
+    public ResponseEntity<Penalty> findPenaltyById(int id) 
+    {
+        Penalty penalty = penaltyRepo.findById(id).orElse(null);
+        if(penalty==null) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        } 
+        return new ResponseEntity<>(penalty, HttpStatus.OK);
+    } 
+
+    public ResponseEntity<Penalty> updatePenalty(UpdatePenaltyRequest request, int id)
+    {
+        Penalty penalty = penaltyRepo.findById(id).orElse(null);
+        if(penalty==null) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+        penalty.setContent(request.getContent()); 
+        penaltyRepo.save(penalty);
+        return new ResponseEntity<>(penalty, HttpStatus.OK);
+    }
     
 
     

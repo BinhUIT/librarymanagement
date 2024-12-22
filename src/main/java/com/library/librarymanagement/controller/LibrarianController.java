@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.library.librarymanagement.entity.BookImagePath;
 import com.library.librarymanagement.entity.BorrowingCardDetail;
+import com.library.librarymanagement.entity.Penalty;
 import com.library.librarymanagement.entity.User;
 import com.library.librarymanagement.entity.WorkDetail;
 import com.library.librarymanagement.request.BookTitleCreateRequest;
@@ -27,6 +28,7 @@ import com.library.librarymanagement.request.BookTypeUpdateRequest;
 import com.library.librarymanagement.request.BuyBookBillRequest;
 import com.library.librarymanagement.request.SellBookBillCreateRequest;
 import com.library.librarymanagement.request.UnlockResponse;
+import com.library.librarymanagement.request.UpdatePenaltyRequest;
 import com.library.librarymanagement.response.BookBorrowingDetailResponse;
 import com.library.librarymanagement.security.TokenSecurity;
 import com.library.librarymanagement.service.LibrarianService;
@@ -391,6 +393,50 @@ public class LibrarianController {
             return librarianService.readerReturnBook(id);
 
         }
+    @GetMapping("/librarian/penalty_all")
+    public ResponseEntity<List<Penalty>> getAllPenaltyCard(@RequestHeader("Authorization") String authHeader) 
+    {
+        int userId = tokenSecurity.getUserIdAndCheckLibrarian(authHeader);
+        if(userId<=-1) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } 
+        if(!tokenSecurity.userExist(userId))  
+        { 
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        }
+        return librarianService.getAllPenalty();
+    } 
+
+    @GetMapping("/librarian/penalty/{id}") 
+    public ResponseEntity<Penalty> getPenalty(@RequestHeader("Authorization") String authHeader,@PathVariable int id) 
+    {
+        int userId = tokenSecurity.getUserIdAndCheckLibrarian(authHeader);
+            if(userId<=-1) 
+            {
+                return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+            } 
+            if(!tokenSecurity.userExist(userId))  
+            { 
+                return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+            }
+        return librarianService.findPenaltyById(id);
+    } 
+
+    @PutMapping("/librarian/update/penalty/{id}") 
+    public ResponseEntity<Penalty> updatePenalty(@RequestHeader("Authorization") String authHeader, @RequestBody UpdatePenaltyRequest request, @PathVariable int id) 
+    {
+        int userId = tokenSecurity.getUserIdAndCheckLibrarian(authHeader);
+        if(userId<=-1) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } 
+        if(!tokenSecurity.userExist(userId))  
+        { 
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        }
+        return librarianService.updatePenalty(request, id);
+    }
     
 
 
