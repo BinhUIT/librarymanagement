@@ -1,5 +1,7 @@
 package com.library.librarymanagement.controller;
 
+import java.util.List;
+
 import org.assertj.core.api.IntegerAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.library.librarymanagement.entity.BookImageData;
+import com.library.librarymanagement.entity.BookImagePath;
 import com.library.librarymanagement.request.BookCreationRequest;
 import com.library.librarymanagement.request.BookUpdateRequest;
 import com.library.librarymanagement.service.BookService;
@@ -52,5 +55,10 @@ public final class BookController {
         } catch (final Exception exception) {
             return false;
         }
+    } 
+    @GetMapping("/all") 
+    public List<BookImagePath> getAllBook() 
+    { 
+        return service.getAllBook();
     }
 }

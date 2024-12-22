@@ -1,5 +1,8 @@
 package com.library.librarymanagement.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -133,6 +136,20 @@ public final class BookService {
 
         return result;
     }    
+
+    public List<BookImagePath> getAllBook() 
+    { 
+        List<BookImagePath> listBook = repository.findAll();
+        List<BookImagePath> listRes= new ArrayList<>();
+        for(int i=0;i<listBook.size();i++)
+        {
+            if(listBook.get(i).getIsUsable()==true) 
+            {
+                listRes.add(listBook.get(i));
+            } 
+        } 
+        return listRes;
+    }
 
     
     
