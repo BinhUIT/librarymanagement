@@ -357,8 +357,40 @@ public class LibrarianController {
             return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
         }  
        return librarianService.deleteABook(id);
-    }  
+    }    
+    
+    @PutMapping("/librarian/reader_take_book/{id}") 
+    public ResponseEntity<String> readerTakeBook(@RequestHeader("Authorization") String authHeader, @PathVariable int id) 
+    {
+        int userId = tokenSecurity.getUserIdAndCheckLibrarian(authHeader);
+        if(userId<=-1) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } 
+        if(!tokenSecurity.userExist(userId))  
+        { 
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } 
+        return librarianService.readerTakeBook(id);
 
+    }
+
+    @PutMapping("/librarian/return_book/{id}") 
+
+    public ResponseEntity<String> returnBook(@RequestHeader("Authorization") String authHeader, @PathVariable int id) 
+        {
+            int userId = tokenSecurity.getUserIdAndCheckLibrarian(authHeader);
+            if(userId<=-1) 
+            {
+                return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+            } 
+            if(!tokenSecurity.userExist(userId))  
+            { 
+                return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+            } 
+            return librarianService.readerReturnBook(id);
+
+        }
     
 
 

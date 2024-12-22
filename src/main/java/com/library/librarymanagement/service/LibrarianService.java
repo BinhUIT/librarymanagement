@@ -32,6 +32,7 @@ import com.library.librarymanagement.entity.ServiceType;
 import com.library.librarymanagement.entity.UnlockRequest;
 import com.library.librarymanagement.entity.User;
 import com.library.librarymanagement.entity.WorkDetail;
+import com.library.librarymanagement.entity.BorrowingCardDetail.Status;
 import com.library.librarymanagement.repository.BookRepository;
 import com.library.librarymanagement.repository.BookStatusRepository;
 import com.library.librarymanagement.repository.BookTitleRepository;
@@ -622,6 +623,62 @@ public class LibrarianService {
         bookTitleRepo.save(bookTitleImagePath);
         return new ResponseEntity<>("Success", HttpStatus.OK);
     }    
+
+    public ResponseEntity<String> readerTakeBook(int bookId) 
+    {
+        BookImagePath book= bookRepo.findById(bookId).orElse(null);
+        if(book==null||book.getIsUsable()==false) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+        BorrowingCardDetail borrowingCardDetail = borrowingCardDetailRepo.findByBook(book); 
+        if(borrowingCardDetail==null) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        } 
+       if(!borrowingCardDetail.updateStatus(Status.BORROWING)){
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+       }
+       borrowingCardDetailRepo.save(borrowingCardDetail);
+       book.setStatus(bookStatusRepo.findById((byte)3).orElse(null));
+       bookRepo.save(book);
+       return new ResponseEntity<>("Success", HttpStatus.OK);
+
+    }
+
+    public ResponseEntity<String> readerReturnBook(int bookId) 
+    {
+        String response;
+        BookImagePath book= bookRepo.findById(bookId).orElse(null);
+        if(book==null||book.getIsUsable()==false) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+        BorrowingCardDetail borrowingCardDetail = borrowingCardDetailRepo.findByBook(book); 
+        if(borrowingCardDetail==null) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+        if(!borrowingCardDetail.updateStatus(Status.RETURNED))
+        {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+         
+        book.setStatus(bookStatusRepo.findById((byte)0).orElse(null));
+        bookRepo.save(book); 
+        Date currentDate = new Date();
+        if(currentDate.before(borrowingCardDetail.getExpireDate())) 
+        {
+            response="Late";
+
+        }
+        else{
+            response="Success";
+        } 
+        borrowingCardDetail.setExpireDate(currentDate); 
+        borrowingCardDetailRepo.save(borrowingCardDetail); 
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 
     
 
