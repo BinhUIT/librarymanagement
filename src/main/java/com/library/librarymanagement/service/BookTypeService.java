@@ -1,17 +1,12 @@
 package com.library.librarymanagement.service;
 
 import java.util.List;
-import java.util.Map;
-
 import javax.sql.DataSource;
 
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -27,13 +22,7 @@ import com.library.librarymanagement.entity.BookTypeImageData;
 import com.library.librarymanagement.entity.BookTypeImagePath;
 import com.library.librarymanagement.repository.BookTypeRepository;
 import com.library.librarymanagement.ulti.File;
-import com.library.librarymanagement.ulti.Report;
-
-import net.sf.jasperreports.engine.JasperCompileManager;
-import net.sf.jasperreports.engine.JasperExportManager;
-import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.JasperReport;
+import com.library.librarymanagement.ulti.JasperReport;
 
 @Service
 public final class BookTypeService {
@@ -276,6 +265,6 @@ public final class BookTypeService {
         parameters.put("ReportStartDate", startDate);
         parameters.put("ReportEndDate", endDate);
 
-        return Report.exportReportFromJasper("/reports/BookTypeBorrowing.jasper", parameters, dataSource);
+        return JasperReport.exportReportFromJasperFile("/reports/BookTypeBorrowing.jasper", parameters, dataSource);
     }
 }

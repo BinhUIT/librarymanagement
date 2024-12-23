@@ -3,9 +3,6 @@ package com.library.librarymanagement.service;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.util.ArrayList;
 
 import org.springframework.data.domain.PageRequest;
@@ -22,13 +19,10 @@ import com.library.librarymanagement.entity.BookTypeImagePath;
 import com.library.librarymanagement.repository.BookTitleRepository;
 import com.library.librarymanagement.repository.BookTypeRepository;
 import com.library.librarymanagement.ulti.File;
-import com.library.librarymanagement.ulti.Report;
+import com.library.librarymanagement.ulti.JasperReport;
 
 import java.sql.Date;
 import javax.sql.DataSource;
-import net.sf.jasperreports.engine.JasperExportManager;
-import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperPrint;
 
 @Service
 public final class BookTitleService {
@@ -93,7 +87,7 @@ public final class BookTitleService {
         } 
         List<BookTitleImagePath> listBookTitle= bookTitleRepository.findByType(bookType); 
         List<BookTitleImageData> listBookTitleImageData = new ArrayList<>();
-        for(int i=0;i<listBookTitle.size();i++) 
+        for (var i = 0; i < listBookTitle.size(); i++) 
         {
             BookTitleImageData bookTitleImageData= new BookTitleImageData(listBookTitle.get(i)); 
             listBookTitleImageData.add(bookTitleImageData); 
@@ -176,16 +170,16 @@ public final class BookTitleService {
     public ResponseEntity<List<BookTitleImageData>> getBookTitleByAuthor(String author) {
         List<BookTitleImagePath> listBookTitleImagePath = bookTitleRepository.findByAuthor(author);  
         List<BookTitleImageData> listBookTitleImageData = new ArrayList<>();
-        for (int i = 0; i < listBookTitleImagePath.size(); i++)
+        for (var i = 0; i < listBookTitleImagePath.size(); i++)
         {
-            BookTitleImageData bookTitleImageData = new BookTitleImageData(listBookTitleImagePath.get(i)); 
+            final var bookTitleImageData = new BookTitleImageData(listBookTitleImagePath.get(i));
             listBookTitleImageData.add(bookTitleImageData);
         }
         return new ResponseEntity<>(listBookTitleImageData, HttpStatus.OK);
     } 
 
     public ResponseEntity<BookTitleImageData> findByName(String name) {
-        BookTitleImagePath bookTitleImagePath = bookTitleRepository.findByName(name); 
+        final var bookTitleImagePath = bookTitleRepository.findByName(name);
         return new ResponseEntity<>(new BookTitleImageData(bookTitleImagePath), HttpStatus.OK);
     }
 
@@ -196,6 +190,6 @@ public final class BookTitleService {
         parameters.put("ReportStartDate", startDate);
         parameters.put("ReportEndDate", endDate);
 
-        return Report.exportReportFromJasper("/reports/BookTitleBorrowing.jasper", parameters, dataSource);
+        return JasperReport.exportReportFromJasperFile("/reports/BookTitleBorrowing.jasper", parameters, dataSource);
     }
 }

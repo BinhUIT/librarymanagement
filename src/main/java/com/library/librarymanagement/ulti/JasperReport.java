@@ -12,15 +12,15 @@ import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 
-public final class Report {
-    private Report() {
+public final class JasperReport {
+    private JasperReport() {
     }
 
-    public static byte[] exportReportFromJasper(
+    public static byte[] exportReportFromJasperFile(
             @NonNull final String jasperFilePath,
             @NonNull final Map<String, Object> parameters,
             @NonNull final DataSource dataSource) throws Exception {
-        final var reportStream = Report.class.getResourceAsStream(jasperFilePath);
+        final var reportStream = JasperReport.class.getResourceAsStream(jasperFilePath);
 
         try (final var connection = dataSource.getConnection()) {
             final var jasperPrint = JasperFillManager.fillReport(reportStream, parameters, connection);
@@ -31,7 +31,7 @@ public final class Report {
         }
     }
 
-    public static byte[] exportReportFromJrxml(
+    public static byte[] exportReportFromJrxmlFile(
             @NotNull final String jrxmlFilePath,
             @NonNull final Map<String, Object> parameters,
             @NonNull final DataSource dataSource) throws Exception {

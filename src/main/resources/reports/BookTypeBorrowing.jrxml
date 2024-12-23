@@ -61,6 +61,7 @@ FROM library.borrowingcarddetail
 WHERE 
      library.service.`IMPLEMENTDATE` >= $P{ReportStartDate} 
 	 AND library.service.`IMPLEMENTDATE` <= $P{ReportEndDate} 
+	 AND  library.borrowingcarddetail.`Status` IN ('BORROWING', 'RENEWAL', 'RETURNED')
 GROUP BY library.booktype.`ID`
 ORDER BY library.booktype.`NAME` ASC]]></query>
 		<field name="BookTypeName" class="java.lang.String">
@@ -97,7 +98,8 @@ FROM library.borrowingcarddetail
 	 library.borrowingcarddetail.`BOOKID` = library.book.`ID`
 WHERE 
      library.service.`IMPLEMENTDATE` >= $P{ReportStartDate} 
-	 AND library.service.`IMPLEMENTDATE` <= $P{ReportEndDate} 
+	 AND library.service.`IMPLEMENTDATE` <= $P{ReportEndDate}
+	 AND  library.borrowingcarddetail.`Status` IN ('BORROWING', 'RENEWAL', 'RETURNED')
 ORDER BY library.book.`ID` ASC
 LIMIT 1]]></query>
 	<field name="BookId" class="java.lang.Integer">
@@ -118,14 +120,14 @@ LIMIT 1]]></query>
 				<text><![CDATA[Books borrowed in types]]></text>
 			</element>
 		</element>
-		<element kind="frame" uuid="e3c14156-5b51-4201-918b-97fdc012e5d4" mode="Opaque" x="0" y="100" width="451" height="32" forecolor="#000000" backcolor="#CC0000">
-			<element kind="textField" uuid="5c3301e7-a737-4c59-8a2f-a6c79fd1adb8" x="250" y="12" width="201" height="20" forecolor="#FFFFFF" fontSize="12.0" pattern="EEEEE dd MMMMM yyyy" hTextAlign="Right">
+		<element kind="frame" uuid="e3c14156-5b51-4201-918b-97fdc012e5d4" mode="Opaque" x="0" y="100" width="451" height="32" forecolor="#000000" backcolor="#956647">
+			<element kind="textField" uuid="5c3301e7-a737-4c59-8a2f-a6c79fd1adb8" x="250" y="0" width="201" height="32" forecolor="#FFFFFF" fontSize="12.0" pattern="EEEEE dd MMMMM yyyy" hTextAlign="Right" vTextAlign="Middle">
 				<expression><![CDATA[new java.util.Date()]]></expression>
+				<box leftPadding="10" rightPadding="10"/>
 			</element>
 		</element>
 		<element kind="image" uuid="8c748e86-5424-4355-b6d2-1e32f8df5f41" x="455" y="0" width="100" height="132" onErrorType="Blank">
-			<expression><![CDATA["cherry.jpg"
-]]></expression>
+			<expression><![CDATA["books.jpg"]]></expression>
 		</element>
 	</title>
 	<pageHeader height="40" splitType="Stretch">
