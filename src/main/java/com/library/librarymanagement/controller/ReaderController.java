@@ -194,6 +194,18 @@ public class ReaderController {
         return readerService.getAllBorrowingCardDetail(userId);
     } 
 
+    @PostMapping("/reader/borrowOneBook/{id}") 
+    public ResponseEntity<BorrowResponse> borrowOneBook(@RequestHeader("Authorization") String authHeader, @PathVariable int id) 
+    {
+        if(authHeader==null||!authHeader.startsWith("Bearer ") || !tokenSecurity.checkToken(authHeader.substring(7))) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+
+        } 
+        int userId = tokenSecurity.extractUserId(authHeader.substring(7));
+        return readerService.borrowOneBook(id, userId);
+    }
+
 
     
    

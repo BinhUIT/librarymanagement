@@ -46,7 +46,7 @@ public class AdminController {
         
     } 
 
-    @GetMapping("/admin/getAllLinrarian") 
+    @GetMapping("/admin/getAllLibrarian") 
     public List<User> getAllLibrarian(@RequestHeader("Authorization") String authHeader) 
     {
         if(authHeader==null||!authHeader.startsWith("Bearer ") || !tokenSecurity.checkToken(authHeader.substring(7))||tokenSecurity.extractRole(authHeader)<=1) 

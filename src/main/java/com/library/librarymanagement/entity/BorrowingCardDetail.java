@@ -101,12 +101,20 @@ public class BorrowingCardDetail {
         return status;
     }
 
-    public boolean updateStatus(final Status newStatus) {
-        boolean isValidValue = switch (newStatus) {
-            case BORROWING, CANCELLED -> this.status == Status.PENDING;
-            case RETURNED -> this.status == Status.BORROWING||this.status==Status.RENEWAL; 
-            case RENEWAL->this.status==Status.BORROWING;
-            default -> false;
+    public boolean updateStatus(final Status newStatus) { 
+        boolean isValidValue; 
+        System.out.println(this.status); 
+        System.out.println(this.id);
+       switch (newStatus) {
+            case Status.BORROWING, Status.CANCELLED : isValidValue=(this.status == Status.PENDING);
+                break;
+            
+            case Status.RETURNED :isValidValue=( this.status ==  Status.BORROWING||this.status==Status.RENEWAL);
+            break; 
+            case Status.RENEWAL: isValidValue= (this.status==Status.BORROWING);
+            break;
+            
+            default: isValidValue= false;
         };
         System.out.println(isValidValue);
         if (isValidValue) {
@@ -118,7 +126,7 @@ public class BorrowingCardDetail {
                 calendar.setTime(utilDate); 
                 calendar.add(Calendar.DAY_OF_MONTH, 7);
                 this.expireDate= new Date(calendar.getTimeInMillis());
-
+                
             }
         }
 

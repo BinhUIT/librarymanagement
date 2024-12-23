@@ -345,6 +345,45 @@ public class ReaaderService {
 
    }  
 
+   public ResponseEntity<BorrowResponse> borrowOneBook(int bookTitleId, int userId) 
+   {
+    BorrowResponse borrowResponse= new BorrowResponse("", new ArrayList<>()); 
+    BookTitleImagePath bookTitleImagePath = bookTitleRepo.findById(bookTitleId).orElse(null);
+    if(bookTitleImagePath==null||bookTitleImagePath.getEnable()==false) 
+    {
+        return new ResponseEntity<>(borrowResponse, HttpStatus.BAD_REQUEST);
+    } 
+    if(bookTitleImagePath.getAmountRemaining()==0) 
+    {
+        borrowResponse.setMessage("Not enough"); 
+        borrowResponse.addResponse(bookTitleImagePath.getName()); 
+        return new ResponseEntity<>(borrowResponse, HttpStatus.OK);
+    } 
+    List<BookImagePath> listBook = bookRepo.findByTitle(bookTitleImagePath);
+    for(int i=0;i<listBook.size();i++) 
+    {
+        if(listBook.get(i).getIsUsable()&&listBook.get(i).getStatus().getId()==0) 
+        {
+            ServiceType serviceType= serviceTypeRepo.findById(1).orElse(null);  
+            User user= userRepo.findById(userId).orElse(null);
+            
+        int newServiceId= serviceRepo.findAll().size()+1; 
+       com.library.librarymanagement.entity.Service service = new com.library.librarymanagement.entity.Service(newServiceId, user, new Date(), serviceType);
+       serviceRepo.save(service); 
+       int newBorrowCardDetailId = borrowingDetailRepo.findAll().size();
+       BorrowingCardDetail borrowingCardDetail = new BorrowingCardDetail(newBorrowCardDetailId, service,listBook.get(i) ,new Date()); 
+       borrowingDetailRepo.save(borrowingCardDetail); 
+       borrowResponse.setMessage("Success"); 
+       borrowResponse.addResponse(borrowingCardDetail);
+       break;
+        }
+    }
+    return new ResponseEntity<>(borrowResponse, HttpStatus.OK);
+
+   }
+
+  
+
 
    public ResponseEntity<List<BorrowingCardDetail>> getAllBorrowingCardDetail(int userId) 
    {
