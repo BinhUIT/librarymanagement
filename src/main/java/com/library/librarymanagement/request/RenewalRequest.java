@@ -1,28 +1,21 @@
 package com.library.librarymanagement.request;
 
-import java.util.List;
+import java.util.Date;
+
 
 public class RenewalRequest { 
-    private ServiceRequest serviceRequest; 
-    private List<RenewalCardDetailRequest> listRenewalDetails; 
+    private Date newExpireDate;
 
     public RenewalRequest() 
-    { 
-
-    } 
-
-    public RenewalRequest(ServiceRequest serviceRequest, List<RenewalCardDetailRequest> listRenewalDetails) 
-    { 
-        this.serviceRequest = serviceRequest; 
-        this.listRenewalDetails= listRenewalDetails; 
-    } 
-
-    public ServiceRequest getServiceRequest() 
-    { 
-        return this.serviceRequest; 
-    } 
-    public List<RenewalCardDetailRequest> getListRenewalDetails() 
     {
-        return this.listRenewalDetails;
+
+    } 
+    public RenewalRequest(Date newExpireDate) 
+    {
+        this.newExpireDate= newExpireDate;
+    } 
+    public Date getNewExpireDate() 
+    {
+        return this.newExpireDate;
     }
 }

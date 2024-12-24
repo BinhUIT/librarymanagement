@@ -106,9 +106,10 @@ public class BorrowingCardDetail {
         System.out.println(this.status); 
         System.out.println(this.id);
        switch (newStatus) {
-            case Status.BORROWING, Status.CANCELLED : isValidValue=(this.status == Status.PENDING);
+            case Status.BORROWING : isValidValue=(this.status == Status.PENDING||this.status==Status.RENEWAL);
                 break;
-            
+            case Status.CANCELLED: isValidValue=(this.status==Status.PENDING);
+            break;
             case Status.RETURNED :isValidValue=( this.status ==  Status.BORROWING||this.status==Status.RENEWAL);
             break; 
             case Status.RENEWAL: isValidValue= (this.status==Status.BORROWING);

@@ -19,7 +19,7 @@ public class Penalty {
     @Column(name="ID", columnDefinition = "INT") 
     private int id;
 
-    @Column(name="CONTENT", columnDefinition = "VARCHAR(1000)") 
+    @Column(name="CONTENT", columnDefinition = "VARCHAR(100)") 
     private String content;
 
     @ManyToOne

@@ -18,6 +18,7 @@ import com.library.librarymanagement.entity.BorrowingCardDetail;
 import com.library.librarymanagement.entity.CartDetail;
 import com.library.librarymanagement.entity.Notification;
 import com.library.librarymanagement.entity.RenewalCardDetail;
+import com.library.librarymanagement.entity.RenewalDetail;
 import com.library.librarymanagement.entity.ServiceType;
 import com.library.librarymanagement.entity.UnlockRequest;
 import com.library.librarymanagement.entity.User;
@@ -386,7 +387,7 @@ public class ReaaderService {
         return new ResponseEntity<>("Success", HttpStatus.OK);
    }
 
-   public ResponseEntity<String> sendRenewalRequest(int borrowingCardDetailId) 
+   public ResponseEntity<String> sendRenewalRequest(int borrowingCardDetailId, RenewalRequest request) 
    {
         BorrowingCardDetail borrowingCardDetail = borrowingDetailRepo.findById(borrowingCardDetailId).orElse(null);
         if(borrowingCardDetail==null) 
@@ -397,9 +398,19 @@ public class ReaaderService {
         {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST); 
         }
-        borrowingCardDetail.updateStatus(Status.RENEWAL);
-        borrowingDetailRepo.save(borrowingCardDetail);
-        return new ResponseEntity<>("Success", HttpStatus.OK);
+        borrowingCardDetail.updateStatus(Status.RENEWAL);  
+        int newRenewalDetailId = renewalDetailRepo.findAll().size(); 
+        RenewalDetail renewalDetail;
+        if(newRenewalDetailId!=0){
+        renewalDetail = new RenewalDetail(borrowingCardDetail, request.getNewExpireDate());
+        } 
+        else {
+            renewalDetail= new RenewalDetail(0, borrowingCardDetail, request.getNewExpireDate());
+        }
+        renewalDetailRepo.save(renewalDetail);
+        borrowingDetailRepo.save(borrowingCardDetail); 
+        System.out.println("Renewal success"); 
+        return new ResponseEntity<>("Success ", HttpStatus.OK);
    }
 
    

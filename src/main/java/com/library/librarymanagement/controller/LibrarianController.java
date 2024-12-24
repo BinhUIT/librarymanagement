@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.library.librarymanagement.entity.BookImagePath;
 import com.library.librarymanagement.entity.BorrowingCardDetail;
 import com.library.librarymanagement.entity.Penalty;
+import com.library.librarymanagement.entity.RenewalDetail;
 import com.library.librarymanagement.entity.User;
 import com.library.librarymanagement.entity.WorkDetail;
 import com.library.librarymanagement.request.BookTitleCreateRequest;
@@ -172,7 +173,7 @@ public class LibrarianController {
     }
 
     @GetMapping("/librarian/getAllBorrowing") 
-    public ResponseEntity<List<BookBorrowingDetailResponse>> getAllBorrowing(@RequestHeader("Authorization") String authHeader)
+    public ResponseEntity<List<BorrowingCardDetail>> getAllBorrowing(@RequestHeader("Authorization") String authHeader)
     {
         int userId = tokenSecurity.getUserIdAndCheckLibrarian(authHeader);
         if(userId<=-1) 
@@ -336,7 +337,23 @@ public class LibrarianController {
             return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
         }  
        return librarianService.deleteBook(id);
-    }    
+    }     
+
+    @GetMapping("/librarian/all_borrow_detail") 
+    public ResponseEntity<List<BorrowingCardDetail>> getAllBorrowDetail(@RequestHeader("Authorization") String authHeader) 
+    {
+        int userId = tokenSecurity.getUserIdAndCheckLibrarian(authHeader);
+        if(userId<=-1) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } 
+        if(!tokenSecurity.userExist(userId))  
+        { 
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } 
+        
+        return librarianService.getAllBorrowingCardDetail();
+    }
     
     
 
@@ -386,6 +403,66 @@ public class LibrarianController {
         return librarianService.updatePenalty(request, id);
     }
     
+
+    @PutMapping("/librarian/readerTakeBook/{id}") 
+    public ResponseEntity<String> readerTakeBook(@RequestHeader("Authorization") String authHeader, @PathVariable int id) 
+    {
+        int userId = tokenSecurity.getUserIdAndCheckLibrarian(authHeader);
+        if(userId<=-1) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } 
+        if(!tokenSecurity.userExist(userId))  
+        { 
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        }
+        return librarianService.readerTakeBook(id);
+    } 
+
+    @PutMapping("/librarian/returnBook/{id}") 
+    public ResponseEntity<String> returnBook(@RequestHeader("Authorization") String authHeader, @PathVariable int id) 
+    {
+        int userId = tokenSecurity.getUserIdAndCheckLibrarian(authHeader);
+        if(userId<=-1) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } 
+        if(!tokenSecurity.userExist(userId))  
+        { 
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } 
+        return librarianService.readerReturnBook(id);
+    }
+
+    @PutMapping("/librarian/response/renewal/{id}") 
+    public ResponseEntity<String> responseRenewal(@RequestHeader("Authorization") String authHeader, @PathVariable int id, @RequestBody String isAccept) 
+    {
+        int userId = tokenSecurity.getUserIdAndCheckLibrarian(authHeader);
+        if(userId<=-1) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } 
+        if(!tokenSecurity.userExist(userId))  
+        { 
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } 
+        return librarianService.responseRenewal(id, isAccept);
+    }
+
+    @GetMapping("/librarian/renewal_list") 
+    public ResponseEntity<List<RenewalDetail>> getAllRenewalRequest(@RequestHeader("Authorization") String authHeader) 
+    {
+        int userId = tokenSecurity.getUserIdAndCheckLibrarian(authHeader);
+        if(userId<=-1) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } 
+        if(!tokenSecurity.userExist(userId))  
+        { 
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } 
+        return librarianService.getWaitingRenewalRequest();
+    }
 
 
 

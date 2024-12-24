@@ -28,19 +28,19 @@ public class RenewalDetail {
     @Column(name="NEWEXPIREDATE", columnDefinition = "DATE") 
     private Date newExpireDate;
 
-    @Column(name="STAUTS", columnDefinition = "INT") 
+    @Column(name="STATUS", columnDefinition = "INT") 
     private int status;
 
     public RenewalDetail() 
     {
 
     } 
-    public RenewalDetail(int id, BorrowingCardDetail borrowingCardDetail, Date newExpireDate, int status) 
+    public RenewalDetail(int id, BorrowingCardDetail borrowingCardDetail, Date newExpireDate) 
     {
         this.id=id;
         this.borrowingCardDetail= borrowingCardDetail;
         this.newExpireDate= newExpireDate;
-        this.status= status;
+        this.status= -1;
     } 
 
     public RenewalDetail(BorrowingCardDetail borrowingCardDetail, Date newExpireDate) 

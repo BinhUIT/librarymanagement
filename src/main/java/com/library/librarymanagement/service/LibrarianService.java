@@ -485,15 +485,9 @@ public class LibrarianService {
     }
 
 
-    public ResponseEntity<List<BookBorrowingDetailResponse>> getAllBorrowingCardDetail() 
+    public ResponseEntity<List<BorrowingCardDetail>> getAllBorrowingCardDetail() 
     {
-        List<BorrowingCardDetail> listBorrowingCard= borrowingCardDetailRepo.findAll();
-        List<BookBorrowingDetailResponse> listRes= new ArrayList<>();
-        for(int i=0;i<listBorrowingCard.size();i++) 
-        {
-            listRes.add(new BookBorrowingDetailResponse(listBorrowingCard.get(i)));
-        } 
-        return new ResponseEntity<>(listRes, HttpStatus.OK);
+        return new ResponseEntity<>(borrowingCardDetailRepo.findAll(), HttpStatus.OK);
     } 
 
     public ResponseEntity<String> updateBookTypeImage(int id, MultipartFile imageFile) 
@@ -616,11 +610,12 @@ public class LibrarianService {
         {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         } 
-        if(borrowingCardDetail.getStatus()!=Status.BORROWING) 
+        if(borrowingCardDetail.getStatus()!=Status.BORROWING&&borrowingCardDetail.getStatus()!=Status.RENEWAL) 
         {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }  
         borrowingCardDetail.updateStatus(Status.RETURNED);
+        borrowingCardDetail.setExpireDate(new Date());
         borrowingCardDetailRepo.save(borrowingCardDetail); 
         BookImagePath book = borrowingCardDetail.getBook();
         book.setStatus(bookStatusRepo.findById((byte)0).orElse(null)); 
@@ -632,18 +627,20 @@ public class LibrarianService {
         Date currentDate = new Date();
         if(borrowingCardDetail.getExpireDate().before(currentDate)) 
         { 
-            LocalDate startLocalDate = borrowingCardDetail.getExpireDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(); 
-            LocalDate endLocalDate = currentDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate(); // Calculate the number of days between the two dates 
+            LocalDate startLocalDate = borrowingCardDetail.getExpireDate().toLocalDate();
+            LocalDate endLocalDate = currentDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate(); 
+            System.out.println("Here"); // Calculate the number of days between the two dates 
             int price = (int)ChronoUnit.DAYS.between(startLocalDate, endLocalDate)*10000;  
-            Penalty penalty;
+            
+            
             int penaltyId= penaltyRepo.findAll().size();
             if(penaltyId==0) 
             {
-                penalty = new Penalty(0, "Trả sách trễ", borrowingCardDetail.getService().getReader(),price);
+                Penalty penalty = new Penalty(0, "Trả sách trễ", borrowingCardDetail.getService().getReader(),price);
                 penaltyRepo.save(penalty);
             } 
             else {
-            penalty= new Penalty("Trả sách trễ", borrowingCardDetail.getService().getReader(),price);
+            Penalty penalty= new Penalty("Trả sách trễ", borrowingCardDetail.getService().getReader(),price);
             User user = borrowingCardDetail.getService().getReader();
             user.setPenaltyTime(user.getPenaltyTime()+1); 
             userRepo.save(user);
@@ -750,10 +747,11 @@ public class LibrarianService {
         {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         } 
+        BorrowingCardDetail borrowingCardDetail= borrowingCardDetailRepo.findById(renewalDetail.getBorrowingCardDetail().getId()).orElse(null);
         if(isAccept.equals("Accept")) 
         {
-            renewalDetail.getBorrowingCardDetail().updateStatus(Status.BORROWING); 
-            renewalDetail.getBorrowingCardDetail().setExpireDate(renewalDetail.getNewExpireDate()); 
+            borrowingCardDetail.updateStatus(Status.BORROWING); 
+            borrowingCardDetail.setExpireDate(renewalDetail.getNewExpireDate()); 
             renewalDetail.setStatus(1); 
             int newNotifId = notifRepo.findAll().size(); 
             String message = "Gia hạn sách với mã số "+Integer.toString(renewalDetail.getBorrowingCardDetail().getBook().getId())+" thành công";
@@ -762,7 +760,7 @@ public class LibrarianService {
 
         } 
         else {
-            renewalDetail.getBorrowingCardDetail().updateStatus(Status.BORROWING); 
+           borrowingCardDetail.updateStatus(Status.BORROWING); 
             int newNotifId = notifRepo.findAll().size(); 
             String message = "Gia hạn sách với mã số "+Integer.toString(renewalDetail.getBorrowingCardDetail().getBook().getId())+" thất bại";
             Notification newNotif = new Notification(newNotifId, renewalDetail.getBorrowingCardDetail().getService().getReader(), new Date(), false, "Gia hạn sách", message);
@@ -771,7 +769,7 @@ public class LibrarianService {
 
             
         } 
-        borrowingCardDetailRepo.save(renewalDetail.getBorrowingCardDetail());
+        borrowingCardDetailRepo.save(borrowingCardDetail);
         renewalDetailRepo.delete(renewalDetail); 
         return new ResponseEntity<>("Success", HttpStatus.OK);
 

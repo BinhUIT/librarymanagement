@@ -197,7 +197,7 @@ public class ReaderController {
     } 
 
     @PutMapping("/reader/renewal/{id}") 
-    public ResponseEntity<String> sendRenewalRequest(@RequestHeader("Authorization") String authHeader, @PathVariable int id) 
+    public ResponseEntity<String> sendRenewalRequest(@RequestHeader("Authorization") String authHeader, @PathVariable int id, @RequestBody RenewalRequest request) 
     {
         
         if(authHeader==null||!authHeader.startsWith("Bearer ") || !tokenSecurity.checkToken(authHeader.substring(7))) 
@@ -205,7 +205,7 @@ public class ReaderController {
             return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
         } 
-        return readerService.sendRenewalRequest(id);
+        return readerService.sendRenewalRequest(id,request);
     }
 
 
