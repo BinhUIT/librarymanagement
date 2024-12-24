@@ -155,17 +155,7 @@ public class ReaderController {
 
     } 
 
-    @PostMapping("/reader/renewal") 
-    public ResponseEntity<String> sendRenewal(@RequestHeader("Authorization") String authHeader, @RequestBody RenewalRequest request) 
-    {
-        if(authHeader==null||!authHeader.startsWith("Bearer ") || !tokenSecurity.checkToken(authHeader.substring(7))) 
-        {
-            return new ResponseEntity<>("Denied", HttpStatus.UNAUTHORIZED);
-
-        } 
-        int userId = tokenSecurity.extractUserId(authHeader.substring(7)); 
-        return readerService.sendRenewalRequest(request, userId);
-    } 
+   
 
 
     @PostMapping("/reader/send/unlockRequest") 
@@ -204,6 +194,18 @@ public class ReaderController {
         } 
         int userId = tokenSecurity.extractUserId(authHeader.substring(7));
         return readerService.borrowOneBook(id, userId);
+    } 
+
+    @PutMapping("/reader/renewal/{id}") 
+    public ResponseEntity<String> sendRenewalRequest(@RequestHeader("Authorization") String authHeader, @PathVariable int id) 
+    {
+        
+        if(authHeader==null||!authHeader.startsWith("Bearer ") || !tokenSecurity.checkToken(authHeader.substring(7))) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+
+        } 
+        return readerService.sendRenewalRequest(id);
     }
 
 

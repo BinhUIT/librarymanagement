@@ -15,7 +15,9 @@ public interface BorrowingCardDetailRepository extends JpaRepository<BorrowingCa
 
     List<BorrowingCardDetail> findByService_ServiceIdAndBook_IdIn(Integer serviceId, Set<Integer> bookIds);   
 
-    BorrowingCardDetail findByBook(BookImagePath book);
+    List<BorrowingCardDetail> findByBook(BookImagePath book);
+
+    BorrowingCardDetail findByService_ServiceIdAndBook_Id(Integer serviceId, Integer bookId);
 
     
 

@@ -141,30 +141,7 @@ public class LibrarianController {
         return librarianService.SellBook(request, userId);
     } 
 
-    @PostMapping("/librarian/response/renewal/{id}") 
-    public ResponseEntity<String> responseRenewalRequest(@RequestHeader("Authorization") String authHeader,@RequestBody String state, @PathVariable int id ) 
-    {  
-        int userId = tokenSecurity.getUserIdAndCheckLibrarian(authHeader);
-        if(userId<=-1) 
-        {
-            return new ResponseEntity<>("Denied", HttpStatus.UNAUTHORIZED);
-        } 
-        if(!tokenSecurity.userExist(userId))  
-        { 
-            return new ResponseEntity<>("User does not exist", HttpStatus.BAD_REQUEST);
-        }  
-        if(state.equals("true")) 
-        {
-            return librarianService.responseARenewalRequest(id, true, userId); 
-
-        } 
-        if(state.equals("false")) 
-        { 
-            return librarianService.responseARenewalRequest(id, false, userId);
-        } 
-        return new ResponseEntity<>("Wrong information", HttpStatus.BAD_REQUEST);
-       
-    } 
+    
 
     @PostMapping("/librarian/lock/{userId}") 
     public ResponseEntity<User> lockUser(@RequestHeader("Authorization") String authHeader, @PathVariable int userId) 
@@ -358,41 +335,12 @@ public class LibrarianController {
         { 
             return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
         }  
-       return librarianService.deleteABook(id);
+       return librarianService.deleteBook(id);
     }    
     
-    @PutMapping("/librarian/reader_take_book/{id}") 
-    public ResponseEntity<String> readerTakeBook(@RequestHeader("Authorization") String authHeader, @PathVariable int id) 
-    {
-        int userId = tokenSecurity.getUserIdAndCheckLibrarian(authHeader);
-        if(userId<=-1) 
-        {
-            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
-        } 
-        if(!tokenSecurity.userExist(userId))  
-        { 
-            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
-        } 
-        return librarianService.readerTakeBook(id);
+    
 
-    }
-
-    @PutMapping("/librarian/return_book/{id}") 
-
-    public ResponseEntity<String> returnBook(@RequestHeader("Authorization") String authHeader, @PathVariable int id) 
-        {
-            int userId = tokenSecurity.getUserIdAndCheckLibrarian(authHeader);
-            if(userId<=-1) 
-            {
-                return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
-            } 
-            if(!tokenSecurity.userExist(userId))  
-            { 
-                return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
-            } 
-            return librarianService.readerReturnBook(id);
-
-        }
+   
     @GetMapping("/librarian/penalty_all")
     public ResponseEntity<List<Penalty>> getAllPenaltyCard(@RequestHeader("Authorization") String authHeader) 
     {

@@ -218,43 +218,7 @@ public class ReaaderService {
     
 
 
-   public ResponseEntity<String> sendRenewalRequest(RenewalRequest request, int userId) 
-   {
-        int newServiceId = serviceRepo.findAll().size();  
-        List<RenewalCardDetail> detailList = new ArrayList<>(); 
-        if(userId!=request.getServiceRequest().getReaderId()) 
-        {
-            return new ResponseEntity<>("Wrong information", HttpStatus.BAD_REQUEST);
-        }
-        User reader = userRepo.findById(request.getServiceRequest().getReaderId()).orElse(null); 
-        if(reader==null) 
-        { 
-            return new ResponseEntity<>("Reader does not exists", HttpStatus.BAD_REQUEST);
-        } 
-        ServiceType serviceType = serviceTypeRepo.findById(request.getServiceRequest().getServiceTypeId()).orElse(null);
-        if(serviceType==null) 
-        { 
-            return new ResponseEntity<>("We do not have this service", HttpStatus.BAD_REQUEST);
-        } 
-        com.library.librarymanagement.entity.Service newService = new com.library.librarymanagement.entity.Service(newServiceId,
-        reader, new Date(), serviceType);  
-        for(RenewalCardDetailRequest detailRequest: request.getListRenewalDetails()) 
-        {  
-            BorrowingCardDetail borrowingDetail = borrowingDetailRepo.findById(detailRequest.getBorrowingCardDetailId()).orElse(null); 
-            if(borrowingDetail==null) return new ResponseEntity<>("Renewal Failed", HttpStatus.BAD_REQUEST); 
-            if(borrowingDetail.getService().getReader().getUserId()!=request.getServiceRequest().getReaderId()) 
-            return new ResponseEntity<>("Renewal send failed", HttpStatus.BAD_REQUEST);  
-            User defaultLibrarian= userRepo.findById(-1).orElse(null);
-            RenewalCardDetail newDetail = new RenewalCardDetail(Integer.MAX_VALUE,newService,defaultLibrarian,borrowingDetail ); 
-            detailList.add(newDetail);
-        }  
-        serviceRepo.save(newService);   
-        for(RenewalCardDetail detail: detailList) 
-        {  
-            renewalDetailRepo.save(detail);
-        } 
-        return new ResponseEntity<>("Send renewal success, please wait for librarian to response", HttpStatus.OK);
-   } 
+   
 
 
    public ResponseEntity<String> sendUnlockRequest(String authHeader) 
@@ -418,6 +382,22 @@ public class ReaaderService {
             return new ResponseEntity<>("", HttpStatus.BAD_REQUEST);
         } 
         borrowingCardDetail.updateStatus(Status.CANCELLED);
+        borrowingDetailRepo.save(borrowingCardDetail);
+        return new ResponseEntity<>("Success", HttpStatus.OK);
+   }
+
+   public ResponseEntity<String> sendRenewalRequest(int borrowingCardDetailId) 
+   {
+        BorrowingCardDetail borrowingCardDetail = borrowingDetailRepo.findById(borrowingCardDetailId).orElse(null);
+        if(borrowingCardDetail==null) 
+        {
+            return new ResponseEntity<>("", HttpStatus.BAD_REQUEST);
+        } 
+        if(borrowingCardDetail.getStatus()!=Status.BORROWING) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST); 
+        }
+        borrowingCardDetail.updateStatus(Status.RENEWAL);
         borrowingDetailRepo.save(borrowingCardDetail);
         return new ResponseEntity<>("Success", HttpStatus.OK);
    }

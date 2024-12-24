@@ -36,7 +36,10 @@ public class User {
     private int role; 
 
     @Column(name="VERIFICATIONCODE", columnDefinition="varchar(100) not null", nullable=false)
-    private String verificationCode;
+    private String verificationCode; 
+
+    @Column(name="PENALTYTIME", columnDefinition = "INT") 
+    private int penaltyTime;
 
     public User() 
     {
@@ -51,7 +54,8 @@ public class User {
         this.enable=enable;
         this.password=password;
         this.role=role;
-        this.verificationCode=verificationCode;
+        this.verificationCode=verificationCode; 
+        this.penaltyTime=0;
     }  
     public User(RegisterRequest request) 
     {
@@ -61,7 +65,8 @@ public class User {
         this.email= request.getEmail(); 
         this.role=request.getRole();
         this.enable=false; 
-        this.verificationCode="";
+        this.verificationCode=""; 
+        this.penaltyTime=0;
     }
     public int getUserId() 
     {
@@ -132,6 +137,15 @@ public class User {
     public void setPhoneNumber(String phoneNumber) 
     {
         this.phoneNumber=phoneNumber;
+    } 
+
+    public int getPenaltyTime() 
+    {
+        return this.penaltyTime;
+    } 
+    public void setPenaltyTime(int penaltyTime)  
+    {
+        this.penaltyTime = penaltyTime;
     }
 
 

@@ -1,6 +1,7 @@
 package com.library.librarymanagement.service;
 
 import java.io.IOException;
+import java.net.http.HttpClient.Redirect;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -29,6 +30,7 @@ import com.library.librarymanagement.entity.BuyBookBillDetail;
 import com.library.librarymanagement.entity.Notification;
 import com.library.librarymanagement.entity.Penalty;
 import com.library.librarymanagement.entity.RenewalCardDetail;
+import com.library.librarymanagement.entity.RenewalDetail;
 import com.library.librarymanagement.entity.ReturningCardDetail;
 import com.library.librarymanagement.entity.SellBookBill;
 import com.library.librarymanagement.entity.SellBookBillDetail;
@@ -120,7 +122,8 @@ public class LibrarianService {
     private WorkDetailRepository workDetailRepo;
 
     @Autowired 
-    private PenaltyRepository penaltyRepo;
+    private PenaltyRepository penaltyRepo; 
+
 
     @Autowired 
     private UnlockRequestRepository unlockRequestRepo;
@@ -337,39 +340,7 @@ public class LibrarianService {
 
     } 
 
-    public ResponseEntity<String> responseARenewalRequest(int requestDetailId, boolean response, int librarianId) 
-    { 
-        RenewalCardDetail renewalDetail = renewalDetailRepo.findById(requestDetailId).orElse(null); 
-        if(renewalDetail==null) 
-        return new ResponseEntity<>("Renewal request doeas not exist", HttpStatus.BAD_REQUEST);
-
-        renewalDetail.setState(response);  
-        String message=""; 
-        BorrowingCardDetail borrowingCardDetail = renewalDetail.getBorrowingCardDetail();  
-        User librarian = userRepo.findById(librarianId).orElse(null); 
-        renewalDetail.setLibrarian(librarian); 
-        int newNotifId = notifRepo.findAll().size();  
-        User reader = borrowingCardDetail.getService().getReader();
-            
-        if(response==true) 
-        { 
-            
-            Calendar calendar= Calendar.getInstance(); 
-            calendar.setTime(borrowingCardDetail.getExpireDate()); 
-            calendar.add(Calendar.DAY_OF_MONTH,30); 
-            Date newExpireDate= calendar.getTime(); 
-            borrowingCardDetail.setExpireDate(newExpireDate);  
-            message="Your book is renewal";
-            
-        }  
-        else 
-        {
-            message="Your request is denied";
-        }
-        Notification notification = new Notification(newNotifId,reader,new Date(),false,"Renewal",message ); 
-        notifRepo.save(notification); 
-        return new ResponseEntity<>("Comoleted response", HttpStatus.OK);
-    } 
+     
 
     public ResponseEntity<String> createReturnBookCard(int librarianId, ReturningRequest request) 
     { 
@@ -617,90 +588,72 @@ public class LibrarianService {
         return new ResponseEntity<>(bookRepo.findByIsUsable(true), HttpStatus.OK);
     }
 
-    public ResponseEntity<String> deleteABook(int id) 
+        
+
+    
+
+    
+    public ResponseEntity<String> readerTakeBook(int borrowingCardDetailId) 
     {
-        BookImagePath bookImagePath= bookRepo.findById(id).orElse(null);
-        if(bookImagePath==null||bookImagePath.getIsUsable()==false||bookImagePath.getStatus().getId()!=0) 
+        BorrowingCardDetail borrowingCardDetail = borrowingCardDetailRepo.findById(borrowingCardDetailId).orElse(null);
+        if(borrowingCardDetail==null) 
         {
-            return new ResponseEntity<>("Can not delete", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         } 
-        bookImagePath.setIsUsable(false);  
-        bookRepo.save(bookImagePath);
-        BookTitleImagePath bookTitleImagePath= bookImagePath.getTitle();
-        bookTitleImagePath.setAmount(bookTitleImagePath.getAmount()-1); 
-        bookTitleImagePath.setAmountRemaining(bookTitleImagePath.getAmountRemaining()-1);
-        bookTitleRepo.save(bookTitleImagePath);
+        if(borrowingCardDetail.getStatus()!=Status.PENDING) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        } 
+        borrowingCardDetail.updateStatus(Status.BORROWING);
+        borrowingCardDetailRepo.save(borrowingCardDetail);
         return new ResponseEntity<>("Success", HttpStatus.OK);
-    }    
+    } 
 
-    public ResponseEntity<String> readerTakeBook(int bookId) 
-    {
-        BookImagePath book= bookRepo.findById(bookId).orElse(null);
-        if(book==null||book.getIsUsable()==false) 
-        {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
-        BorrowingCardDetail borrowingCardDetail = borrowingCardDetailRepo.findByBook(book); 
+    public ResponseEntity<String> readerReturnBook(int borrowingCardDetailId) 
+    { 
+        BorrowingCardDetail borrowingCardDetail = borrowingCardDetailRepo.findById(borrowingCardDetailId).orElse(null);
         if(borrowingCardDetail==null) 
         {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         } 
-       if(!borrowingCardDetail.updateStatus(Status.BORROWING)){
+        if(borrowingCardDetail.getStatus()!=Status.BORROWING) 
+        {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-       }
-       borrowingCardDetailRepo.save(borrowingCardDetail);
-       book.setStatus(bookStatusRepo.findById((byte)3).orElse(null));
-       bookRepo.save(book);
-       return new ResponseEntity<>("Success", HttpStatus.OK);
+        }  
+        borrowingCardDetail.updateStatus(Status.RETURNED);
+        borrowingCardDetailRepo.save(borrowingCardDetail); 
+        BookImagePath book = borrowingCardDetail.getBook();
+        book.setStatus(bookStatusRepo.findById((byte)0).orElse(null)); 
+        bookRepo.save(book);
 
-    }
-
-    public ResponseEntity<String> readerReturnBook(int bookId) 
-    {
-        String response;
-        BookImagePath book= bookRepo.findById(bookId).orElse(null);
-        if(book==null||book.getIsUsable()==false) 
-        {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
-        BorrowingCardDetail borrowingCardDetail = borrowingCardDetailRepo.findByBook(book); 
-        if(borrowingCardDetail==null) 
-        {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
-        if(!borrowingCardDetail.updateStatus(Status.RETURNED))
-        {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
-         
-        book.setStatus(bookStatusRepo.findById((byte)0).orElse(null));
-        bookRepo.save(book); 
+        BookTitleImagePath bookTitle = book.getTitle();
+        bookTitle.setAmountRemaining(bookTitle.getAmountRemaining()+1); 
+        bookTitleRepo.save(bookTitle); 
         Date currentDate = new Date();
-        if(currentDate.before(borrowingCardDetail.getExpireDate())) 
-        {
-            
-            Penalty newPenalty;  
-            LocalDate startLocalDate = currentDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate(); 
-            LocalDate endLocalDate = borrowingCardDetail.getExpireDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(); // Calculate the number of days between the two dates 
-            int daysBetween =(int) ChronoUnit.DAYS.between(startLocalDate, endLocalDate);
-            int money = 10000*daysBetween;
-            if(penaltyRepo.findAll().size()==0) 
+        if(borrowingCardDetail.getExpireDate().before(currentDate)) 
+        { 
+            LocalDate startLocalDate = borrowingCardDetail.getExpireDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(); 
+            LocalDate endLocalDate = currentDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate(); // Calculate the number of days between the two dates 
+            int price = (int)ChronoUnit.DAYS.between(startLocalDate, endLocalDate)*10000;  
+            Penalty penalty;
+            int penaltyId= penaltyRepo.findAll().size();
+            if(penaltyId==0) 
             {
-                newPenalty = new Penalty(1, "", borrowingCardDetail.getService().getReader(), money);
+                penalty = new Penalty(0, "Trả sách trễ", borrowingCardDetail.getService().getReader(),price);
+                penaltyRepo.save(penalty);
             } 
             else {
-                newPenalty = new Penalty("", borrowingCardDetail.getService().getReader(), money);
-            }  
-            response=Integer.toString(newPenalty.getId());
-            penaltyRepo.save(newPenalty);
-
+            penalty= new Penalty("Trả sách trễ", borrowingCardDetail.getService().getReader(),price);
+            User user = borrowingCardDetail.getService().getReader();
+            user.setPenaltyTime(user.getPenaltyTime()+1); 
+            userRepo.save(user);
+            penaltyRepo.save(penalty);  
+            }
+            return  new ResponseEntity<>(Integer.toString(penaltyId), HttpStatus.OK);
+            
         }
-        else{
-            response="Success";
-        } 
-        borrowingCardDetail.setExpireDate(currentDate); 
-        borrowingCardDetailRepo.save(borrowingCardDetail); 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return new ResponseEntity<>("Success", HttpStatus.OK);
+
     }
 
     public ResponseEntity<List<Penalty>> getAllPenalty() 
@@ -727,6 +680,118 @@ public class LibrarianService {
         penalty.setContent(request.getContent()); 
         penaltyRepo.save(penalty);
         return new ResponseEntity<>(penalty, HttpStatus.OK);
+    }
+
+    public ResponseEntity<String> deleteBook(int bookId) 
+    {
+        BookImagePath bookImagePath= bookRepo.findById(bookId).orElse(null); 
+        
+        if(bookImagePath==null||bookImagePath.getIsUsable()==false) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        } 
+        BookTitleImagePath bookTitle= bookImagePath.getTitle();
+        List<BorrowingCardDetail> listBorrowDetail = borrowingCardDetailRepo.findByBook(bookImagePath);
+        for(int i=0;i<listBorrowDetail.size();i++) 
+        {
+            if(listBorrowDetail.get(i).getStatus()==Status.BORROWING||listBorrowDetail.get(i).getStatus()==Status.RENEWAL) 
+            {
+                return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            } 
+            if(listBorrowDetail.get(i).getStatus()==Status.PENDING) 
+            {
+                
+                if(bookTitle.getAmountRemaining()==0) 
+                {
+                    return new ResponseEntity<>("Not enough", HttpStatus.OK);
+                }
+                List<BookImagePath> listBook = bookRepo.findByTitle(bookTitle);
+                for(int j=0;j<listBook.size();j++) 
+                {
+                    if(listBook.get(j).getId()!=bookImagePath.getId()) 
+                    {
+                        if(listBook.get(j).getIsUsable()==true&&listBook.get(j).getStatus().getId()==0) 
+                        {
+                            listBook.get(j).setStatus(bookStatusRepo.findById((byte)1).orElse(null)); 
+                            listBorrowDetail.get(i).setBook(listBook.get(j));
+                            bookTitle.setAmountRemaining(bookTitle.getAmountRemaining()-1);  
+                            bookTitle.setAmount(bookTitle.getAmount()-1);
+                            bookImagePath.setIsUsable(false);
+
+                            bookRepo.save(listBook.get(j)); 
+                            bookRepo.save(bookImagePath);
+                            borrowingCardDetailRepo.save(listBorrowDetail.get(i));
+                            bookTitleRepo.save(bookTitle);
+                            break;
+                        }
+                    }
+                } 
+                return new ResponseEntity<>("Success", HttpStatus.OK);
+            }
+        } 
+        bookTitle.setAmountRemaining(bookTitle.getAmountRemaining()-1);  
+        bookTitle.setAmount(bookTitle.getAmount()-1);
+        bookImagePath.setIsUsable(false); 
+        bookRepo.save(bookImagePath);
+        bookTitleRepo.save(bookTitle);
+        return new ResponseEntity<>("Success", HttpStatus.OK);
+
+
+    }
+
+    public ResponseEntity<String> responseRenewal(int id,String isAccept ) 
+    {
+        RenewalDetail renewalDetail = renewalDetailRepo.findById(id).orElse(null); 
+        if(renewalDetail==null) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        } 
+        if(renewalDetail.getBorrowingCardDetail().getStatus()!=Status.RENEWAL) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        } 
+        if(isAccept.equals("Accept")) 
+        {
+            renewalDetail.getBorrowingCardDetail().updateStatus(Status.BORROWING); 
+            renewalDetail.getBorrowingCardDetail().setExpireDate(renewalDetail.getNewExpireDate()); 
+            renewalDetail.setStatus(1); 
+            int newNotifId = notifRepo.findAll().size(); 
+            String message = "Gia hạn sách với mã số "+Integer.toString(renewalDetail.getBorrowingCardDetail().getBook().getId())+" thành công";
+            Notification newNotif = new Notification(newNotifId, renewalDetail.getBorrowingCardDetail().getService().getReader(), new Date(), false, "Gia hạn sách", message); 
+            notifRepo.save(newNotif);
+
+        } 
+        else {
+            renewalDetail.getBorrowingCardDetail().updateStatus(Status.BORROWING); 
+            int newNotifId = notifRepo.findAll().size(); 
+            String message = "Gia hạn sách với mã số "+Integer.toString(renewalDetail.getBorrowingCardDetail().getBook().getId())+" thất bại";
+            Notification newNotif = new Notification(newNotifId, renewalDetail.getBorrowingCardDetail().getService().getReader(), new Date(), false, "Gia hạn sách", message);
+            renewalDetail.setStatus(0); 
+            notifRepo.save(newNotif); 
+
+            
+        } 
+        borrowingCardDetailRepo.save(renewalDetail.getBorrowingCardDetail());
+        renewalDetailRepo.delete(renewalDetail); 
+        return new ResponseEntity<>("Success", HttpStatus.OK);
+
+        
+
+    }
+
+    public ResponseEntity<List<RenewalDetail>> getWaitingRenewalRequest() 
+    {
+        return new ResponseEntity<>(renewalDetailRepo.findByStatus(-1), HttpStatus.OK);
+    } 
+
+    public ResponseEntity<List<Penalty>> getPenaltyByUser(int userId) 
+    { 
+        User reader = userRepo.findById(userId).orElse(null);
+        if(reader==null) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(penaltyRepo.findByReader(reader), HttpStatus.OK);
     }
     
 
