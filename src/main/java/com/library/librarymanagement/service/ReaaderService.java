@@ -336,7 +336,12 @@ public class ReaaderService {
        com.library.librarymanagement.entity.Service service = new com.library.librarymanagement.entity.Service(newServiceId, user, new Date(), serviceType);
        serviceRepo.save(service); 
        int newBorrowCardDetailId = borrowingDetailRepo.findAll().size();
-       BorrowingCardDetail borrowingCardDetail = new BorrowingCardDetail(newBorrowCardDetailId, service,listBook.get(i) ,new Date()); 
+       Date currentDate = new Date();  
+        Calendar calendar = Calendar.getInstance(); 
+        calendar.setTime(currentDate); 
+        calendar.add(Calendar.DAY_OF_MONTH, 7);  
+        Date expireDate = calendar.getTime();
+       BorrowingCardDetail borrowingCardDetail = new BorrowingCardDetail(newBorrowCardDetailId, service,listBook.get(i),expireDate); 
        borrowingDetailRepo.save(borrowingCardDetail); 
        borrowResponse.setMessage("Success"); 
        borrowResponse.addResponse(borrowingCardDetail);

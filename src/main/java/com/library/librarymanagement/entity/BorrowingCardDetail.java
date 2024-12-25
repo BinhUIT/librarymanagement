@@ -108,7 +108,7 @@ public class BorrowingCardDetail {
        switch (newStatus) {
             case Status.BORROWING : isValidValue=(this.status == Status.PENDING||this.status==Status.RENEWAL);
                 break;
-            case Status.CANCELLED: isValidValue=(this.status==Status.PENDING);
+            case Status.CANCELLED: isValidValue=(this.status!=Status.RETURNED);
             break;
             case Status.RETURNED :isValidValue=( this.status ==  Status.BORROWING||this.status==Status.RENEWAL);
             break; 

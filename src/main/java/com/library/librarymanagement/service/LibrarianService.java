@@ -1,6 +1,7 @@
 package com.library.librarymanagement.service;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.http.HttpClient.Redirect;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -61,8 +62,10 @@ import com.library.librarymanagement.request.BookTitleCreateRequest;
 import com.library.librarymanagement.request.BookTitleUpdateRequest;
 import com.library.librarymanagement.request.BookTypeCreateRequest;
 import com.library.librarymanagement.request.BookTypeUpdateRequest;
+import com.library.librarymanagement.request.BorrowOfflineRequest;
 import com.library.librarymanagement.request.BuyBookBillDetailRequest;
 import com.library.librarymanagement.request.BuyBookBillRequest;
+import com.library.librarymanagement.request.RenewalRequest;
 import com.library.librarymanagement.request.ReturningDetailRequest;
 import com.library.librarymanagement.request.ReturningRequest;
 import com.library.librarymanagement.request.SellBookBillCreateRequest;
@@ -72,6 +75,8 @@ import com.library.librarymanagement.request.UpdatePenaltyRequest;
 import com.library.librarymanagement.resource.ResourceStrings;
 import com.library.librarymanagement.response.BookBorrowingDetailResponse;
 import com.library.librarymanagement.ulti.File;
+
+import jakarta.mail.MessagingException;
 
 
 
@@ -123,6 +128,9 @@ public class LibrarianService {
 
     @Autowired 
     private PenaltyRepository penaltyRepo; 
+    
+    @Autowired 
+    private UserService userService;
 
 
     @Autowired 
@@ -599,6 +607,10 @@ public class LibrarianService {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         } 
         borrowingCardDetail.updateStatus(Status.BORROWING);
+
+        BookImagePath book= borrowingCardDetail.getBook();
+        book.setStatus(bookStatusRepo.findById((byte)3).orElse(null));
+        bookRepo.save(book);
         borrowingCardDetailRepo.save(borrowingCardDetail);
         return new ResponseEntity<>("Success", HttpStatus.OK);
     } 
@@ -736,7 +748,7 @@ public class LibrarianService {
 
     }
 
-    public ResponseEntity<String> responseRenewal(int id,String isAccept ) 
+    public ResponseEntity<String> responseRenewal(int id,String isAccept ) throws UnsupportedEncodingException, MessagingException 
     {
         RenewalDetail renewalDetail = renewalDetailRepo.findById(id).orElse(null); 
         if(renewalDetail==null) 
@@ -753,19 +765,19 @@ public class LibrarianService {
             borrowingCardDetail.updateStatus(Status.BORROWING); 
             borrowingCardDetail.setExpireDate(renewalDetail.getNewExpireDate()); 
             renewalDetail.setStatus(1); 
-            int newNotifId = notifRepo.findAll().size(); 
+             
             String message = "Gia hạn sách với mã số "+Integer.toString(renewalDetail.getBorrowingCardDetail().getBook().getId())+" thành công";
-            Notification newNotif = new Notification(newNotifId, renewalDetail.getBorrowingCardDetail().getService().getReader(), new Date(), false, "Gia hạn sách", message); 
-            notifRepo.save(newNotif);
+           String content ="Gia hạn thành công";
+           userService.sendEmail(borrowingCardDetail.getService().getReader(), content, message);
 
         } 
         else {
            borrowingCardDetail.updateStatus(Status.BORROWING); 
-            int newNotifId = notifRepo.findAll().size(); 
-            String message = "Gia hạn sách với mã số "+Integer.toString(renewalDetail.getBorrowingCardDetail().getBook().getId())+" thất bại";
-            Notification newNotif = new Notification(newNotifId, renewalDetail.getBorrowingCardDetail().getService().getReader(), new Date(), false, "Gia hạn sách", message);
+             
+            String message = "Gia hạn sách với mã số "+Integer.toString(renewalDetail.getBorrowingCardDetail().getBook().getId())+" thất bại"; 
             renewalDetail.setStatus(0); 
-            notifRepo.save(newNotif); 
+            String content ="Gia hạn thất bại";
+            userService.sendEmail(borrowingCardDetail.getService().getReader(), content, message);
 
             
         } 
@@ -791,7 +803,83 @@ public class LibrarianService {
         }
         return new ResponseEntity<>(penaltyRepo.findByReader(reader), HttpStatus.OK);
     }
-    
+
+
+    public ResponseEntity<List<BorrowingCardDetail>> borrowManually(BorrowOfflineRequest request) 
+    {
+        User reader = userRepo.findById(request.getUserId()).orElse(null);
+        if(reader==null||reader.getEnable()==false) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        } 
+        int newServiceId = serviceRepo.findAll().size()+1; 
+        ServiceType serviceType = serviceTypeRepo.findById(0).orElse(null); 
+        com.library.librarymanagement.entity.Service service = new com.library.librarymanagement.entity.Service(newServiceId, reader, new Date(), serviceType);
+        for(int i=0;i<request.getListBook().size();i++) 
+        {  
+            BookImagePath book = bookRepo.findById(request.getListBook().get(i)).orElse(null);
+            if(book==null||book.getIsUsable()==false||book.getStatus().getId()!=0) 
+            {
+                return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            }
+        } 
+        for(int i=0;i<request.getListBook().size();i++) 
+        { 
+            BookImagePath book = bookRepo.findById(request.getListBook().get(i)).orElse(null);
+            int newBorrowDetailId = borrowingCardDetailRepo.findAll().size(); 
+            Date currentDate = new Date();  
+            Calendar calendar = Calendar.getInstance(); 
+            calendar.setTime(currentDate); 
+            calendar.add(Calendar.DAY_OF_MONTH, 7);  
+             Date expireDate = calendar.getTime();
+            BorrowingCardDetail borrowingCardDetail = new BorrowingCardDetail(newBorrowDetailId, service, book,expireDate);
+            borrowingCardDetail.updateStatus(Status.BORROWING);
+            borrowingCardDetailRepo.save(borrowingCardDetail);
+
+        } 
+        return new ResponseEntity<>(borrowingCardDetailRepo.findByService_ServiceId(service.getServiceId()), HttpStatus.OK);
+
+
+    }
+
+    public ResponseEntity<String> destroyBookAndLockUser(int borrowDetailId) throws UnsupportedEncodingException, MessagingException 
+    {
+        BorrowingCardDetail borrowDetail = borrowingCardDetailRepo.findById(borrowDetailId).orElse(null); 
+        if(borrowDetail==null) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+        borrowDetail.updateStatus(Status.CANCELLED);
+
+        BookImagePath book= borrowDetail.getBook();
+        book.setIsUsable(false); 
+        BookTitleImagePath bookTitle = book.getTitle();
+        bookTitle.setAmount(bookTitle.getAmount()-1); 
+        bookTitle.setAmountRemaining(bookTitle.getAmountRemaining()-1); 
+        User reader = userRepo.findById(borrowDetail.getService().getReader().getUserId()).orElse(null);
+        reader.setEnable(false);  
+        borrowingCardDetailRepo.save(borrowDetail);
+        bookRepo.save(book);
+        bookTitleRepo.save(bookTitle);
+        userRepo.save(reader);
+        String content ="Khóa tài khoản";
+        String subject ="Bạn đã bị khóa tài khoản vì trả sách trễ, vui lòng liên hệ thủ thư để giải quyết";
+        userService.sendEmail(reader, content, subject); 
+        return new ResponseEntity<>("Success", HttpStatus.OK);
+
+    }
+
+    public ResponseEntity<String> renewalOffline(int borrowDetailId, RenewalRequest request) 
+    {
+        BorrowingCardDetail borrowingCardDetail = borrowingCardDetailRepo.findById(borrowDetailId).orElse(null);
+        if(borrowingCardDetail==null||borrowingCardDetail.getStatus()!=Status.BORROWING) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        } 
+        borrowingCardDetail.setExpireDate(request.getNewExpireDate()); 
+        borrowingCardDetailRepo.save(borrowingCardDetail);
+        return new ResponseEntity<>("Success", HttpStatus.OK);
+    }
 
     
 

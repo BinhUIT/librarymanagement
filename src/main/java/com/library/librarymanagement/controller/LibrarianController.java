@@ -1,5 +1,6 @@
 package com.library.librarymanagement.controller;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,13 +27,17 @@ import com.library.librarymanagement.request.BookTitleCreateRequest;
 import com.library.librarymanagement.request.BookTitleUpdateRequest;
 import com.library.librarymanagement.request.BookTypeCreateRequest;
 import com.library.librarymanagement.request.BookTypeUpdateRequest;
+import com.library.librarymanagement.request.BorrowOfflineRequest;
 import com.library.librarymanagement.request.BuyBookBillRequest;
+import com.library.librarymanagement.request.RenewalRequest;
 import com.library.librarymanagement.request.SellBookBillCreateRequest;
 import com.library.librarymanagement.request.UnlockResponse;
 import com.library.librarymanagement.request.UpdatePenaltyRequest;
 import com.library.librarymanagement.response.BookBorrowingDetailResponse;
 import com.library.librarymanagement.security.TokenSecurity;
 import com.library.librarymanagement.service.LibrarianService;
+
+import jakarta.mail.MessagingException;
 
 @RestController
 public class LibrarianController { 
@@ -435,7 +440,7 @@ public class LibrarianController {
     }
 
     @PutMapping("/librarian/response/renewal/{id}") 
-    public ResponseEntity<String> responseRenewal(@RequestHeader("Authorization") String authHeader, @PathVariable int id, @RequestBody String isAccept) 
+    public ResponseEntity<String> responseRenewal(@RequestHeader("Authorization") String authHeader, @PathVariable int id, @RequestBody String isAccept) throws UnsupportedEncodingException, MessagingException 
     {
         int userId = tokenSecurity.getUserIdAndCheckLibrarian(authHeader);
         if(userId<=-1) 
@@ -464,6 +469,50 @@ public class LibrarianController {
         return librarianService.getWaitingRenewalRequest();
     }
 
+    @PostMapping("/librarian/borrowOffline") 
+    public ResponseEntity<List<BorrowingCardDetail>> borrowOffline(@RequestHeader("Authorization") String authHeader, @RequestBody BorrowOfflineRequest request) 
+    {
+        int userId = tokenSecurity.getUserIdAndCheckLibrarian(authHeader);
+        if(userId<=-1) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } 
+        if(!tokenSecurity.userExist(userId))  
+        { 
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } 
+        return librarianService.borrowManually(request);
+    }
+
+    @DeleteMapping("/librarian/destroy_book_lock_user/{id}") 
+    public ResponseEntity<String> destroyBookAndLockUser(@RequestHeader("Authorization") String authHeader, @PathVariable int id) throws UnsupportedEncodingException, MessagingException 
+    {
+        int userId = tokenSecurity.getUserIdAndCheckLibrarian(authHeader);
+        if(userId<=-1) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } 
+        if(!tokenSecurity.userExist(userId))  
+        { 
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } 
+        return librarianService.destroyBookAndLockUser(id);
+    } 
+
+    @PutMapping("/librarian/renewalOffline/{id}") 
+    public ResponseEntity<String> renewalOnline(@RequestHeader("Authorization") String authHeader, @PathVariable int id,@RequestBody RenewalRequest request) 
+    {
+        int userId = tokenSecurity.getUserIdAndCheckLibrarian(authHeader);
+        if(userId<=-1) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } 
+        if(!tokenSecurity.userExist(userId))  
+        { 
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } 
+        return librarianService.renewalOffline(id, request);
+    }
 
 
 

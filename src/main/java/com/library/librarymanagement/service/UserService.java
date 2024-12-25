@@ -131,7 +131,7 @@ public class UserService {
 
         return new ResponseEntity<>("Đăng kí thành công, vui lòng kiểm tra email để kích hoạt tài khoản", HttpStatus.OK);
     } 
-    private void sendEmail(User user, String content, String subject) throws MessagingException, UnsupportedEncodingException
+    public void sendEmail(User user, String content, String subject) throws MessagingException, UnsupportedEncodingException
     {    
         String toAddress = user.getEmail(); 
         String fromAddress = "leyen15121971@gmail.com";  
