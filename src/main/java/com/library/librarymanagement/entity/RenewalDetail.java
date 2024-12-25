@@ -31,23 +31,28 @@ public class RenewalDetail {
     @Column(name="STATUS", columnDefinition = "INT") 
     private int status;
 
+    @Column(name="SENDDATE", columnDefinition = "DATE") 
+    private Date sendDate;
+
     public RenewalDetail() 
     {
 
     } 
-    public RenewalDetail(int id, BorrowingCardDetail borrowingCardDetail, Date newExpireDate) 
+    public RenewalDetail(int id, BorrowingCardDetail borrowingCardDetail, Date newExpireDate, Date sendDate) 
     {
         this.id=id;
         this.borrowingCardDetail= borrowingCardDetail;
         this.newExpireDate= newExpireDate;
-        this.status= -1;
+        this.status= -1; 
+        this.sendDate= sendDate;
     } 
 
     public RenewalDetail(BorrowingCardDetail borrowingCardDetail, Date newExpireDate) 
     {
         this.borrowingCardDetail= borrowingCardDetail;
         this.newExpireDate= newExpireDate;
-        this.status= -1;
+        this.status= -1; 
+        this.sendDate= new Date();
     }
 
     public int getId() 
@@ -65,7 +70,11 @@ public class RenewalDetail {
     public int getStatus() 
     {
         return this.status;
-    } 
+    }  
+    public Date getSendDate() 
+    {
+        return this.sendDate;
+    }
 
     public void setStatus(int status) 
     {

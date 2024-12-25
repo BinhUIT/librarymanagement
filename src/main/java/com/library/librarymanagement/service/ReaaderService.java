@@ -410,7 +410,7 @@ public class ReaaderService {
         renewalDetail = new RenewalDetail(borrowingCardDetail, request.getNewExpireDate());
         } 
         else {
-            renewalDetail= new RenewalDetail(0, borrowingCardDetail, request.getNewExpireDate());
+            renewalDetail= new RenewalDetail(0, borrowingCardDetail, request.getNewExpireDate(), new Date());
         }
         renewalDetailRepo.save(renewalDetail);
         borrowingDetailRepo.save(borrowingCardDetail); 

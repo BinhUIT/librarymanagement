@@ -869,7 +869,7 @@ public class LibrarianService {
 
     }
 
-    public ResponseEntity<String> renewalOffline(int borrowDetailId, RenewalRequest request) 
+    public ResponseEntity<String> renewalOffline(int borrowDetailId, RenewalRequest request) throws UnsupportedEncodingException, MessagingException 
     {
         BorrowingCardDetail borrowingCardDetail = borrowingCardDetailRepo.findById(borrowDetailId).orElse(null);
         if(borrowingCardDetail==null||borrowingCardDetail.getStatus()!=Status.BORROWING) 
@@ -878,6 +878,9 @@ public class LibrarianService {
         } 
         borrowingCardDetail.setExpireDate(request.getNewExpireDate()); 
         borrowingCardDetailRepo.save(borrowingCardDetail);
+        String message = "Gia hạn sách với mã số "+Integer.toString(borrowingCardDetail.getBook().getId())+" thành công";
+           String content ="Gia hạn thành công";
+           userService.sendEmail(borrowingCardDetail.getService().getReader(), content, message);
         return new ResponseEntity<>("Success", HttpStatus.OK);
     }
 

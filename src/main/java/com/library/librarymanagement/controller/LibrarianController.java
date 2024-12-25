@@ -500,7 +500,7 @@ public class LibrarianController {
     } 
 
     @PutMapping("/librarian/renewalOffline/{id}") 
-    public ResponseEntity<String> renewalOnline(@RequestHeader("Authorization") String authHeader, @PathVariable int id,@RequestBody RenewalRequest request) 
+    public ResponseEntity<String> renewalOnline(@RequestHeader("Authorization") String authHeader, @PathVariable int id,@RequestBody RenewalRequest request) throws UnsupportedEncodingException, MessagingException 
     {
         int userId = tokenSecurity.getUserIdAndCheckLibrarian(authHeader);
         if(userId<=-1) 
