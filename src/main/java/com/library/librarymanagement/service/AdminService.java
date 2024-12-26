@@ -215,12 +215,5 @@ public class AdminService {
         return new ResponseEntity<>("Delete success", HttpStatus.OK);
     }
 
-    public ResponseEntity<List<SellBookBillDetail>> getAllSellBookBillDetail() 
-    {
-        return new ResponseEntity<>(sellBookBillDetailRepo.findAll(), HttpStatus.OK);
-    } 
-    public ResponseEntity<List<BuyBookBillDetail>> getAllBuyBookBill() 
-    {
-        return new ResponseEntity<>(buyBookBillDetailRepo.findAll(), HttpStatus.OK);
-    }    
+        
 }

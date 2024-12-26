@@ -279,6 +279,7 @@ public class ReaaderService {
             BookTitleImagePath bookTitle= bookTitleRepo.findById(cartDetail.getBookTitleImagePath().getId()).orElse(null);
             List<BookImagePath> listBook= bookRepo.findByTitle(bookTitle);
             int borrowAmount = request.getListRequest().get(i).getAmount();
+            System.out.println(borrowAmount);
             int beginIndex=0;
             int newBorrowCardDetailId = borrowingDetailRepo.findAll().size();
             while(borrowAmount>0) 
@@ -299,6 +300,7 @@ public class ReaaderService {
                     borrowingDetailRepo.save(borrowingCardDetail);
                     borrowResponse.setMessage("Success");
                     borrowResponse.addResponse(borrowingCardDetail);
+                    newBorrowCardDetailId++;
                     borrowAmount--;
 
                 } 

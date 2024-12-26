@@ -19,8 +19,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.library.librarymanagement.entity.BookImagePath;
 import com.library.librarymanagement.entity.BorrowingCardDetail;
+import com.library.librarymanagement.entity.BuyBookBillDetail;
 import com.library.librarymanagement.entity.Penalty;
+import com.library.librarymanagement.entity.Regulation;
 import com.library.librarymanagement.entity.RenewalDetail;
+import com.library.librarymanagement.entity.SellBookBillDetail;
 import com.library.librarymanagement.entity.User;
 import com.library.librarymanagement.entity.WorkDetail;
 import com.library.librarymanagement.request.BookTitleCreateRequest;
@@ -513,6 +516,54 @@ public class LibrarianController {
         } 
         return librarianService.renewalOffline(id, request);
     }
+
+    @GetMapping("/librarian/getBuyBookDetail") 
+    public ResponseEntity<List<BuyBookBillDetail>> getAllBuyBookDetail(@RequestHeader("Authorization") String authHeader) 
+    {
+        int userId = tokenSecurity.getUserIdAndCheckLibrarian(authHeader);
+        if(userId<=-1) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } 
+        if(!tokenSecurity.userExist(userId))  
+        { 
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } 
+        return librarianService.getAllBuyBookBill();
+    } 
+
+    @GetMapping("/librarian/getSellBookBill") 
+    public ResponseEntity<List<SellBookBillDetail>> getAllSellBookBill(@RequestHeader("Authorization") String authHeader) 
+    {
+        int userId = tokenSecurity.getUserIdAndCheckLibrarian(authHeader);
+        if(userId<=-1) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } 
+        if(!tokenSecurity.userExist(userId))  
+        { 
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        }
+        return librarianService.getAllSellBookBillDetail();
+
+    }
+
+    @GetMapping("/librarian/updateRegulation") 
+    public ResponseEntity<String> updateRegulation(@RequestHeader("Authorization") String authHeader, @RequestBody Regulation regulation) 
+    {
+        int userId = tokenSecurity.getUserIdAndCheckLibrarian(authHeader);
+        if(userId<=-1) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } 
+        if(!tokenSecurity.userExist(userId))  
+        { 
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } 
+        return librarianService.updateRegulation(regulation);
+    }
+
+
 
 
 

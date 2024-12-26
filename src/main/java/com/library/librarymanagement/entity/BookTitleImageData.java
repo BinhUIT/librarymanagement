@@ -27,6 +27,8 @@ public final class BookTitleImageData {
 
     private String review = null;
 
+    private int borrowTime;
+
     @JsonSerialize(using = ByteArraySerializer.class)
     private byte[] imageData = null;
 
@@ -45,8 +47,13 @@ public final class BookTitleImageData {
             this.review= bookTitleImagePath.getReview();
 
             final var file = new File(bookTitleImagePath.getImagePath());
-            this.imageData = file.readBytes();
+            this.imageData = file.readBytes(); 
+            this.borrowTime= bookTitleImagePath.getBorrowTime();
         }
+    } 
+    public int getBorrowTime() 
+    {
+        return this.borrowTime;
     }
     public String getNxb() 
     {

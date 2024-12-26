@@ -163,7 +163,7 @@ public class Sceduling {
             
         }
     }
-    @Scheduled(fixedRate = 30000)  
+    @Scheduled(fixedRate = 1000000)  
     public void scheduleDatabase() throws UnsupportedEncodingException, MessagingException 
     {
         checkDaysToTakeBook(); 

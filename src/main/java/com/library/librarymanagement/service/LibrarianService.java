@@ -30,6 +30,7 @@ import com.library.librarymanagement.entity.BuyBookBill;
 import com.library.librarymanagement.entity.BuyBookBillDetail;
 import com.library.librarymanagement.entity.Notification;
 import com.library.librarymanagement.entity.Penalty;
+import com.library.librarymanagement.entity.Regulation;
 import com.library.librarymanagement.entity.RenewalCardDetail;
 import com.library.librarymanagement.entity.RenewalDetail;
 import com.library.librarymanagement.entity.ReturningCardDetail;
@@ -51,6 +52,7 @@ import com.library.librarymanagement.repository.NotificationRepository;
 import com.library.librarymanagement.repository.PenaltyRepository;
 import com.library.librarymanagement.repository.RenewalDetailRepository;
 import com.library.librarymanagement.repository.ReturningCardDetailRpository;
+import com.library.librarymanagement.repository.ReulationRepository;
 import com.library.librarymanagement.repository.SellBookBillDetailRepository;
 import com.library.librarymanagement.repository.SellBookBillRepository;
 import com.library.librarymanagement.repository.ServiceRepository;
@@ -130,7 +132,10 @@ public class LibrarianService {
     private PenaltyRepository penaltyRepo; 
     
     @Autowired 
-    private UserService userService;
+    private UserService userService;  
+
+    @Autowired 
+    private ReulationRepository regulationRepo;
 
 
     @Autowired 
@@ -607,7 +612,9 @@ public class LibrarianService {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         } 
         borrowingCardDetail.updateStatus(Status.BORROWING);
-
+        BookTitleImagePath bookTitle= borrowingCardDetail.getBook().getTitle();
+        bookTitle.setBorrowTime(bookTitle.getBorrowTime()+1); 
+        bookTitleRepo.save(bookTitle);
         BookImagePath book= borrowingCardDetail.getBook();
         book.setStatus(bookStatusRepo.findById((byte)3).orElse(null));
         bookRepo.save(book);
@@ -767,8 +774,8 @@ public class LibrarianService {
             renewalDetail.setStatus(1); 
              
             String message = "Gia hạn sách với mã số "+Integer.toString(renewalDetail.getBorrowingCardDetail().getBook().getId())+" thành công";
-           String content ="Gia hạn thành công";
-           userService.sendEmail(borrowingCardDetail.getService().getReader(), content, message);
+            String content ="Gia hạn thành công";
+            userService.sendEmail(borrowingCardDetail.getService().getReader(), content, message);
 
         } 
         else {
@@ -849,7 +856,7 @@ public class LibrarianService {
         {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
-        borrowDetail.updateStatus(Status.CANCELLED);
+        borrowDetail.updateStatus(Status.DESTROY);
 
         BookImagePath book= borrowDetail.getBook();
         book.setIsUsable(false); 
@@ -882,7 +889,26 @@ public class LibrarianService {
            String content ="Gia hạn thành công";
            userService.sendEmail(borrowingCardDetail.getService().getReader(), content, message);
         return new ResponseEntity<>("Success", HttpStatus.OK);
+    } 
+    public ResponseEntity<List<SellBookBillDetail>> getAllSellBookBillDetail() 
+    {
+        return new ResponseEntity<>(sellBookBillDetailRepo.findAll(), HttpStatus.OK);
+    } 
+    public ResponseEntity<List<BuyBookBillDetail>> getAllBuyBookBill() 
+    {
+        return new ResponseEntity<>(buyBookBillDetailRepo.findAll(), HttpStatus.OK);
     }
+
+    public ResponseEntity<String> updateRegulation(Regulation regulation) 
+    {
+        Regulation reg= regulationRepo.findById(1).orElse(null);
+        reg.setDaysToResponseRenewal(regulation.getDaysToResponseRenewal()); 
+        reg.setDaysToTakeBook(regulation.getDaysToTakeBook()); 
+        reg.setDefaultBorrowingDays(regulation.getDefaultBorrowingDays()); 
+        regulationRepo.save(reg);
+        return new ResponseEntity<>("Success", HttpStatus.OK);
+    }
+    
 
     
 

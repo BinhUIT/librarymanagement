@@ -142,26 +142,7 @@ public class AdminController {
         return adminService.deleteWorkDetail(id);
     } 
 
-    @GetMapping("/admin/getSellBookBill") 
-    public ResponseEntity<List<SellBookBillDetail>> getAllSellBookBillDetail(@RequestHeader("Authorization") String authHeader) 
-    {
-        if(authHeader==null||!authHeader.startsWith("Bearer ") || !tokenSecurity.checkToken(authHeader.substring(7))||tokenSecurity.extractRole(authHeader)<=1) 
-        {
-            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED); 
+    
 
-        } 
-        return adminService.getAllSellBookBillDetail();    
-    } 
-
-    @GetMapping("/admin/getBuyBookBill") 
-    public ResponseEntity<List<BuyBookBillDetail>> getAllBuyBookBillDetail(@RequestHeader("Authorization") String authHeader) 
-    {
-        if(authHeader==null||!authHeader.startsWith("Bearer ") || !tokenSecurity.checkToken(authHeader.substring(7))||tokenSecurity.extractRole(authHeader)<=1) 
-        {
-            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED); 
-
-        } 
-        return adminService.getAllBuyBookBill();
-    }
-
+    
 }

@@ -1,8 +1,16 @@
 package com.library.librarymanagement.service;
 
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.io.InputStream;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Map;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.sql.SQLException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -18,18 +26,26 @@ import com.library.librarymanagement.entity.BookTitleImagePath;
 import com.library.librarymanagement.entity.BookTypeImagePath;
 import com.library.librarymanagement.repository.BookTitleRepository;
 import com.library.librarymanagement.repository.BookTypeRepository;
-import com.library.librarymanagement.ulti.File;
+import com.library.librarymanagement.ulti.File; 
+import java.sql.Date; 
+
+import javax.sql.DataSource;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
 
 @Service
 public final class BookTitleService {
     private final BookTitleRepository bookTitleRepository;
     private final BookTypeRepository bookTypeRepository;
-
+    private final DataSource dataSource;
     @Autowired(required = true)
     private BookTitleService(final BookTitleRepository bookTitleRepository,
-            final BookTypeRepository bookTypeRepository) {
+            final BookTypeRepository bookTypeRepository, final DataSource datasource) {
         this.bookTitleRepository = bookTitleRepository;
-        this.bookTypeRepository = bookTypeRepository;
+        this.bookTypeRepository = bookTypeRepository; 
+        this.dataSource= datasource;
     }
 
     public List<BookTitleImagePath> getBookTitlesImagePathByPage(final Integer start, final Integer amount) {
@@ -173,6 +189,31 @@ public final class BookTitleService {
         } 
         return new ResponseEntity<>(listBookTitleImageData, HttpStatus.OK);
     } 
+    
+    public ResponseEntity<List<BookTitleImageData>>  getHotBook() 
+    {
+        List<BookTitleImagePath> listBookTitleImagePath= bookTitleRepository.findAll();
+        List<BookTitleImageData> listBookTitleImageData= new ArrayList<>();
+        for(int i=0;i<listBookTitleImagePath.size();i++) 
+        { 
+            if(listBookTitleImagePath.get(i).getEnable()) {
+            listBookTitleImageData.add(new BookTitleImageData(listBookTitleImagePath.get(i))); 
+            }
+        }
+        List<BookTitleImageData> listRes= new ArrayList<>();
+        Collections.sort(listBookTitleImageData, new Comparator<BookTitleImageData>() {
+            @Override 
+            public int compare(BookTitleImageData b1, BookTitleImageData b2) 
+            {
+                return -Integer.compare(b1.getBorrowTime(), b2.getBorrowTime());
+            }
+        });
+        for(int i=0;i<10;i++) 
+        {
+            listRes.add(listBookTitleImageData.get(i));
+        } 
+        return new ResponseEntity<>(listRes, HttpStatus.OK);
+    }
 
     public ResponseEntity<BookTitleImageData> findByName(String name) 
     { 
@@ -191,5 +232,22 @@ public final class BookTitleService {
             }
         } 
         return listBookTitleImageData;
+    } 
+     public byte[] exportReportBorrowingByTypeAndDateRange(
+            final Short bookTypeId, final Date startDate, final Date endDate) throws JRException, SQLException {
+        final InputStream reportStream = getClass().getResourceAsStream(
+                "/reports/BookTitleReport/BookTitleBorrowing.jasper");
+        // JasperReport jasperReport = JasperCompileManager.compileReport(
+        // "src/main/resources/reports/BookTitleReport/BookTitleBorrowing.jrxml");
+        final Map<String, Object> parameters = new HashMap<>(3);
+        parameters.put("BookTypeId", bookTypeId);
+        parameters.put("ReportStartDate", startDate);
+        parameters.put("ReportEndDate", endDate);
+        try (final var connection = dataSource.getConnection()) {
+            final JasperPrint jasperPrint = JasperFillManager.fillReport(reportStream, parameters, connection);
+            final var outputStream = new ByteArrayOutputStream();
+            JasperExportManager.exportReportToPdfStream(jasperPrint, outputStream);
+            return outputStream.toByteArray();
+        }
     }
 }

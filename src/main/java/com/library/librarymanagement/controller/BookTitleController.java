@@ -1,6 +1,10 @@
 package com.library.librarymanagement.controller;
 
 import java.util.List;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +22,8 @@ import com.library.librarymanagement.request.BookTitleCreationRequest;
 import com.library.librarymanagement.request.BookTitleUpdateRequest;
 import com.library.librarymanagement.entity.BookTitleImageData;
 import com.library.librarymanagement.service.BookTitleService;
-
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 @RestController
 @RequestMapping("/book-titles")
 public final class BookTitleController {
@@ -91,7 +96,30 @@ public final class BookTitleController {
         return service.getAll();
     }
 
+    @GetMapping("/report")
+    public ResponseEntity<byte[]> exportReportBorrowingByTypeAndDateRange(@RequestParam("id") String bookTypeIdString,
+            @RequestParam("startDate") String startDateString, @RequestParam("endDate") String endDateString) {
+        try {
+            final var bookTypeId = Short.valueOf(bookTypeIdString);
+            final var startDate = Date.valueOf(startDateString);
+            final var endDate = Date.valueOf(endDateString);
+            final var pdfBytes = this.service.exportReportBorrowingByTypeAndDateRange(bookTypeId, startDate, endDate);
+
+    
+            final var headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDisposition(ContentDisposition.builder("attachment")
+                    .filename("report.pdf")
+                    .build());
+
+            return ResponseEntity.ok().headers(headers).body(pdfBytes);
+        } catch (final Exception exception) {
+            exception.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+}
 
     
 
-}
+

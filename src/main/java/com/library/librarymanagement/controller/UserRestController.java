@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.library.librarymanagement.entity.Regulation;
 import com.library.librarymanagement.entity.User;
 import com.library.librarymanagement.request.LoginRequest;
 import com.library.librarymanagement.request.RegisterRequest;
@@ -115,6 +116,12 @@ public class UserRestController {
     public User findUserById(@PathVariable int id) 
     { 
         return userService.findUserById(id);
+    } 
+
+    @GetMapping("/regulation") 
+    public Regulation getRegulation() 
+    {
+        return userService.getRegulation();
     }
     
 

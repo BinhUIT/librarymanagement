@@ -15,7 +15,9 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
+import com.library.librarymanagement.entity.Regulation;
 import com.library.librarymanagement.entity.User;
+import com.library.librarymanagement.repository.ReulationRepository;
 import com.library.librarymanagement.repository.UserRepository;
 import com.library.librarymanagement.request.LoginRequest;
 import com.library.librarymanagement.request.RegisterRequest;
@@ -38,6 +40,8 @@ public class UserService {
     private JavaMailSender mailSender; 
     @Autowired 
     private TokenSecurity tokenSecurity;
+    @Autowired 
+    private ReulationRepository regulationRepo;
     
     private Random rand; 
     public UserService() 
@@ -312,5 +316,10 @@ public class UserService {
         Matcher matcher = pattern.matcher(fullname); 
         return !matcher.find();
 
+    } 
+
+    public Regulation getRegulation() 
+    {
+        return regulationRepo.findById(1).orElse(null);
     }
-}
+} 

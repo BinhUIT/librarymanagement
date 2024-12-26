@@ -39,7 +39,8 @@ public class BorrowingCardDetail {
         CANCELLED,
         BORROWING,
         RETURNED,
-        RENEWAL
+        RENEWAL,
+        DESTROY
     }
 
     public BorrowingCardDetail() 
@@ -114,6 +115,7 @@ public class BorrowingCardDetail {
             break; 
             case Status.RENEWAL: isValidValue= (this.status==Status.BORROWING);
             break;
+            case Status.DESTROY: isValidValue=true;
             
             default: isValidValue= false;
         };

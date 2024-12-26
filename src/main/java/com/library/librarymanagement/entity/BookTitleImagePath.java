@@ -59,6 +59,9 @@ public final class BookTitleImagePath {
     @Column(name="ENABLE", columnDefinition = "BOOLEAN") 
     private boolean enable;
 
+    @Column(name="BORROWTIME", columnDefinition = "INT") 
+    private int borrowTime;
+
     @Autowired(required = true)
     private BookTitleImagePath() {
     }
@@ -69,7 +72,8 @@ public final class BookTitleImagePath {
         this.type = type;
         this.author = author;
         this.imagePath = imagePath; 
-        this.enable=true;
+        this.enable=true; 
+        this.borrowTime=0;
     } 
     public BookTitleImagePath(int id,String name, BookTypeImagePath type, String author, String imagePath, String nxb, int year, String language, int pageAmount, String review) 
     {
@@ -86,6 +90,7 @@ public final class BookTitleImagePath {
         this.amount=0;
         this.amountRemaining=0; 
         this.enable=true;
+        this.borrowTime=0;
     }
     public BookTitleImagePath(int id, String name, BookTypeImagePath type, String author, String imagePath) 
     { 
@@ -96,7 +101,25 @@ public final class BookTitleImagePath {
         this.imagePath = imagePath; 
         this.amount=0; 
         this.amountRemaining=0; 
-        this.enable=true;
+        this.enable=true; 
+        this.borrowTime=0;
+    } 
+    public BookTitleImagePath(int id, String name, BookTypeImagePath type,int amount, int amountRemaining, String author, String nxb, int year, String language, int pageAmount, String review, boolean enable, int borrowTime, String imagePath)
+    {
+        this.id=id;
+        this.name = name;
+        this.type = type;
+        this.author = author;
+        this.imagePath = imagePath;
+        this.nxb=nxb;
+        this.year=year;
+        this.language=language;
+        this.pageAmount=pageAmount;
+        this.review=review;
+        this.amount=amount;
+        this.amountRemaining=amountRemaining; 
+        this.enable=enable;
+        this.borrowTime=borrowTime;
     }
     public String getNxb() 
     {
@@ -198,5 +221,12 @@ public final class BookTitleImagePath {
     public void setEnable(boolean enable) 
     {
         this.enable=enable;
+    } 
+    public int getBorrowTime() 
+    {
+        return this.borrowTime;
+    } 
+    public void setBorrowTime(int borrowTime) {
+        this.borrowTime = borrowTime;
     }
 }
