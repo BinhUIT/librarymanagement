@@ -28,8 +28,12 @@ public class Service {
 
     @ManyToOne 
     @JoinColumn(name="SERVICETYPEID", columnDefinition="INT", referencedColumnName="SERVICETYPEID") 
-    private ServiceType serviceType; 
+    private ServiceType serviceType;  
 
+    @Column(name="REMINDTAKE", columnDefinition = "BOOLEAN") 
+    private boolean remindTake;
+    @Column(name="REMINDRETURN", columnDefinition = "BOOLEAN") 
+    private boolean remindReturn;
     public Service() 
     {
 
@@ -40,8 +44,35 @@ public class Service {
         this.serviceId=serviceId; 
         this.reader=reader; 
         this.implementDate=implementDate; 
-        this.serviceType=serviceType; 
+        this.serviceType=serviceType;  
+        this.remindTake=false;
+        this.remindReturn=false;
+    }  
+    public Service(int serviceId, User reader, Date implementDate, ServiceType serviceType, boolean remindTake,boolean remindReturn) 
+    {
+        this.serviceId=serviceId; 
+        this.reader=reader; 
+        this.implementDate=implementDate; 
+        this.serviceType=serviceType;  
+        this.remindTake=remindTake;
+        this.remindReturn=remindReturn;
     } 
+    public boolean getRemindTake() 
+    {
+        return this.remindTake;
+    } 
+    public boolean getRemindReturn() 
+    {
+        return this.remindReturn;
+    } 
+    public void setRemindTake(boolean remindTake)
+    {
+        this.remindTake= remindTake;
+    } 
+    public void setRemindReturn(boolean remindReturn) 
+    {
+        this.remindReturn= remindReturn;
+    }
     public int getServiceId() 
     {
         return this.serviceId;

@@ -83,11 +83,13 @@ public class Sceduling {
                         isSendMail=true;
                     } 
                     else {
-                        if(daysBetween==regulation.getDaysToTakeBook()) 
+                        if(daysBetween==regulation.getDaysToTakeBook()&&!listService.get(i).getRemindTake()) 
                         {
                             String content="Nhắc nhở lấy sách";
                             String subjext="Bạn còn 1 ngày để lấy sách, nếu không lấy thì các sách bạn đã đăng ký mượn sẽ bị hủy và trả về cho thư viện";
-                            userService.sendEmail(listService.get(i).getReader(), content, subjext); 
+                            userService.sendEmail(listService.get(i).getReader(), content, subjext);  
+                            listService.get(i).setRemindTake(true); 
+                            serviceRepo.save( listService.get(i));
                             break;
                         }
                     }
@@ -99,6 +101,7 @@ public class Sceduling {
             {
                 String content="Đã hủy phiếu mượn";
                 String subjext="Phiếu mượn của bạn đã bị hủy do bạn không đến lấy sách đúng hạn";
+                
                 userService.sendEmail(listService.get(i).getReader(), content, subjext); 
             }
         }
@@ -139,17 +142,21 @@ public class Sceduling {
                 {
                     
                     Date currentDate= new Date();
-                    Date sendDate = listBorrowDetail.get(j).getExpireDate();
-                    LocalDate startDate= sendDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate(); 
+                    
+                    LocalDate startDate= listBorrowDetail.get(j).getExpireDate().toLocalDate();
                     LocalDate endDate = currentDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
                     int daysBetween = (int)ChronoUnit.DAYS.between(startDate, endDate); 
-                    if(daysBetween<2) 
+                    if(daysBetween<2&&!listService.get(i).getRemindReturn()) 
                     {
-                        String content="Nhắc nhở trả sáchsách";
-                        String subjext="Bạn sắp đến hạn trả sách, vui lòng mang các sách đã mượn đến thư viện trả đúng hạn hoặc gia hạn thêmthêm";
-                        userService.sendEmail(listService.get(i).getReader(), content, subjext); 
+                        String content="Nhắc nhở trả sách";
+                        String subjext="Bạn sắp đến hạn trả sách, vui lòng mang các sách đã mượn đến thư viện trả đúng hạn hoặc gia hạn thêm"; 
+                        listService.get(i).setRemindReturn(true);
+                        serviceRepo.save(listService.get(i));
+                        userService.sendEmail(listService.get(i).getReader(), content, subjext);  
+                        break;
+
                     } 
-                    break;
+                    
                 } 
                 
             }
@@ -162,6 +169,7 @@ public class Sceduling {
         checkDaysToTakeBook(); 
         checkDayToResponseRenewal(); 
         checkDayToReturnBook();
+        System.out.println("Auto");
         
     }
 }
