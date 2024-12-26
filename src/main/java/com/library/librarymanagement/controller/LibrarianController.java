@@ -563,6 +563,21 @@ public class LibrarianController {
         return librarianService.updateRegulation(regulation);
     }
 
+    @GetMapping("/librarian/checkCanSold/{id}") 
+    public ResponseEntity<Object> checkCanSold(@RequestHeader("Authorization") String authHeader, @PathVariable int id) 
+    {
+        int userId = tokenSecurity.getUserIdAndCheckLibrarian(authHeader);
+        if(userId<=-1) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } 
+        if(!tokenSecurity.userExist(userId))  
+        { 
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } 
+        return librarianService.checkCanSell(id);
+    }
+
 
 
 

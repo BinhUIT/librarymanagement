@@ -307,13 +307,20 @@ public class LibrarianService {
                 listFail.add(detailRequest.getBookId());
                 continue;
             }   
-            int readeyStatus=0;
-            BookStatus readyStatus = bookStatusRepo.findById((byte)readeyStatus).orElse(null);
-            if(book.getStatus().getId()!=readyStatus.getId()) 
+            
+            if(book.getStatus().getId()!=(byte)0&&book.getStatus().getId()!=1) 
             { 
                 listFail.add(detailRequest.getBookId()); 
                 continue;
             } 
+            if(book.getStatus().getId()==(byte)1) 
+            {
+                if(book.getTitle().getAmountRemaining()==0) 
+                {
+                    listFail.add(detailRequest.getBookId()); 
+                    continue;
+                }
+            }
     
             SellBookBillDetail newDetail = new SellBookBillDetail(Integer.MAX_VALUE,newSellBookBill, book, detailRequest.getPrice());
             listDetail.add(newDetail);
@@ -321,24 +328,38 @@ public class LibrarianService {
         } 
         if(!listFail.isEmpty()) 
         { 
-            String responseString = "Fail to create bill, books with id: "; 
-            for(int i=0;i<listFail.size();i++) 
-            {  
-                if(i==0) 
-                {
-                    responseString +=Integer.toString(i);
-                } 
-                else { 
-                    responseString +=","+Integer.toString(i);
-                }
-            } 
-            return new ResponseEntity<>(responseString, HttpStatus.BAD_REQUEST);
+            String responseString = "Fail to create bill"; 
+             
+            return new ResponseEntity<>(responseString, HttpStatus.OK);
         }  
         sellBookBillRepo.save(newSellBookBill);
         for(SellBookBillDetail i: listDetail) 
         { 
             BookImagePath soldBook = i.getBook();
-            BookTitleImagePath bookTitle = soldBook.getTitle(); 
+            BookTitleImagePath bookTitle = soldBook.getTitle();
+            if(soldBook.getStatus().getId()==(byte)1) 
+            {
+                List<BorrowingCardDetail> borrowDetail = borrowingCardDetailRepo.findByBook(soldBook);
+                for(int j=0;j<borrowDetail.size();j++) 
+                {
+                    if(borrowDetail.get(j).getStatus()==Status.PENDING) 
+                    {
+                        List<BookImagePath> listBookReady = bookRepo.findByTitle(bookTitle);
+                        for(int g=0;g<listBookReady.size();g++) 
+                        {
+                            if(listBookReady.get(g).getStatus().getId()==(byte)0&&listBookReady.get(g).getIsUsable()==true) 
+                            {
+                                borrowDetail.get(j).setBook(listBookReady.get(g)); 
+                                listBookReady.get(g).setStatus(bookStatusRepo.findById((byte)1).orElse(null));
+                                bookRepo.save(listBookReady.get(g));
+                                borrowingCardDetailRepo.save(borrowDetail.get(j));
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                }
+            } 
             bookTitle.setAmount(bookTitle.getAmount()-1); 
             bookTitle.setAmountRemaining(bookTitle.getAmountRemaining()-1);  
             Integer status=2;
@@ -909,6 +930,36 @@ public class LibrarianService {
         return new ResponseEntity<>("Success", HttpStatus.OK);
     }
     
+    public ResponseEntity<Object> checkCanSell(int bookId) 
+    {
+        BookImagePath book = bookRepo.findById(bookId).orElse(null);
+        if(book==null||book.getIsUsable()==false||book.getStatus().getId()==(byte)2) 
+        {
+            return new ResponseEntity<>(new Object(){
+                public String message="Không thể bán";
+                
+            }, HttpStatus.OK);
+        }
+        if(book.getStatus().getId()==(byte)0) 
+        {
+            return new ResponseEntity<>(book, HttpStatus.OK);
+        }
+        if(book.getStatus().getId()==(byte)1) 
+        {
+            if(book.getTitle().getAmountRemaining()==0) 
+            {
+                return new ResponseEntity<>(new Object(){
+                    public String message="Sách đang được chờ lấy và không có sách thay thế";
+                    
+                }, HttpStatus.OK);
+            }
+            return new ResponseEntity<>(book, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(new Object(){
+            public String message="Sách đang được mượn, không thể bán";
+            
+        }, HttpStatus.OK);
+    }
 
     
 
