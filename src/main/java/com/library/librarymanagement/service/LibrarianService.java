@@ -676,7 +676,7 @@ public class LibrarianService {
             int penaltyId= penaltyRepo.findAll().size();
             if(penaltyId==0) 
             {
-                Penalty penalty = new Penalty(0, "Trả sách trễ", borrowingCardDetail.getService().getReader(),price);
+                Penalty penalty = new Penalty(1, "Trả sách trễ", borrowingCardDetail.getService().getReader(),price, new Date());
                 penaltyRepo.save(penalty);
             } 
             else {

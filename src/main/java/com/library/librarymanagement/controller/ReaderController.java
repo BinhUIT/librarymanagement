@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.library.librarymanagement.entity.BorrowingCardDetail;
 import com.library.librarymanagement.entity.CartDetail;
 import com.library.librarymanagement.entity.Notification;
+import com.library.librarymanagement.entity.Penalty;
 import com.library.librarymanagement.request.AddCartDetailRequest;
 import com.library.librarymanagement.request.BorrowingRequest;
 import com.library.librarymanagement.request.CartDetailUpdateRequest;
@@ -206,6 +207,18 @@ public class ReaderController {
 
         } 
         return readerService.sendRenewalRequest(id,request);
+    }
+
+    @GetMapping("/reader/allPenalty") 
+    public ResponseEntity<List<Penalty>> getAllPenalty(@RequestHeader("Authorization") String authHeader) 
+    {
+        if(authHeader==null||!authHeader.startsWith("Bearer ") || !tokenSecurity.checkToken(authHeader.substring(7))) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+
+        } 
+        int userId = tokenSecurity.extractUserId(authHeader.substring(7));
+        return readerService.getAllPenalty(userId);
     }
 
 

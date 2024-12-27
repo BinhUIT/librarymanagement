@@ -1,5 +1,7 @@
 package com.library.librarymanagement.entity;
 
+import java.util.Date;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -27,25 +29,30 @@ public class Penalty {
     private User reader;
 
     @Column(name="MONEY", columnDefinition = "INT") 
-    private int money; 
+    private int money;  
+
+    @Column(name="IMPLEMENTDATE", columnDefinition = "DATE") 
+    private Date implementDate;
 
     public Penalty() 
     {
 
     } 
-    public Penalty(int id, String content, User reader, int money) 
+    public Penalty(int id, String content, User reader, int money, Date implementDate) 
     {
         this.id=id;
         this.content=content;
         this.reader=reader;
-        this.money= money;
+        this.money= money; 
+        this.implementDate= implementDate;
     } 
 
     public Penalty(String content, User reader, int money) 
     {
         this.content=content;
         this.reader= reader;
-        this.money= money;
+        this.money= money; 
+        this.implementDate= new Date();
     }
 
     public int getId() 
@@ -67,5 +74,9 @@ public class Penalty {
     public void setContent(String content) 
     {
         this.content= content;
+    } 
+    public Date getImplementDate() 
+    {
+        return this.implementDate;
     }
 }

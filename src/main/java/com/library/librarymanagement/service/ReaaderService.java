@@ -17,6 +17,7 @@ import com.library.librarymanagement.entity.BookTitleImagePath;
 import com.library.librarymanagement.entity.BorrowingCardDetail;
 import com.library.librarymanagement.entity.CartDetail;
 import com.library.librarymanagement.entity.Notification;
+import com.library.librarymanagement.entity.Penalty;
 import com.library.librarymanagement.entity.RenewalCardDetail;
 import com.library.librarymanagement.entity.RenewalDetail;
 import com.library.librarymanagement.entity.ServiceType;
@@ -29,6 +30,7 @@ import com.library.librarymanagement.repository.BookTitleRepository;
 import com.library.librarymanagement.repository.BorrowingCardDetailRepository;
 import com.library.librarymanagement.repository.CartDetailRepository;
 import com.library.librarymanagement.repository.NotificationRepository;
+import com.library.librarymanagement.repository.PenaltyRepository;
 import com.library.librarymanagement.repository.RenewalDetailRepository;
 import com.library.librarymanagement.repository.ServiceRepository;
 import com.library.librarymanagement.repository.ServiceTypeRepository;
@@ -77,6 +79,8 @@ public class ReaaderService {
     @Autowired 
    private UnlockRequestRepository unlockRequestRepo;
    
+   @Autowired 
+   private PenaltyRepository penaltyRepo;
    
 
    public void sendNotification(int readerId, Date sendDate, String message, String subject)  
@@ -418,6 +422,16 @@ public class ReaaderService {
         borrowingDetailRepo.save(borrowingCardDetail); 
         System.out.println("Renewal success"); 
         return new ResponseEntity<>("Success ", HttpStatus.OK);
+   }
+
+   public ResponseEntity<List<Penalty>> getAllPenalty(int userId) 
+   {
+        User reader= userRepo.findById(userId).orElse(null);
+        if(reader==null||reader.getEnable()==false) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        } 
+        return new ResponseEntity<>(penaltyRepo.findByReader(reader), HttpStatus.OK);
    }
 
    
