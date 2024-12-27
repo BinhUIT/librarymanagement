@@ -926,6 +926,7 @@ public class LibrarianService {
         reg.setDaysToResponseRenewal(regulation.getDaysToResponseRenewal()); 
         reg.setDaysToTakeBook(regulation.getDaysToTakeBook()); 
         reg.setDefaultBorrowingDays(regulation.getDefaultBorrowingDays()); 
+        reg.setDaysToLockUser(regulation.getDaysToLockUser());
         regulationRepo.save(reg);
         return new ResponseEntity<>("Success", HttpStatus.OK);
     }

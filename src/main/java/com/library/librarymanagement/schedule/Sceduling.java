@@ -17,6 +17,7 @@ import com.library.librarymanagement.entity.BookTitleImagePath;
 import com.library.librarymanagement.entity.BorrowingCardDetail;
 import com.library.librarymanagement.entity.Regulation;
 import com.library.librarymanagement.entity.RenewalDetail;
+import com.library.librarymanagement.entity.User;
 import com.library.librarymanagement.entity.BorrowingCardDetail.Status;
 import com.library.librarymanagement.repository.BookRepository;
 import com.library.librarymanagement.repository.BookStatusRepository;
@@ -25,6 +26,7 @@ import com.library.librarymanagement.repository.BorrowingCardDetailRepository;
 import com.library.librarymanagement.repository.RenewalDetailRepository;
 import com.library.librarymanagement.repository.ReulationRepository;
 import com.library.librarymanagement.repository.ServiceRepository;
+import com.library.librarymanagement.repository.UserRepository;
 import com.library.librarymanagement.response.BorrowResponse;
 import com.library.librarymanagement.service.UserService;
 
@@ -52,7 +54,10 @@ public class Sceduling {
     private ReulationRepository regulationRepo; 
 
     @Autowired
-    private BookStatusRepository statusRepo;
+    private BookStatusRepository statusRepo; 
+
+    @Autowired 
+    private UserRepository userRepo;
     private void checkDaysToTakeBook() throws UnsupportedEncodingException, MessagingException 
     { 
         Regulation regulation= regulationRepo.findById(1).orElse(null);
@@ -163,12 +168,48 @@ public class Sceduling {
             
         }
     }
+    private void checkDayToLockUser() throws UnsupportedEncodingException, MessagingException 
+    {
+        Regulation regulation= regulationRepo.findById(1).orElse(null);
+        List<BorrowingCardDetail> listBorrowingCardDetails = borrowingDetailRepo.findAll();
+        for(int i=0;i<listBorrowingCardDetails.size();i++) 
+        {
+            if(listBorrowingCardDetails.get(i).getStatus()!=Status.RENEWAL&&listBorrowingCardDetails.get(i).getStatus()!=Status.BORROWING)
+            {
+                continue;
+            }
+            Date currentDate= new Date(); 
+            LocalDate startDate= listBorrowingCardDetails.get(i).getExpireDate().toLocalDate();
+            LocalDate endDate = currentDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate(); 
+            int daysBetween = (int)ChronoUnit.DAYS.between(startDate, endDate);  
+            if(daysBetween>regulation.getDaysToLockUser())
+            {
+                BookImagePath book = listBorrowingCardDetails.get(i).getBook();
+                book.setIsUsable(false);
+                BookTitleImagePath bookTitle = book.getTitle();
+                bookTitle.setAmountRemaining(bookTitle.getAmountRemaining()-1); 
+                bookTitle.setAmount(bookTitle.getAmount()-1); 
+                User user = listBorrowingCardDetails.get(i).getService().getReader();
+                user.setEnable(false); 
+                listBorrowingCardDetails.get(i).updateStatus(Status.DESTROY);
+                bookRepo.save(book);
+                bookTitleRepo.save(bookTitle);
+                userRepo.save(user);
+                borrowingDetailRepo.save(listBorrowingCardDetails.get(i));
+                String content="Bạn đã bị khóa tài khoản";
+                String subject ="Bạn đã bị khóa tài khoản vì trả sách trễ";
+                userService.sendEmail(user, subject, content);
+            }
+
+        }
+    }
     @Scheduled(fixedRate = 1000000)  
     public void scheduleDatabase() throws UnsupportedEncodingException, MessagingException 
     {
         checkDaysToTakeBook(); 
         checkDayToResponseRenewal(); 
-        checkDayToReturnBook();
+        checkDayToReturnBook(); 
+        checkDayToLockUser();
         System.out.println("Auto");
         
     }

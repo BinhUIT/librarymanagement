@@ -24,19 +24,23 @@ public class Regulation {
     private int daysToTakeBook; 
 
     @Column (name="DAYSTORESPONSERENEWAL", columnDefinition = "INT") 
-    private int daysToResponseRenewal;
+    private int daysToResponseRenewal; 
+
+    @Column(name="DAYSTOLOCKUSER", columnDefinition = "INT") 
+    private int daysToLockUser;
 
     public Regulation() 
     {
 
     } 
-    public Regulation(int id, int defaultBorrowingDays, int moneyLatePerDay, int daysToTakeBook, int daysToResponseRenewal) 
+    public Regulation(int id, int defaultBorrowingDays, int moneyLatePerDay, int daysToTakeBook, int daysToResponseRenewal, int daysToLockUser) 
     {
         this.id=id;
         this.defaultBorrowingDays= defaultBorrowingDays;
         this.moneyLatePerDay= moneyLatePerDay;
         this.daysToTakeBook= daysToTakeBook; 
-        this.daysToResponseRenewal= daysToResponseRenewal;
+        this.daysToResponseRenewal= daysToResponseRenewal; 
+        this.daysToLockUser = daysToLockUser;
     } 
 
     public int getId() 
@@ -75,6 +79,14 @@ public class Regulation {
     public void setDaysToResponseRenewal(int daysToResponseRenewal) 
     {
         this.daysToResponseRenewal= daysToResponseRenewal;
+    } 
+    public int getDaysToLockUser() 
+    {
+        return this.daysToLockUser;
+    } 
+    public void setDaysToLockUser(int daysToLockUser) 
+    {
+        this.daysToLockUser= daysToLockUser;
     }
 
 
