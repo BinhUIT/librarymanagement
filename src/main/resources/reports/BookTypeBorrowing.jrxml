@@ -20,7 +20,7 @@
 			<rightPen lineWidth="0.5" lineColor="#000000"/>
 		</box>
 	</style>
-	<style name="Table_CH" mode="Opaque" backcolor="#BFE1FF">
+	<style name="Table_CH" mode="Opaque" backcolor="#8AC4FF">
 		<box>
 			<pen lineWidth="0.5" lineColor="#000000"/>
 			<topPen lineWidth="0.5" lineColor="#000000"/>
@@ -74,15 +74,9 @@ ORDER BY library.booktype.`NAME` ASC]]></query>
 			<property name="com.jaspersoft.studio.field.label" value="BookTypeAmount"/>
 		</field>
 		<variable name="TotalBookTypesAmount" calculation="Sum" class="java.lang.Long">
-			<expression><![CDATA[$V{BookTypeAmount_COUNT} > 0 ? $F{BookTypeAmount}: Long.valueOf(0)]]></expression>
+			<expression><![CDATA[$F{BookTypeAmount}]]></expression>
 			<initialValueExpression><![CDATA[Long.valueOf(0)]]></initialValueExpression>
 		</variable>
-		<group name="BookTypeName">
-			<expression><![CDATA[$F{BookTypeName}]]></expression>
-		</group>
-		<group name="BookTypeAmount">
-			<expression><![CDATA[$F{BookTypeAmount}]]></expression>
-		</group>
 	</dataset>
 	<parameter name="ReportStartDate" class="java.sql.Date">
 		<defaultValueExpression><![CDATA[new java.util.Date()]]></defaultValueExpression>
