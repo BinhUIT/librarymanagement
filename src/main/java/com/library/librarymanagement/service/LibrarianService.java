@@ -876,6 +876,10 @@ public class LibrarianService {
         User reader = userRepo.findById(borrowDetail.getService().getReader().getUserId()).orElse(null);
         reader.setEnable(false);  
         borrowingCardDetailRepo.save(borrowDetail);
+        if(bookTitle.getEnable()==false||bookTitle.getType().getEnable()==false) 
+        {
+            book.setIsUsable(false);
+        }
         bookRepo.save(book);
         bookTitleRepo.save(bookTitle);
         userRepo.save(reader);

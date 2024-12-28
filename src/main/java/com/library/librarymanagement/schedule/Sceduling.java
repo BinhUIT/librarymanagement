@@ -79,10 +79,15 @@ public class Sceduling {
                     {
                         listBorrowDetail.get(j).updateStatus(Status.CANCELLED);
                         borrowingDetailRepo.save(listBorrowDetail.get(j));
-                        BookImagePath book = listBorrowDetail.get(j).getBook();
+                        BookImagePath book = listBorrowDetail.get(j).getBook(); 
+                        BookTitleImagePath bookTitle= book.getTitle();
+                        if(bookTitle.getEnable()==false||bookTitle.getType().getEnable()==false) 
+                        {
+                            book.setIsUsable(false);
+                        }
                         book.setStatus(statusRepo.findById((byte)0).orElse(null)); 
                         bookRepo.save(book);
-                        BookTitleImagePath bookTitle= book.getTitle();
+                        
                         bookTitle.setAmountRemaining(bookTitle.getAmountRemaining()+1); 
                         bookTitleRepo.save(bookTitle); 
                         isSendMail=true;
