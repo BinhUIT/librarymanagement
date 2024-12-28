@@ -52,4 +52,12 @@ public final class UpdateBorrowingCardDetailRequest {
     {
         return this.status;
     }
+    public Integer getServiceId() 
+    {
+        return this.serviceId;
+    } 
+    public Set<Integer> getBooksId() 
+    {
+        return this.booksId;
+    }
 }

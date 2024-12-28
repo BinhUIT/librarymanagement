@@ -23,19 +23,38 @@ public final class BookTypeImagePath {
     @Column(name = "ImagePath", columnDefinition = "varchar(100)", nullable = false, unique = true)
     private String imagePath = null;
 
+    @Column(name="ENABLE", columnDefinition = "BOOLEAN") 
+    private boolean enable;
     @Autowired(required = true)
     private BookTypeImagePath() {
     }
 
     public BookTypeImagePath(final String name, final String imagePath) {
         this.name = name;
-        this.imagePath = imagePath;
+        this.imagePath = imagePath; 
+        this.enable=true;
     } 
     public BookTypeImagePath(short id, String name, String imagePath) 
     { 
         this.id=id; 
         this.name=name; 
-        this.imagePath=imagePath;
+        this.imagePath=imagePath; 
+        this.enable=true;
+    } 
+    public BookTypeImagePath(short id, String name, String imagePath, boolean enable) 
+    { 
+        this.id=id; 
+        this.name=name; 
+        this.imagePath=imagePath; 
+        this.enable= enable;
+    }
+    public boolean getEnable() 
+    {
+        return this.enable;
+    } 
+    public void setEnable(boolean enable) 
+    {
+        this.enable= enable;
     }
 
     public Short getId() {

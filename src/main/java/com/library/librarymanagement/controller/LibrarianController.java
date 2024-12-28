@@ -576,6 +576,34 @@ public class LibrarianController {
             return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
         } 
         return librarianService.checkCanSell(id);
+    } 
+    @DeleteMapping("/librarian/delete_book_title/{id}")
+    public ResponseEntity<String> deleteBookTitle(@RequestHeader("Authorization") String authHeader, @PathVariable int id) 
+    {
+        int userId = tokenSecurity.getUserIdAndCheckLibrarian(authHeader);
+        if(userId<=-1) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } 
+        if(!tokenSecurity.userExist(userId))  
+        { 
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } 
+        return librarianService.deleteBookTitle(id);
+    } 
+    @DeleteMapping("/librarian/delete_book_type/{id}") 
+    public ResponseEntity<String> deleteBookType(@RequestHeader("Authorization") String authHeader, @PathVariable short id) 
+    {
+        int userId = tokenSecurity.getUserIdAndCheckLibrarian(authHeader);
+        if(userId<=-1) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } 
+        if(!tokenSecurity.userExist(userId))  
+        { 
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        }  
+        return librarianService.deleteBookType(id);
     }
 
 

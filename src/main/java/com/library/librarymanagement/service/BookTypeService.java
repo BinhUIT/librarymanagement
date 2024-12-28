@@ -45,8 +45,10 @@ public final class BookTypeService {
         List<BookTypeImageData> result = new ArrayList<>();
 
         if (this.repository != null) {
-            for (final var bookTypeImagePath : this.repository.findAll()) {
+            for (final var bookTypeImagePath : this.repository.findAll()) { 
+                if(bookTypeImagePath.getEnable()) {
                 result.add(new BookTypeImageData(bookTypeImagePath));
+                }
             }
         }
 

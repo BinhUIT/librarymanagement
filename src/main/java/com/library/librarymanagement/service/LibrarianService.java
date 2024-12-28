@@ -593,23 +593,7 @@ public class LibrarianService {
         return new ResponseEntity<>(listRes, HttpStatus.OK);
     }    
 
-    public ResponseEntity<String> deleteABookTitle(int bookTitleId) 
-    {
-        BookTitleImagePath bookTitleImagePath= bookTitleRepo.findById(bookTitleId).orElse(null);
-        if(bookTitleImagePath==null||bookTitleImagePath.getEnable()!=true) 
-        {
-            return new ResponseEntity<>("Cannot delete this book title", HttpStatus.BAD_REQUEST);
-        } 
-        List<BookImagePath> listBookImagePath= bookRepo.findByTitle(bookTitleImagePath);
-        for(int i=0;i<listBookImagePath.size();i++) 
-        {
-            listBookImagePath.get(i).setIsUsable(false); 
-            bookRepo.save(listBookImagePath.get(i));
-        } 
-        bookTitleImagePath.setEnable(false); 
-        bookTitleRepo.save(bookTitleImagePath); 
-        return new ResponseEntity<>("Success", HttpStatus.OK);
-    } 
+    
 
     public ResponseEntity<List<BookImagePath>> getAllBook() 
     {
@@ -661,7 +645,11 @@ public class LibrarianService {
         book.setStatus(bookStatusRepo.findById((byte)0).orElse(null)); 
         bookRepo.save(book);
 
-        BookTitleImagePath bookTitle = book.getTitle();
+        BookTitleImagePath bookTitle = book.getTitle(); 
+        if(bookTitle.getEnable()==false||bookTitle.getType().getEnable()==false) 
+        {
+            book.setIsUsable(false);
+        }
         bookTitle.setAmountRemaining(bookTitle.getAmountRemaining()+1); 
         bookTitleRepo.save(bookTitle); 
         Date currentDate = new Date();
@@ -689,6 +677,7 @@ public class LibrarianService {
             return  new ResponseEntity<>(Integer.toString(penaltyId), HttpStatus.OK);
             
         }
+        
         return new ResponseEntity<>("Success", HttpStatus.OK);
 
     }
@@ -960,8 +949,47 @@ public class LibrarianService {
             public String message="Sách đang được mượn, không thể bán";
             
         }, HttpStatus.OK);
-    }
+    } 
 
+    public ResponseEntity<String> deleteBookTitle(int bookTitleId) 
+    {
+        BookTitleImagePath bookTitleImagePath = bookTitleRepo.findById(bookTitleId).orElse(null);
+        if(bookTitleImagePath==null||bookTitleImagePath.getEnable()==false) 
+        {
+            return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
+        } 
+        List<BookImagePath> listBook = bookRepo.findByTitle(bookTitleImagePath);
+        for(int i=0;i<listBook.size();i++) 
+        {
+            if(listBook.get(i).getStatus().getId()==(byte)0) 
+            {
+                listBook.get(i).setIsUsable(false); 
+                bookRepo.save(listBook.get(i));
+            }
+        }
+        bookTitleImagePath.setEnable(false);
+        bookTitleRepo.save(bookTitleImagePath);
+        return new ResponseEntity<>("Success", HttpStatus.OK);
+    }
+    public ResponseEntity<String> deleteBookType(short bookTypeId) 
+    {
+        BookTypeImagePath bookType= bookTypeRepo.findById(bookTypeId).orElse(null);
+        if(bookType==null||bookType.getEnable()==false) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+        List<BookTitleImagePath> listBookTitle = bookTitleRepo.findByType(bookType);
+        for(int i=0;i<listBookTitle.size();i++) 
+        { 
+            if(listBookTitle.get(i).getEnable()) {
+            deleteBookTitle(listBookTitle.get(i).getId()); 
+            }
+        } 
+        bookType.setEnable(false); 
+        bookTypeRepo.save(bookType);
+        return new ResponseEntity<>("Success", HttpStatus.OK);
+
+    }
     
 
     
