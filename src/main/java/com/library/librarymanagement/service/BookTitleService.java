@@ -26,7 +26,9 @@ import com.library.librarymanagement.entity.BookTitleImagePath;
 import com.library.librarymanagement.entity.BookTypeImagePath;
 import com.library.librarymanagement.repository.BookTitleRepository;
 import com.library.librarymanagement.repository.BookTypeRepository;
-import com.library.librarymanagement.ulti.File; 
+import com.library.librarymanagement.ulti.File;
+import com.library.librarymanagement.ulti.JasperReport;
+
 import java.sql.Date; 
 
 import javax.sql.DataSource;
@@ -233,21 +235,14 @@ public final class BookTitleService {
         } 
         return listBookTitleImageData;
     } 
-     public byte[] exportReportBorrowingByTypeAndDateRange(
-            final Short bookTypeId, final Date startDate, final Date endDate) throws JRException, SQLException {
-        final InputStream reportStream = getClass().getResourceAsStream(
-                "/reports/BookTitleReport/BookTitleBorrowing.jasper");
-        // JasperReport jasperReport = JasperCompileManager.compileReport(
-        // "src/main/resources/reports/BookTitleReport/BookTitleBorrowing.jrxml");
-        final Map<String, Object> parameters = new HashMap<>(3);
+
+    public byte[] exportReportBorrowingByTypeAndDateRange(
+            final Short bookTypeId, final Date startDate, final Date endDate) throws Exception {
+        final HashMap<String, Object> parameters = HashMap.newHashMap(3);
         parameters.put("BookTypeId", bookTypeId);
         parameters.put("ReportStartDate", startDate);
         parameters.put("ReportEndDate", endDate);
-        try (final var connection = dataSource.getConnection()) {
-            final JasperPrint jasperPrint = JasperFillManager.fillReport(reportStream, parameters, connection);
-            final var outputStream = new ByteArrayOutputStream();
-            JasperExportManager.exportReportToPdfStream(jasperPrint, outputStream);
-            return outputStream.toByteArray();
-        }
+
+        return JasperReport.exportReportFromJasperFile("/reports/BookTitleBorrowing.jasper", parameters, dataSource);
     }
 }

@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Collections;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +21,8 @@ import com.library.librarymanagement.request.BookTypeCreationRequest;
 import com.library.librarymanagement.request.BookTypeUpdateRequest;
 import com.library.librarymanagement.entity.BookTypeImageData;
 import com.library.librarymanagement.service.BookTypeService;
-import jakarta.validation.Valid;
+import jakarta.validation.Valid; 
+import java.sql.Date;
 
 @RestController
 @RequestMapping("/book-types")
@@ -79,6 +83,27 @@ public final class BookTypeController {
             return this.service.updateBookType(request);
         } catch (final Exception exception) {
             return false;
+        }
+    } 
+    @GetMapping("/report")
+    public ResponseEntity<byte[]> exportReportBorrowingByTypeAndDateRange(
+            @RequestParam("startDate") String startDateString, @RequestParam("endDate") String endDateString) {
+        try {
+            final var startDate = Date.valueOf(startDateString);
+            final var endDate = Date.valueOf(endDateString);
+
+            final var pdfBytes = this.service.exportReportBorrowingByDateRange(startDate, endDate);
+
+            final var headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDisposition(ContentDisposition.builder("attachment")
+                    .filename("report.pdf")
+                    .build());
+
+            return ResponseEntity.ok().headers(headers).body(pdfBytes);
+        } catch (final Exception exception) {
+            exception.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 

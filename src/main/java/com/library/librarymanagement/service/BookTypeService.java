@@ -1,7 +1,12 @@
 package com.library.librarymanagement.service;
 
 import java.util.List;
+
+import javax.sql.DataSource;
+
 import java.util.ArrayList;
+import java.util.HashMap; 
+import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,16 +24,21 @@ import com.library.librarymanagement.entity.BookTypeImageData;
 import com.library.librarymanagement.entity.BookTypeImagePath;
 import com.library.librarymanagement.repository.BookTypeRepository;
 import com.library.librarymanagement.ulti.File;
+import com.library.librarymanagement.ulti.JasperReport;
+
+
+
 
 @Service
 public final class BookTypeService {
     private final BookTypeRepository repository;
     private PlatformTransactionManager transactionManager;
-
+    private final DataSource dataSource;
     @Autowired(required = true)
-    public BookTypeService(final BookTypeRepository repository, final PlatformTransactionManager transactionManager) {
+    public BookTypeService(final BookTypeRepository repository, final PlatformTransactionManager transactionManager, final DataSource dataSource) {
         this.repository = repository;
         this.transactionManager = transactionManager;
+        this.dataSource= dataSource;
     }
 
     public List<BookTypeImageData> getAllBookTypes() {
@@ -251,6 +261,13 @@ public final class BookTypeService {
     public ResponseEntity<BookTypeImageData> findByName(String name)
     { 
         return new ResponseEntity<>(new BookTypeImageData(repository.findByName(name)), HttpStatus.OK);
+    } 
+     public byte[] exportReportBorrowingByDateRange(final Date startDate, final Date endDate) throws Exception {
+        final HashMap<String, Object> parameters = HashMap.newHashMap(2);
+        parameters.put("ReportStartDate", startDate);
+        parameters.put("ReportEndDate", endDate);
+
+        return JasperReport.exportReportFromJasperFile("/reports/BookTypeBorrowing.jasper", parameters, dataSource);
     }
 
 }
