@@ -97,15 +97,16 @@ public final class BookTitleController {
     }
 
     @GetMapping("/report")
-    public ResponseEntity<byte[]> exportReportBorrowingByTypeAndDateRange(@RequestParam("id") String bookTypeIdString,
+    public ResponseEntity<byte[]> exportReportBorrowingByTypeAndDateRange(
+            @RequestParam(value = "id", required = false) String bookTypeIdString,
             @RequestParam("startDate") String startDateString, @RequestParam("endDate") String endDateString) {
         try {
-            final var bookTypeId = Short.valueOf(bookTypeIdString);
+            final var bookTypeId = bookTypeIdString != null ? Short.valueOf(bookTypeIdString) : null;
             final var startDate = Date.valueOf(startDateString);
             final var endDate = Date.valueOf(endDateString);
+
             final var pdfBytes = this.service.exportReportBorrowingByTypeAndDateRange(bookTypeId, startDate, endDate);
 
-    
             final var headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
             headers.setContentDisposition(ContentDisposition.builder("attachment")
@@ -119,7 +120,3 @@ public final class BookTitleController {
         }
     }
 }
-
-    
-
-
