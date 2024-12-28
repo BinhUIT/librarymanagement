@@ -48,4 +48,8 @@ public final class UpdateBorrowingCardDetailRequest {
             this.booksId = null;
         }
     }
+    public Status getStatus() 
+    {
+        return this.status;
+    }
 }
