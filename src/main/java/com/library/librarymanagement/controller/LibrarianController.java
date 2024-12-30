@@ -32,6 +32,7 @@ import com.library.librarymanagement.request.BookTypeCreateRequest;
 import com.library.librarymanagement.request.BookTypeUpdateRequest;
 import com.library.librarymanagement.request.BorrowOfflineRequest;
 import com.library.librarymanagement.request.BuyBookBillRequest;
+import com.library.librarymanagement.request.CreatePenaltyRequest;
 import com.library.librarymanagement.request.RenewalRequest;
 import com.library.librarymanagement.request.SellBookBillCreateRequest;
 import com.library.librarymanagement.request.UnlockResponse;
@@ -425,6 +426,21 @@ public class LibrarianController {
             return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
         }
         return librarianService.readerTakeBook(id);
+    } 
+
+    @PostMapping("/librarian/create_penalty") 
+    public ResponseEntity<Penalty> createPenaley(@RequestHeader("Authorization") String authHeader, @RequestBody CreatePenaltyRequest request) 
+    {
+        int userId = tokenSecurity.getUserIdAndCheckLibrarian(authHeader);
+        if(userId<=-1) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } 
+        if(!tokenSecurity.userExist(userId))  
+        { 
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } 
+        return librarianService.createPenalty(request);
     } 
 
     @PutMapping("/librarian/returnBook/{id}") 

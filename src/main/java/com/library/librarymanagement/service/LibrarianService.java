@@ -67,6 +67,7 @@ import com.library.librarymanagement.request.BookTypeUpdateRequest;
 import com.library.librarymanagement.request.BorrowOfflineRequest;
 import com.library.librarymanagement.request.BuyBookBillDetailRequest;
 import com.library.librarymanagement.request.BuyBookBillRequest;
+import com.library.librarymanagement.request.CreatePenaltyRequest;
 import com.library.librarymanagement.request.RenewalRequest;
 import com.library.librarymanagement.request.ReturningDetailRequest;
 import com.library.librarymanagement.request.ReturningRequest;
@@ -706,6 +707,20 @@ public class LibrarianService {
         }
         penalty.setContent(request.getContent()); 
         penaltyRepo.save(penalty);
+        return new ResponseEntity<>(penalty, HttpStatus.OK);
+    } 
+
+    public ResponseEntity<Penalty> createPenalty(CreatePenaltyRequest request) 
+    {
+        User reader= userRepo.findById(request.getReaderId()).orElse(null);
+        if(reader==null||reader.getRole()==1) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        } 
+        Penalty penalty= new Penalty(request.getContent(), reader, request.getMoney());
+        penaltyRepo.save(penalty);
+        reader.setPenaltyTime(reader.getPenaltyTime()+1); 
+        userRepo.save(reader);
         return new ResponseEntity<>(penalty, HttpStatus.OK);
     }
 
