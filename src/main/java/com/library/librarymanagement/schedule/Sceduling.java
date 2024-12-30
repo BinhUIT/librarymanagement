@@ -162,7 +162,11 @@ public class Sceduling {
                         String subjext="Bạn sắp đến hạn trả sách, vui lòng mang các sách đã mượn đến thư viện trả đúng hạn hoặc gia hạn thêm"; 
                         listService.get(i).setRemindReturn(true);
                         serviceRepo.save(listService.get(i));
-                        userService.sendEmail(listService.get(i).getReader(), content, subjext);  
+                        if(listService.get(i).getReader().getEnable()==false) 
+                        {
+                            break;
+                        }
+                        userService.sendEmail(listService.get(i).getReader(), subjext, content);  
                         break;
 
                     } 
@@ -208,7 +212,7 @@ public class Sceduling {
 
         }
     }
-    @Scheduled(fixedRate = 1000000)  
+    @Scheduled(fixedRate = 60000)  
     public void scheduleDatabase() throws UnsupportedEncodingException, MessagingException 
     {
         checkDaysToTakeBook(); 

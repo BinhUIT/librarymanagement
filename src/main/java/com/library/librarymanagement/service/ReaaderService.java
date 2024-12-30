@@ -434,6 +434,22 @@ public class ReaaderService {
         return new ResponseEntity<>(penaltyRepo.findByReader(reader), HttpStatus.OK);
    }
 
+   public ResponseEntity<String> cancelBorrowingDetail(int borrowingDetailId) 
+   {
+        BorrowingCardDetail borrowDetail=borrowingDetailRepo.findById(borrowingDetailId).orElse(null);
+        if(borrowDetail==null||borrowDetail.getStatus()!=Status.PENDING) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        } 
+        borrowDetail.updateStatus(Status.CANCELLED);
+        borrowDetail.getBook().setStatus(bookStatusRepo.findById((byte)0).orElse(null));
+        borrowDetail.getBook().getTitle().setAmountRemaining(borrowDetail.getBook().getTitle().getAmountRemaining()+1);
+        borrowingDetailRepo.save(borrowDetail);
+        bookRepo.save(borrowDetail.getBook()); 
+        bookTitleRepo.save(borrowDetail.getBook().getTitle());
+        return new ResponseEntity<>("Success", HttpStatus.OK);
+   }
+
    
 
    

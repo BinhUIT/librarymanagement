@@ -219,6 +219,18 @@ public class ReaderController {
         } 
         int userId = tokenSecurity.extractUserId(authHeader.substring(7));
         return readerService.getAllPenalty(userId);
+    } 
+
+    @PutMapping("/reader/cancel_borrow/{id}") 
+    public ResponseEntity<String> cancelBorrowDetail(@RequestHeader("Authorization") String authHeader, @PathVariable int id) 
+    {
+        if(authHeader==null||!authHeader.startsWith("Bearer ") || !tokenSecurity.checkToken(authHeader.substring(7))) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+
+        } 
+        int userId = tokenSecurity.extractUserId(authHeader.substring(7));
+        return readerService.cancelBorrowingDetail(id);
     }
 
 

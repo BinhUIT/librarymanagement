@@ -639,6 +639,7 @@ public class LibrarianService {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }  
         borrowingCardDetail.updateStatus(Status.RETURNED);
+        LocalDate startLocalDate = borrowingCardDetail.getExpireDate().toLocalDate();
         borrowingCardDetail.setExpireDate(new Date());
         borrowingCardDetailRepo.save(borrowingCardDetail); 
         BookImagePath book = borrowingCardDetail.getBook();
@@ -655,14 +656,14 @@ public class LibrarianService {
         Date currentDate = new Date();
         if(borrowingCardDetail.getExpireDate().before(currentDate)) 
         { 
-            LocalDate startLocalDate = borrowingCardDetail.getExpireDate().toLocalDate();
+            
             LocalDate endLocalDate = currentDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate(); 
             System.out.println("Here"); // Calculate the number of days between the two dates 
             int price = (int)ChronoUnit.DAYS.between(startLocalDate, endLocalDate)*10000;  
             
             
-            int penaltyId= penaltyRepo.findAll().size();
-            if(penaltyId==0) 
+            int penaltyId= penaltyRepo.findAll().size()+1;
+            if(penaltyId==1) 
             {
                 Penalty penalty = new Penalty(1, "Trả sách trễ", borrowingCardDetail.getService().getReader(),price, new Date());
                 penaltyRepo.save(penalty);
