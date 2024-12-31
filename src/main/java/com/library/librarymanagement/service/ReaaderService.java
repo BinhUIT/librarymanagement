@@ -337,7 +337,9 @@ public class ReaaderService {
         {
             ServiceType serviceType= serviceTypeRepo.findById(1).orElse(null);  
             User user= userRepo.findById(userId).orElse(null);
-            
+            BookTitleImagePath bookTitle = listBook.get(i).getTitle();
+            bookTitle.setAmountRemaining(bookTitle.getAmountRemaining()-1); 
+            bookTitleRepo.save(bookTitle);
         int newServiceId= serviceRepo.findAll().size()+1; 
        com.library.librarymanagement.entity.Service service = new com.library.librarymanagement.entity.Service(newServiceId, user, new Date(), serviceType);
        serviceRepo.save(service); 

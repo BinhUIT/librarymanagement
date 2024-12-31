@@ -143,7 +143,7 @@ public final class BookService {
         List<BookImagePath> listRes= new ArrayList<>();
         for(int i=0;i<listBook.size();i++)
         {
-            if(listBook.get(i).getIsUsable()==true) 
+            if(listBook.get(i).getIsUsable()==true||(listBook.get(i).getIsUsable()==false&&listBook.get(i).getStatus().getId()==(byte)3) )
             {
                 listRes.add(listBook.get(i));
             } 

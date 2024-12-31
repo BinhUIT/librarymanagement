@@ -102,8 +102,10 @@ public final class BookTitleService {
         List<BookTitleImageData> listBookTitleImageData = new ArrayList<>();
         for(int i=0;i<listBookTitle.size();i++) 
         {
+            if(listBookTitle.get(i).getEnable()) {
             BookTitleImageData bookTitleImageData= new BookTitleImageData(listBookTitle.get(i)); 
-            listBookTitleImageData.add(bookTitleImageData); 
+            listBookTitleImageData.add(bookTitleImageData);  
+            }
 
         }  
         return new ResponseEntity<>(listBookTitleImageData, HttpStatus.OK);

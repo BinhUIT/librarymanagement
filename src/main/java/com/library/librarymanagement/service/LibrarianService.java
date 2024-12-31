@@ -629,7 +629,8 @@ public class LibrarianService {
     } 
 
     public ResponseEntity<String> readerReturnBook(int borrowingCardDetailId) 
-    { 
+    {  
+        Regulation regulation= regulationRepo.findById(1).orElse(null);
         BorrowingCardDetail borrowingCardDetail = borrowingCardDetailRepo.findById(borrowingCardDetailId).orElse(null);
         if(borrowingCardDetail==null) 
         {
@@ -640,8 +641,10 @@ public class LibrarianService {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }  
         borrowingCardDetail.updateStatus(Status.RETURNED);
-        LocalDate startLocalDate = borrowingCardDetail.getExpireDate().toLocalDate();
+        LocalDate startLocalDate = borrowingCardDetail.getExpireDate().toLocalDate(); 
+        Date expire = borrowingCardDetail.getExpireDate();
         borrowingCardDetail.setExpireDate(new Date());
+
         borrowingCardDetailRepo.save(borrowingCardDetail); 
         BookImagePath book = borrowingCardDetail.getBook();
         book.setStatus(bookStatusRepo.findById((byte)0).orElse(null)); 
@@ -655,12 +658,12 @@ public class LibrarianService {
         bookTitle.setAmountRemaining(bookTitle.getAmountRemaining()+1); 
         bookTitleRepo.save(bookTitle); 
         Date currentDate = new Date();
-        if(borrowingCardDetail.getExpireDate().before(currentDate)) 
+        if(expire.before(currentDate)) 
         { 
             
             LocalDate endLocalDate = currentDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate(); 
             System.out.println("Here"); // Calculate the number of days between the two dates 
-            int price = (int)ChronoUnit.DAYS.between(startLocalDate, endLocalDate)*10000;  
+            int price = -(int)ChronoUnit.DAYS.between(startLocalDate, endLocalDate)*regulation.getMoneyLatePerDay();  
             
             
             int penaltyId= penaltyRepo.findAll().size()+1;
