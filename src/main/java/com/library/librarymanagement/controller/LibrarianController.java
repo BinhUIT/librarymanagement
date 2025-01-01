@@ -622,6 +622,21 @@ public class LibrarianController {
         return librarianService.deleteBookType(id);
     }
 
+    @PutMapping("/librarian/recover/book/{id}") 
+    public ResponseEntity<String> recoverBook(@RequestHeader("Authorization") String authHeader, @PathVariable int id) 
+    {
+        int userId = tokenSecurity.getUserIdAndCheckLibrarian(authHeader);
+        if(userId<=-1) 
+        {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } 
+        if(!tokenSecurity.userExist(userId))  
+        { 
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        }
+        return librarianService.recoverBook(id);
+    }
+
 
 
 
