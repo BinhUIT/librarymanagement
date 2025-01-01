@@ -269,7 +269,7 @@ public final class BookTypeService {
         parameters.put("ReportStartDate", startDate);
         parameters.put("ReportEndDate", endDate);
 
-        return JasperReport.exportReportFromJasperFile("/reports/BookTypeBorrowing.jasper", parameters, dataSource);
+        return JasperReport.exportReportFromJrxmlFile("E:\\New Library\\librarymanagement\\src\\main\\resources\\reports\\BookTypeBorrowing.jrxml", parameters, dataSource);
     }
 
 }

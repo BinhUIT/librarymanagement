@@ -14,35 +14,54 @@
 	<style name="Table_TH" mode="Opaque" backcolor="#F0F8FF">
 		<box>
 			<pen lineWidth="0.5" lineColor="#000000"/>
-			<topPen lineWidth="0.5" lineColor="#000000"/>
-			<leftPen lineWidth="0.5" lineColor="#000000"/>
-			<bottomPen lineWidth="0.5" lineColor="#000000"/>
-			<rightPen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 		</box>
 	</style>
-	<style name="Table_CH" mode="Opaque" backcolor="#BFE1FF">
+	<style name="Table_CH" mode="Opaque" backcolor="#8AC4FF">
 		<box>
 			<pen lineWidth="0.5" lineColor="#000000"/>
-			<topPen lineWidth="0.5" lineColor="#000000"/>
-			<leftPen lineWidth="0.5" lineColor="#000000"/>
-			<bottomPen lineWidth="0.5" lineColor="#000000"/>
-			<rightPen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 		</box>
 	</style>
 	<style name="Table_TD" mode="Opaque" backcolor="#FFFFFF">
 		<box>
 			<pen lineWidth="0.5" lineColor="#000000"/>
-			<topPen lineWidth="0.5" lineColor="#000000"/>
-			<leftPen lineWidth="0.5" lineColor="#000000"/>
-			<bottomPen lineWidth="0.5" lineColor="#000000"/>
-			<rightPen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_GH" mode="Opaque" backcolor="#BFE1FF">
+		<pen lineColor="#030303"/>
+		<box>
+			<pen lineWidth="0.5"/>
+			<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_GF" mode="Opaque" backcolor="#ABD6FF">
+		<box>
+			<pen lineWidth="0.5"/>
+			<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 		</box>
 	</style>
 	<dataset name="BookTitleBorrowingDataset" whenResourceMissingType="Empty" uuid="bf078ff4-7bd1-4874-9ff4-56fc7e47d34e">
 		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Library"/>
 		<parameter name="BookTypeId" class="java.lang.Short">
-			<defaultValueExpression><![CDATA[(short) 0]]></defaultValueExpression>
+			<defaultValueExpression><![CDATA[null]]></defaultValueExpression>
 		</parameter>
 		<parameter name="ReportStartDate" class="java.sql.Date">
 			<defaultValueExpression><![CDATA[new java.util.Date()]]></defaultValueExpression>
@@ -50,8 +69,70 @@
 		<parameter name="ReportEndDate" class="java.sql.Date">
 			<defaultValueExpression><![CDATA[new java.util.Date()]]></defaultValueExpression>
 		</parameter>
-		<query language="SQL"><![CDATA[SELECT library.booktitle.`NAME` AS `BookTitleName`,
-	count(*) AS `BookTitleAmount`
+		<query language="SQL"><![CDATA[SELECT 
+    library.booktype.`NAME` AS `BookTypeName`,
+    library.booktitle.`NAME` AS `BookTitleName`,
+    COUNT(*) AS `BookTitleAmount`
+FROM 
+    library.borrowingcarddetail
+    INNER JOIN library.service 
+        ON library.borrowingcarddetail.`SERVICEID` = library.service.`SERVICEID`
+    INNER JOIN library.book 
+        ON library.borrowingcarddetail.`BOOKID` = library.book.`ID`
+    INNER JOIN library.booktitle 
+        ON library.book.`TITLEID` = library.booktitle.`ID`
+    INNER JOIN library.booktype 
+        ON library.booktitle.`TYPEID` = library.booktype.`ID`
+WHERE 
+	 (($P{BookTypeId} IS NULL) OR (library.booktype.`ID` = $P{BookTypeId}))
+	 AND library.service.`IMPLEMENTDATE` >= $P{ReportStartDate} 
+	 AND library.service.`IMPLEMENTDATE` <= $P{ReportEndDate} 
+	 AND  library.borrowingcarddetail.`Status` IN ('BORROWING', 'RENEWAL', 'RETURNED')
+GROUP BY 
+    library.booktype.`NAME`,
+    library.booktitle.`ID`
+ORDER BY 
+    COUNT(*) OVER (PARTITION BY library.booktype.`NAME`) DESC,
+    library.booktype.`NAME` ASC,
+    COUNT(*) DESC,
+    library.booktitle.`NAME` ASC;
+]]></query>
+		<field name="BookTypeName" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="NAME"/>
+			<property name="com.jaspersoft.studio.field.label" value="BookTypeName"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="booktype"/>
+		</field>
+		<field name="BookTitleName" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="NAME"/>
+			<property name="com.jaspersoft.studio.field.label" value="BookTitleName"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="booktitle"/>
+		</field>
+		<field name="BookTitleAmount" class="java.lang.Long">
+			<property name="com.jaspersoft.studio.field.name" value="BookTitleAmount"/>
+			<property name="com.jaspersoft.studio.field.label" value="BookTitleAmount"/>
+		</field>
+		<variable name="TotalBookTitlesAmount" calculation="Sum" class="java.lang.Long">
+			<expression><![CDATA[$F{BookTitleAmount}]]></expression>
+			<initialValueExpression><![CDATA[Long.valueOf(0)]]></initialValueExpression>
+		</variable>
+		<variable name="SubTotalBookTitlesAmount" resetType="Group" calculation="Sum" resetGroup="BookTypeName" class="java.lang.Long">
+			<expression><![CDATA[$F{BookTitleAmount}]]></expression>
+			<initialValueExpression><![CDATA[Long.valueOf(0)]]></initialValueExpression>
+		</variable>
+		<group name="BookTypeName">
+			<expression><![CDATA[$F{BookTypeName}]]></expression>
+		</group>
+	</dataset>
+	<parameter name="BookTypeId" class="java.lang.Short">
+		<defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+	</parameter>
+	<parameter name="ReportStartDate" class="java.sql.Date">
+		<defaultValueExpression><![CDATA[new java.util.Date()]]></defaultValueExpression>
+	</parameter>
+	<parameter name="ReportEndDate" class="java.sql.Date">
+		<defaultValueExpression><![CDATA[new java.util.Date()]]></defaultValueExpression>
+	</parameter>
+	<query language="SQL"><![CDATA[select  library.booktype.`NAME` as `BookTypeName`
 FROM library.borrowingcarddetail
 	inner join library.service ON 
 	 library.borrowingcarddetail.`SERVICEID` = library.service.`SERVICEID` 
@@ -62,44 +143,10 @@ FROM library.borrowingcarddetail
 	inner join library.booktype ON 
 	 library.booktitle.`TYPEID` = library.booktype.`ID` 
 WHERE 
-	 library.booktype.`ID` = $P{BookTypeId} 
+	 (($P{BookTypeId} IS NULL) OR (library.booktype.`ID` = $P{BookTypeId}))
 	 AND library.service.`IMPLEMENTDATE` >= $P{ReportStartDate} 
 	 AND library.service.`IMPLEMENTDATE` <= $P{ReportEndDate} 
 	 AND  library.borrowingcarddetail.`Status` IN ('BORROWING', 'RENEWAL', 'RETURNED')
-GROUP BY library.booktitle.`ID`
-ORDER BY library.booktitle.`NAME` ASC]]></query>
-		<field name="BookTitleName" class="java.lang.String">
-			<property name="com.jaspersoft.studio.field.name" value="NAME"/>
-			<property name="com.jaspersoft.studio.field.label" value="BookTitleName"/>
-			<property name="com.jaspersoft.studio.field.tree.path" value="booktitle"/>
-		</field>
-		<field name="BookTitleAmount" class="java.lang.Integer">
-			<property name="com.jaspersoft.studio.field.name" value="BookTitleAmount"/>
-			<property name="com.jaspersoft.studio.field.label" value="BookTitleAmount"/>
-		</field>
-		<variable name="TotalBookTitlesAmount" calculation="Sum" class="java.lang.Long">
-			<expression><![CDATA[$V{BookTitleAmount_COUNT} > 0 ? $F{BookTitleAmount} : Long.valueOf(0)]]></expression>
-			<initialValueExpression><![CDATA[Long.valueOf(0)]]></initialValueExpression>
-		</variable>
-		<group name="BookTitleName">
-			<expression><![CDATA[$F{BookTitleName}]]></expression>
-		</group>
-		<group name="BookTitleAmount">
-			<expression><![CDATA[$F{BookTitleAmount}]]></expression>
-		</group>
-	</dataset>
-	<parameter name="BookTypeId" class="java.lang.Short">
-		<defaultValueExpression><![CDATA[(short) 0]]></defaultValueExpression>
-	</parameter>
-	<parameter name="ReportStartDate" class="java.sql.Date">
-		<defaultValueExpression><![CDATA[new java.util.Date()]]></defaultValueExpression>
-	</parameter>
-	<parameter name="ReportEndDate" class="java.sql.Date">
-		<defaultValueExpression><![CDATA[new java.util.Date()]]></defaultValueExpression>
-	</parameter>
-	<query language="SQL"><![CDATA[select  library.booktype.`NAME` as `BookTypeName`
-from  library.booktype 
-where   library.booktype.`ID`  = $P{BookTypeId} 
 order by  library.booktype.`NAME` asc
 limit 1]]></query>
 	<field name="BookTypeName" class="java.lang.String">
@@ -134,7 +181,7 @@ limit 1]]></query>
 		<element kind="frame" uuid="0a5fc4ac-2e39-4b7a-8f96-59f8eb2df66d" mode="Opaque" x="0" y="10" width="555" height="24" forecolor="#B89F7D" backcolor="#000000">
 			<property name="com.jaspersoft.studio.unit.y" value="px"/>
 			<element kind="textField" uuid="4fbebfd3-a184-45af-b7d9-5c3faaf087b5" x="0" y="0" width="294" height="24" forecolor="#FFFFFF" markup="none" fontName="Calibri" fontSize="15.0" textAdjust="StretchHeight" blankWhenNull="true" bold="true" vTextAlign="Middle" style="Column header">
-				<expression><![CDATA["Book Type Name: " + $F{BookTypeName}]]></expression>
+				<expression><![CDATA[($P{BookTypeId} != null) ? ("Book Type Name: " + $F{BookTypeName}) : ("All Book Types")]]></expression>
 			</element>
 			<element kind="textField" uuid="3e7be253-5788-4ae4-923f-c78492074b57" key="" x="300" y="0" width="253" height="24" forecolor="#FFFFFF" backcolor="rgba(3, 2, 2, 0.0)" markup="none" fontName="Calibri" fontSize="15.0" textAdjust="ScaleFont" blankWhenNull="false" bold="true" hTextAlign="Right" vTextAlign="Middle" style="SubTitle">
 				<expression><![CDATA["Date range: " 
@@ -150,9 +197,9 @@ limit 1]]></query>
 		<property name="com.jaspersoft.studio.unit.height" value="px"/>
 	</columnHeader>
 	<detail>
-		<band height="102" splitType="Stretch">
+		<band height="159" splitType="Stretch">
 			<element kind="frame" uuid="b50221b5-8254-440b-8c6f-1f0b138c9259" mode="Opaque" x="0" y="0" width="555" height="61" style="Row">
-				<element kind="component" uuid="e4f2e94e-ce8d-4eec-8476-9be4f0e8f739" x="0" y="0" width="550" height="90">
+				<element kind="component" uuid="e4f2e94e-ce8d-4eec-8476-9be4f0e8f739" x="0" y="0" width="550" height="150">
 					<component kind="table" whenNoDataType="AllSectionsNoDetail">
 						<datasetRun uuid="a7ddeb81-0f38-45ad-8ecf-3fc33b2c3e70" subDataset="BookTitleBorrowingDataset">
 							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
@@ -185,6 +232,22 @@ limit 1]]></query>
 									<box leftPadding="10" rightPadding="10" style="Detail"/>
 								</element>
 							</detailCell>
+							<groupHeader groupName="BookTypeName">
+								<cell height="30" rowSpan="1" style="Table_GH">
+									<element kind="textField" uuid="56c50d2d-e685-4bcb-918c-065f9d305702" mode="Transparent" x="0" y="0" width="450" height="30" fontName="Calibri" fontSize="13.0" linkType="None" linkTarget="Self" bold="true" vTextAlign="Middle">
+										<expression><![CDATA[($F{BookTypeName} != null) ? $F{BookTypeName} : ""]]></expression>
+										<box leftPadding="10" rightPadding="10"/>
+									</element>
+								</cell>
+							</groupHeader>
+							<groupFooter groupName="BookTypeName">
+								<cell height="30" rowSpan="1" style="Table_GF">
+									<element kind="staticText" uuid="36800831-c108-4214-b3ba-300f168e5b5a" mode="Transparent" x="0" y="0" width="450" height="30" fontName="Calibri" fontSize="13.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+										<text><![CDATA[Subtotal]]></text>
+										<box leftPadding="10" rightPadding="10"/>
+									</element>
+								</cell>
+							</groupFooter>
 							<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
 						</column>
 						<column kind="single" uuid="f27f4b4e-373d-4dd4-9771-55b2090c9109" width="100">
@@ -201,11 +264,22 @@ limit 1]]></query>
 								</element>
 							</columnFooter>
 							<detailCell height="30" style="Table_TD">
-								<element kind="textField" uuid="c4e29c3b-92f4-472b-b26b-beed4c021b50" x="0" y="0" width="100" height="30" fontName="Calibri" fontSize="13.0" textAdjust="StretchHeight" pattern="#,##0.###;-#,##0.###" hTextAlign="Right" vTextAlign="Middle" style="Column header">
+								<element kind="textField" uuid="c4e29c3b-92f4-472b-b26b-beed4c021b50" x="0" y="0" width="100" height="30" forecolor="#030000" fontName="Calibri" fontSize="13.0" textAdjust="StretchHeight" pattern="#,##0.###;-#,##0.###" bold="false" hTextAlign="Right" vTextAlign="Middle" style="Column header">
 									<expression><![CDATA[$F{BookTitleAmount}]]></expression>
 									<box leftPadding="10" rightPadding="10" style="Column header"/>
 								</element>
 							</detailCell>
+							<groupHeader groupName="BookTypeName">
+								<cell height="30" rowSpan="1" style="Table_GH"/>
+							</groupHeader>
+							<groupFooter groupName="BookTypeName">
+								<cell height="30" rowSpan="1" style="Table_GF">
+									<element kind="textField" uuid="c15b2655-ba50-454c-b490-6ee3800bcc47" x="0" y="0" width="100" height="30" fontName="Calibri" fontSize="13.0" bold="true" hTextAlign="Right" vTextAlign="Middle">
+										<expression><![CDATA[$V{SubTotalBookTitlesAmount}]]></expression>
+										<box leftPadding="10" rightPadding="10"/>
+									</element>
+								</cell>
+							</groupFooter>
 							<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
 						</column>
 					</component>
