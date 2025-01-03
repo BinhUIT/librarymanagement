@@ -851,6 +851,7 @@ public class LibrarianService {
         int newServiceId = serviceRepo.findAll().size()+1; 
         ServiceType serviceType = serviceTypeRepo.findById(0).orElse(null); 
         com.library.librarymanagement.entity.Service service = new com.library.librarymanagement.entity.Service(newServiceId, reader, new Date(), serviceType);
+        serviceRepo.save(service);
         for(int i=0;i<request.getListBook().size();i++) 
         {  
             BookImagePath book = bookRepo.findById(request.getListBook().get(i)).orElse(null);
@@ -1014,6 +1015,37 @@ public class LibrarianService {
 
     }
     
+
+    public ResponseEntity<String> recoverBook(int bookId) 
+    {
+        BookImagePath book = bookRepo.findById(bookId).orElse(null);
+        if(book==null||book.getStatus().getId()==(byte)2)
+        {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        } 
+        book.setIsUsable(true); 
+        book.setStatus(bookStatusRepo.findById((byte)0).orElse(null));
+        if(book.getTitle().getEnable()==false) 
+        {
+            book.getTitle().setEnable(true); 
+            book.getTitle().setAmount(1); 
+            book.getTitle().setAmountRemaining(1); 
+            bookTitleRepo.save(book.getTitle());
+        } 
+        else {
+            book.getTitle().setAmount(book.getTitle().getAmount()+1); 
+            book.getTitle().setAmountRemaining(book.getTitle().getAmountRemaining()+1); 
+            bookTitleRepo.save(book.getTitle());
+        }
+        if(book.getTitle().getType().getEnable()==false) 
+        {
+            book.getTitle().getType().setEnable(true); 
+            bookTypeRepo.save(book.getTitle().getType());
+        }   
+        bookRepo.save(book);
+        return new ResponseEntity<>("Success", HttpStatus.OK);
+
+    }
 
     
 

@@ -194,6 +194,7 @@ public class UserService {
             return new ResponseEntity<>("User with this name is already exist", HttpStatus.ALREADY_REPORTED); 
         
         } 
+        user.setFullname(request.getFullname());
         user.setAddress(request.getAddress()); 
         user.setPhoneNumber(request.getPhoneNumber()); 
         userRepo.save(user); 
