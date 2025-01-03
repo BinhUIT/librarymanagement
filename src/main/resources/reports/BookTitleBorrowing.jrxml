@@ -160,10 +160,10 @@ limit 1]]></query>
 	<background splitType="Stretch"/>
 	<title height="132" splitType="Stretch">
 		<element kind="frame" uuid="6c6ca4e1-17cd-4913-93d6-5e670ea9ae8a" mode="Opaque" x="0" y="0" width="451" height="95" backcolor="#000000">
-			<element kind="staticText" uuid="a2a2cac8-5a7d-4487-8c54-dab235ce4e21" x="0" y="0" width="370" height="66" fontName="Calibri" bold="false" style="Title">
+			<element kind="staticText" uuid="a2a2cac8-5a7d-4487-8c54-dab235ce4e21" x="0" y="0" width="370" height="66" fontName="Times New Roman" bold="false" style="Title">
 				<text><![CDATA[Library Report]]></text>
 			</element>
-			<element kind="staticText" uuid="8978eac3-c578-41c9-837e-48d2b0184642" x="157" y="66" width="249" height="29" fontName="Calibri" fontSize="22.0" bold="false" style="SubTitle">
+			<element kind="staticText" uuid="8978eac3-c578-41c9-837e-48d2b0184642" x="157" y="66" width="249" height="29" fontName="Times New Roman" fontSize="22.0" bold="false" style="SubTitle">
 				<text><![CDATA[Books borrowed in titles]]></text>
 			</element>
 		</element>
@@ -180,10 +180,10 @@ limit 1]]></query>
 	<pageHeader height="40" splitType="Stretch">
 		<element kind="frame" uuid="0a5fc4ac-2e39-4b7a-8f96-59f8eb2df66d" mode="Opaque" x="0" y="10" width="555" height="24" forecolor="#B89F7D" backcolor="#000000">
 			<property name="com.jaspersoft.studio.unit.y" value="px"/>
-			<element kind="textField" uuid="4fbebfd3-a184-45af-b7d9-5c3faaf087b5" x="0" y="0" width="294" height="24" forecolor="#FFFFFF" markup="none" fontName="Calibri" fontSize="15.0" textAdjust="StretchHeight" blankWhenNull="true" bold="true" vTextAlign="Middle" style="Column header">
+			<element kind="textField" uuid="4fbebfd3-a184-45af-b7d9-5c3faaf087b5" x="0" y="0" width="294" height="24" forecolor="#FFFFFF" markup="none" fontName="Times New Roman" fontSize="15.0" textAdjust="StretchHeight" blankWhenNull="true" bold="true" vTextAlign="Middle" style="Column header">
 				<expression><![CDATA[($P{BookTypeId} != null) ? ("Book Type Name: " + $F{BookTypeName}) : ("All Book Types")]]></expression>
 			</element>
-			<element kind="textField" uuid="3e7be253-5788-4ae4-923f-c78492074b57" key="" x="300" y="0" width="253" height="24" forecolor="#FFFFFF" backcolor="rgba(3, 2, 2, 0.0)" markup="none" fontName="Calibri" fontSize="15.0" textAdjust="ScaleFont" blankWhenNull="false" bold="true" hTextAlign="Right" vTextAlign="Middle" style="SubTitle">
+			<element kind="textField" uuid="3e7be253-5788-4ae4-923f-c78492074b57" key="" x="300" y="0" width="253" height="24" forecolor="#FFFFFF" backcolor="rgba(3, 2, 2, 0.0)" markup="none" fontName="Times New Roman" fontSize="15.0" textAdjust="ScaleFont" blankWhenNull="false" bold="true" hTextAlign="Right" vTextAlign="Middle" style="SubTitle">
 				<expression><![CDATA["Date range: " 
 + new java.text.SimpleDateFormat($V{DateFormatString}).format($P{ReportStartDate}) 
 + " - " 
@@ -215,26 +215,26 @@ limit 1]]></query>
 						</datasetRun>
 						<column kind="single" uuid="05c5d559-a7ea-4875-b09f-599de6da5b83" width="450">
 							<columnHeader height="30" rowSpan="1" style="Table_CH">
-								<element kind="staticText" uuid="8e886b79-8077-4c1f-9c2a-66ca30ccdb36" key="" x="0" y="0" width="450" height="30" fontName="Calibri" fontSize="13.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+								<element kind="staticText" uuid="8e886b79-8077-4c1f-9c2a-66ca30ccdb36" key="" x="0" y="0" width="450" height="30" fontName="Times New Roman" fontSize="13.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
 									<text><![CDATA[Book Title Name]]></text>
 									<box leftPadding="10" rightPadding="10"/>
 								</element>
 							</columnHeader>
 							<columnFooter height="30" rowSpan="1" style="Table_CH">
-								<element kind="staticText" uuid="7c2e70df-1d68-4764-9f37-5c35331e3026" x="0" y="0" width="450" height="30" fontName="Calibri" fontSize="13.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+								<element kind="staticText" uuid="7c2e70df-1d68-4764-9f37-5c35331e3026" x="0" y="0" width="450" height="30" fontName="Times New Roman" fontSize="13.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
 									<text><![CDATA[Total]]></text>
 									<box leftPadding="10" rightPadding="10"/>
 								</element>
 							</columnFooter>
 							<detailCell height="30" style="Table_TD">
-								<element kind="textField" uuid="783caac3-239a-429e-8550-a4a92568f15e" x="0" y="0" width="450" height="30" fontName="Calibri" fontSize="13.0" textAdjust="ScaleFont" blankWhenNull="false" vTextAlign="Middle" style="Detail">
+								<element kind="textField" uuid="783caac3-239a-429e-8550-a4a92568f15e" x="0" y="0" width="450" height="30" fontName="Times New Roman" fontSize="13.0" textAdjust="ScaleFont" blankWhenNull="false" vTextAlign="Middle" style="Detail">
 									<expression><![CDATA[$F{BookTitleName}]]></expression>
 									<box leftPadding="10" rightPadding="10" style="Detail"/>
 								</element>
 							</detailCell>
 							<groupHeader groupName="BookTypeName">
 								<cell height="30" rowSpan="1" style="Table_GH">
-									<element kind="textField" uuid="56c50d2d-e685-4bcb-918c-065f9d305702" mode="Transparent" x="0" y="0" width="450" height="30" fontName="Calibri" fontSize="13.0" linkType="None" linkTarget="Self" bold="true" vTextAlign="Middle">
+									<element kind="textField" uuid="56c50d2d-e685-4bcb-918c-065f9d305702" mode="Transparent" x="0" y="0" width="450" height="30" fontName="Times New Roman" fontSize="13.0" linkType="None" linkTarget="Self" bold="true" vTextAlign="Middle">
 										<expression><![CDATA[($F{BookTypeName} != null) ? $F{BookTypeName} : ""]]></expression>
 										<box leftPadding="10" rightPadding="10"/>
 									</element>
@@ -242,7 +242,7 @@ limit 1]]></query>
 							</groupHeader>
 							<groupFooter groupName="BookTypeName">
 								<cell height="30" rowSpan="1" style="Table_GF">
-									<element kind="staticText" uuid="36800831-c108-4214-b3ba-300f168e5b5a" mode="Transparent" x="0" y="0" width="450" height="30" fontName="Calibri" fontSize="13.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+									<element kind="staticText" uuid="36800831-c108-4214-b3ba-300f168e5b5a" mode="Transparent" x="0" y="0" width="450" height="30" fontName="Times New Roman" fontSize="13.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
 										<text><![CDATA[Subtotal]]></text>
 										<box leftPadding="10" rightPadding="10"/>
 									</element>
@@ -252,19 +252,19 @@ limit 1]]></query>
 						</column>
 						<column kind="single" uuid="f27f4b4e-373d-4dd4-9771-55b2090c9109" width="100">
 							<columnHeader height="30" rowSpan="1" style="Table_CH">
-								<element kind="staticText" uuid="cd0e6d00-0262-4e2b-bc40-8603b4335222" x="0" y="0" width="100" height="30" fontName="Calibri" fontSize="13.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+								<element kind="staticText" uuid="cd0e6d00-0262-4e2b-bc40-8603b4335222" x="0" y="0" width="100" height="30" fontName="Times New Roman" fontSize="13.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
 									<text><![CDATA[Amount]]></text>
 									<box leftPadding="10" rightPadding="10"/>
 								</element>
 							</columnHeader>
 							<columnFooter height="30" rowSpan="1" style="Table_CH">
-								<element kind="textField" uuid="56d281ec-a48d-4c8f-8bf0-e8f76c1b6c25" x="0" y="0" width="100" height="30" fontName="Calibri" fontSize="13.0" pattern="#,##0.###;-#,##0.###" bold="true" hTextAlign="Right" vTextAlign="Middle">
+								<element kind="textField" uuid="56d281ec-a48d-4c8f-8bf0-e8f76c1b6c25" x="0" y="0" width="100" height="30" fontName="Times New Roman" fontSize="13.0" pattern="#,##0.###;-#,##0.###" bold="true" hTextAlign="Right" vTextAlign="Middle">
 									<expression><![CDATA[$V{TotalBookTitlesAmount}]]></expression>
 									<box leftPadding="10" rightPadding="10"/>
 								</element>
 							</columnFooter>
 							<detailCell height="30" style="Table_TD">
-								<element kind="textField" uuid="c4e29c3b-92f4-472b-b26b-beed4c021b50" x="0" y="0" width="100" height="30" forecolor="#030000" fontName="Calibri" fontSize="13.0" textAdjust="StretchHeight" pattern="#,##0.###;-#,##0.###" bold="false" hTextAlign="Right" vTextAlign="Middle" style="Column header">
+								<element kind="textField" uuid="c4e29c3b-92f4-472b-b26b-beed4c021b50" x="0" y="0" width="100" height="30" forecolor="#030000" fontName="Times New Roman" fontSize="13.0" textAdjust="StretchHeight" pattern="#,##0.###;-#,##0.###" bold="false" hTextAlign="Right" vTextAlign="Middle" style="Column header">
 									<expression><![CDATA[$F{BookTitleAmount}]]></expression>
 									<box leftPadding="10" rightPadding="10" style="Column header"/>
 								</element>
@@ -274,7 +274,7 @@ limit 1]]></query>
 							</groupHeader>
 							<groupFooter groupName="BookTypeName">
 								<cell height="30" rowSpan="1" style="Table_GF">
-									<element kind="textField" uuid="c15b2655-ba50-454c-b490-6ee3800bcc47" x="0" y="0" width="100" height="30" fontName="Calibri" fontSize="13.0" bold="true" hTextAlign="Right" vTextAlign="Middle">
+									<element kind="textField" uuid="c15b2655-ba50-454c-b490-6ee3800bcc47" x="0" y="0" width="100" height="30" fontName="Times New Roman" fontSize="13.0" bold="true" hTextAlign="Right" vTextAlign="Middle">
 										<expression><![CDATA[$V{SubTotalBookTitlesAmount}]]></expression>
 										<box leftPadding="10" rightPadding="10"/>
 									</element>
